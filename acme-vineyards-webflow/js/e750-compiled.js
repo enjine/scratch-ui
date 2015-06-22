@@ -205,16 +205,16 @@ function ProductList(el) {
 
 	Object.assign(options, defaults, opts);
 
-	this.collection.fetch(options).then(this.collection.parse, function () {
+	this.collection.fetch(options).then(this.collection.parse, function (reason) {
 		console.error("Parsing Failed! ", _this, _arguments);
 	}).then(function (response) {
 		_this.render(response, _this.el);
-	}, function () {
+	}, function (reason) {
 		console.error("Render Failed! ", _this, _arguments);
-	})["catch"](function () {
+	})["catch"](function (reason) {
 		console.error("Promise Rejected! ", _this, _arguments, document.cookie);
 	})["finally"](function () {
-		console.log("finally", _this, options);
+		console.log("finally", _this, _arguments, options);
 		_this.registerComponents(_this);
 	});
 }
@@ -531,9 +531,9 @@ Object.assign(BaseView.prototype, {
 	render: function render() {},
 
 	registerComponents: function registerComponents(scope) {
-		console.log('registering components', scope);
+		console.log('registering child components for: ', scope);
 
-		var components = undefined.el.children;
+		var components = scope.el.children;
 
 		if (components.length) {
 			console.log(components, typeof components, Object.keys(_components.componentMap));
@@ -557,7 +557,7 @@ Object.assign(BaseView.prototype, {
 				console.error(e);
 			}
 		} else {
-			console.info('No components to register.');
+			console.info('No child components to register.');
 		}
 	}
 });

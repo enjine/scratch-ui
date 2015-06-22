@@ -51,19 +51,19 @@ export function ProductList(el, opts = {}) {
 	Object.assign(options, defaults, opts);
 
 	this.collection.fetch(options)
-		.then(this.collection.parse, () => {
+		.then(this.collection.parse, (reason) => {
 			console.error("Parsing Failed! ", this, arguments);
 		})
 		.then((response) => {
 			this.render(response, this.el);
-		}, () => {
+		}, (reason) => {
 			console.error("Render Failed! ", this, arguments);
 		})
-		.catch(() => {
+		.catch((reason) => {
 			console.error("Promise Rejected! ", this, arguments, document.cookie);
 		})
 		.finally(() => {
-			console.log('finally', this, options);
+			console.log('finally', this, arguments, options);
 			this.registerComponents(this);
 		});
 }
