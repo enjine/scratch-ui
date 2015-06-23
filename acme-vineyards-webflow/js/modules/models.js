@@ -26,13 +26,13 @@ Object.assign(BaseModel.prototype, {
 	 * @param options
 	 * @returns {*}
 	 */
-	fetch: (options) => {
+	fetch: function(options) {
 		// TODO: trigger beforeAsync, beforeFetch
-		console.log('fetch', options);
+		console.log('fetch', this, arguments);
 		return net.http.get(options);
 	},
 
-	parse: (response) => {
+	parse: function(response) {
 		if (Object.keys(response).length > 0) {
 			console.log("Parsing response: ", this, response);
 			return response;
@@ -42,7 +42,7 @@ Object.assign(BaseModel.prototype, {
 		}
 	},
 
-	serialize: () => {}
+	serialize: function() {}
 });
 
 

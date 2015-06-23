@@ -125,6 +125,7 @@ var BaseCollection = function BaseCollection() {
 };
 
 Object.assign(BaseCollection.prototype, {
+	models: [],
 	model: _models.BaseModel,
 	fetch: _models.BaseModel.prototype.fetch,
 	parse: _models.BaseModel.prototype.parse
@@ -176,7 +177,7 @@ function ProductList(el) {
 	var opts = arguments[1] === undefined ? {} : arguments[1];
 
 	Object.assign(this, _views.BaseView.prototype, opts, {
-		render: (function (results, el) {
+		render: (function (results) {
 			var template = _core.jst.getFromDOM("product/simple"),
 			    html = "";
 
@@ -184,7 +185,7 @@ function ProductList(el) {
 				html += template(results[obj]);
 			}
 
-			el.innerHTML = html;
+			this.el.innerHTML = html;
 			return this;
 		}).bind(this)
 
@@ -207,10 +208,10 @@ function ProductList(el) {
 
 	Object.assign(options, defaults, opts);
 
-	this.collection.fetch(options).then(this.collection.parse, function (reason) {
+	this.collection.fetch(options).then(this.collection.parse.bind(this), function (reason) {
 		console.error("Parsing Failed! ", _this, _arguments);
 	}).then(function (response) {
-		_this.render(response, _this.el);
+		_this.render(response);
 	}, function (reason) {
 		console.error("Render Failed! ", _this, _arguments);
 	})["catch"](function (reason) {
@@ -432,13 +433,13 @@ Object.assign(BaseModel.prototype, {
   */
 	fetch: function fetch(options) {
 		// TODO: trigger beforeAsync, beforeFetch
-		console.log("fetch", options);
+		console.log("fetch", this, arguments);
 		return _core.net.http.get(options);
 	},
 
 	parse: function parse(response) {
 		if (Object.keys(response).length > 0) {
-			console.log("Parsing response: ", undefined, response);
+			console.log("Parsing response: ", this, response);
 			return response;
 		} else {
 			console.error("Response has zero length.");

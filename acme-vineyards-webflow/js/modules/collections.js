@@ -6,6 +6,7 @@ var BaseCollection = function(ptions = {}) {
 };
 
 Object.assign(BaseCollection.prototype, {
+	models: [],
 	model: BaseModel,
 	fetch: BaseModel.prototype.fetch,
 	parse: BaseModel.prototype.parse

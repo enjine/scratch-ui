@@ -19,7 +19,7 @@ export function Product() {
 export function ProductList(el, opts = {}) {
 
 	Object.assign(this, BaseView.prototype, opts, {
-		render: function(results, el) {
+		render: function(results) {
 			var template = jst.getFromDOM("product/simple"),
 				html = "";
 
@@ -27,7 +27,7 @@ export function ProductList(el, opts = {}) {
 				html += template(results[obj]);
 			}
 
-			el.innerHTML = html;
+			this.el.innerHTML = html;
 			return this;
 		}.bind(this)
 
@@ -51,11 +51,11 @@ export function ProductList(el, opts = {}) {
 	Object.assign(options, defaults, opts);
 
 	this.collection.fetch(options)
-		.then(this.collection.parse, (reason) => {
+		.then(this.collection.parse.bind(this), (reason) => {
 			console.error("Parsing Failed! ", this, arguments);
 		})
 		.then((response) => {
-			this.render(response, this.el);
+			this.render(response);
 		}, (reason) => {
 			console.error("Render Failed! ", this, arguments);
 		})
