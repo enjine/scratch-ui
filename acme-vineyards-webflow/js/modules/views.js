@@ -1,4 +1,4 @@
-import {componentMap} from "./components";
+import {resolver} from "./components";
 
 export function BaseView(el, opts = {}) {
 	"use strict";
@@ -20,7 +20,7 @@ export function BaseView(el, opts = {}) {
 			let components = this.el.children;
 			debugger;
 			if (components.length) {
-				console.log(components, typeof components, Object.keys(componentMap));
+				console.log(components, typeof components, Object.keys(resolver));
 				try {
 					[].filter.call(components, (node, idx, arr) => {
 						return node.dataset.component;
@@ -37,9 +37,14 @@ export function BaseView(el, opts = {}) {
 						if (!this.childViews[componentId]) {
 							this.childViews[componentId] = [];
 						}
-						this.childViews[componentId].push(new componentMap[componentId](componentEl));
 
-						console.log('component: ', componentMap[componentId], componentEl, this.childViews);
+						if(resolver[componentId]){
+							this.childViews[componentId].push(new resolver[componentId](componentEl));
+							console.log('registered component: ', resolver[componentId], componentEl, this.childViews);
+						}else{
+							throw new ReferenceError(componentId + " not found in component resolver.", resolver)
+						}
+
 					});
 				} catch (e) {
 					console.error(e);

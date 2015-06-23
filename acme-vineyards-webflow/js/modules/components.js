@@ -3,7 +3,7 @@ import {BaseView} from "./views";
 import {ProductCollection} from "./collections";
 import {ui} from './cart';
 
-export var componentMap = {
+export var resolver = {
 		"ui/header": BaseView,
 		"ui/slider": BaseView,
 		"ui/intro": BaseView,

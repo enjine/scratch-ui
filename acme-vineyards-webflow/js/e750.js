@@ -1,10 +1,11 @@
 //import 'core-js'; // Node module
-import {componentMap} from "./modules/components";
+import {resolver} from "./modules/components";
 
+// TODO: this needs to be an ApplicationView
 var e750 = (function(){
 	"use strict";
 
-	var componentInstances = {};
+	var componentInstances = [];
 
 	function init(){
 		console.log('cookies:', document.cookie);
@@ -17,10 +18,14 @@ var e750 = (function(){
 			console.log('partial: ', partial);
 		});
 
+		// TODO: this needs to be put into a view manager that is on the BaseView prototype
 		components.forEach((componentEl) => {
 			let componentId = componentEl.dataset.component;
-			console.log('component: ', componentId, componentEl, componentMap[componentId]);
-			componentInstances[componentId] = new componentMap[componentId](componentEl);
+			console.log('component: ', componentId, componentEl, resolver[componentId]);
+			if(!componentInstances[componentId]){
+				componentInstances[componentId] = [];
+			}
+			componentInstances[componentId].push(new resolver[componentId](componentEl));
 		});
 
 		console.log(componentInstances);

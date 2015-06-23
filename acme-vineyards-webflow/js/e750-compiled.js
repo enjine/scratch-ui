@@ -152,7 +152,7 @@ var _collections = require("./collections");
 
 var _cart = require("./cart");
 
-var componentMap = {
+var resolver = {
 	"ui/header": _views.BaseView,
 	"ui/slider": _views.BaseView,
 	"ui/intro": _views.BaseView,
@@ -161,7 +161,7 @@ var componentMap = {
 	"cart/product/simple": _cart.ui.baseProduct
 };
 
-exports.componentMap = componentMap;
+exports.resolver = resolver;
 
 function Product() {
 	Object.assign(this, _views.BaseView.prototype);
@@ -540,7 +540,7 @@ function BaseView(el) {
 			var components = _this.el.children;
 			debugger;
 			if (components.length) {
-				console.log(components, typeof components, Object.keys(_components.componentMap));
+				console.log(components, typeof components, Object.keys(_components.resolver));
 				try {
 					[].filter.call(components, function (node, idx, arr) {
 						return node.dataset.component;
@@ -557,9 +557,13 @@ function BaseView(el) {
 						if (!_this.childViews[componentId]) {
 							_this.childViews[componentId] = [];
 						}
-						_this.childViews[componentId].push(new _components.componentMap[componentId](componentEl));
 
-						console.log("component: ", _components.componentMap[componentId], componentEl, _this.childViews);
+						if (_components.resolver[componentId]) {
+							_this.childViews[componentId].push(new _components.resolver[componentId](componentEl));
+							console.log("registered component: ", _components.resolver[componentId], componentEl, _this.childViews);
+						} else {
+							throw new ReferenceError(componentId + " not found in component resolver.", _components.resolver);
+						}
 					});
 				} catch (e) {
 					console.error(e);
@@ -3104,10 +3108,11 @@ module.exports = function (promiseConstructor) {
 
 var _modulesComponents = require("./modules/components");
 
+// TODO: this needs to be an application view
 var e750 = (function () {
 	"use strict";
 
-	var componentInstances = {};
+	var componentInstances = [];
 
 	function init() {
 		console.log("cookies:", document.cookie);
@@ -3120,10 +3125,14 @@ var e750 = (function () {
 			console.log("partial: ", partial);
 		});
 
+		// TODO: this needs to be put into a view manager that is on the BaseView prototype
 		components.forEach(function (componentEl) {
 			var componentId = componentEl.dataset.component;
-			console.log("component: ", componentId, componentEl, _modulesComponents.componentMap[componentId]);
-			componentInstances[componentId] = new _modulesComponents.componentMap[componentId](componentEl);
+			console.log("component: ", componentId, componentEl, _modulesComponents.resolver[componentId]);
+			if (!componentInstances[componentId]) {
+				componentInstances[componentId] = [];
+			}
+			componentInstances[componentId].push(new _modulesComponents.resolver[componentId](componentEl));
 		});
 
 		console.log(componentInstances);
