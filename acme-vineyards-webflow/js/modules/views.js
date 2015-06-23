@@ -1,24 +1,24 @@
 import {resolver} from "./components";
 
-export function BaseView(el, opts = {}) {
-	"use strict";
+export function BaseView(el, opts = {}) {};
 
-	Object.assign(BaseView.prototype, {
+Object.assign(BaseView.prototype, {
+		options: {},
 		el: null,
 		model: null,
 		collection: null,
 		template: null,
 		childViews: {},
 
-		render: () => {
+		render: function() {
 			return this;
 		},
 
-		registerComponents: () => {
+		registerComponents: function() {
 			console.log('registering child components for: ', this, arguments);
 
 			let components = this.el.children;
-			debugger;
+			//debugger;
 			if (components.length) {
 				console.log(components, typeof components, Object.keys(resolver));
 				try {
@@ -56,6 +56,5 @@ export function BaseView(el, opts = {}) {
 			return this;
 		}
 	});
-};
 
 export default {BaseView}

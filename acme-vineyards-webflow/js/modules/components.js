@@ -18,8 +18,8 @@ export function Product() {
 
 export function ProductList(el, opts = {}) {
 
-	Object.assign(this, BaseView.prototype, {
-		render: (results, el) => {
+	Object.assign(this, BaseView.prototype, opts, {
+		render: function(results, el) {
 			var template = jst.getFromDOM("product/simple"),
 				html = "";
 
@@ -29,7 +29,7 @@ export function ProductList(el, opts = {}) {
 
 			el.innerHTML = html;
 			return this;
-		}
+		}.bind(this)
 
 	});
 

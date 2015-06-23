@@ -1,7 +1,7 @@
 import {BaseModel, Product} from './models';
 
 
-var BaseCollection = function(options) {
+var BaseCollection = function(ptions = {}) {
 	Object.assign(this, options);
 };
 

@@ -3,27 +3,35 @@ import {net} from "./core";
 var _attributes = {
 	_guid: null,
 	_some_other_global_property: null,
-	all: () => {
+	all: function () {
 		let values = {};
-		for(let p in this.getOwnPropertyNames){
+		for (let p in this.getOwnPropertyNames) {
 			values[p] = _attributes[p];
 		}
 	}
-
 };
 
 
 export function BaseModel(options = {}) {
 	Object.assign(this.options, options);
-};
+}
+
+
 Object.assign(BaseModel.prototype, {
 	options: {},
-	attributes: Object.create(_attributes),
+	values: Object.create(_attributes),
+
+	/**
+	 * returns an A+ promise
+	 * @param options
+	 * @returns {*}
+	 */
 	fetch: (options) => {
-		// trigger beforeAsync, beforeFetch
+		// TODO: trigger beforeAsync, beforeFetch
 		console.log('fetch', options);
 		return net.http.get(options);
 	},
+
 	parse: (response) => {
 		if (Object.keys(response).length > 0) {
 			console.log("Parsing response: ", this, response);
@@ -32,10 +40,11 @@ Object.assign(BaseModel.prototype, {
 			console.error("Response has zero length.");
 			return false;
 		}
-
 	},
+
 	serialize: () => {}
 });
+
 
 export var Product = function (options) {
 	let defaults = {
@@ -97,6 +106,6 @@ export var Product = function (options) {
 	};
 
 	Object.assign(this, BaseView.prototype, options);
-	Obkect.assign(this.attributes, defaults);
+	Object.assign(this.values, defaults);
 
 };

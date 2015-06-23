@@ -118,7 +118,9 @@ exports.ProductCollection = ProductCollection;
 
 var _models = require('./models');
 
-var BaseCollection = function BaseCollection(options) {
+var BaseCollection = function BaseCollection() {
+	var ptions = arguments[0] === undefined ? {} : arguments[0];
+
 	Object.assign(this, options);
 };
 
@@ -173,8 +175,8 @@ function ProductList(el) {
 	var _arguments = arguments;
 	var opts = arguments[1] === undefined ? {} : arguments[1];
 
-	Object.assign(this, _views.BaseView.prototype, {
-		render: function render(results, el) {
+	Object.assign(this, _views.BaseView.prototype, opts, {
+		render: (function (results, el) {
 			var template = _core.jst.getFromDOM("product/simple"),
 			    html = "";
 
@@ -183,8 +185,8 @@ function ProductList(el) {
 			}
 
 			el.innerHTML = html;
-			return _this;
-		}
+			return this;
+		}).bind(this)
 
 	});
 
@@ -407,11 +409,10 @@ var _attributes = {
 	_some_other_global_property: null,
 	all: function all() {
 		var values = {};
-		for (var p in undefined.getOwnPropertyNames) {
+		for (var p in this.getOwnPropertyNames) {
 			values[p] = _attributes[p];
 		}
 	}
-
 };
 
 function BaseModel() {
@@ -420,15 +421,21 @@ function BaseModel() {
 	Object.assign(this.options, options);
 }
 
-;
 Object.assign(BaseModel.prototype, {
 	options: {},
-	attributes: Object.create(_attributes),
+	values: Object.create(_attributes),
+
+	/**
+  * returns an A+ promise
+  * @param options
+  * @returns {*}
+  */
 	fetch: function fetch(options) {
-		// trigger beforeAsync, beforeFetch
+		// TODO: trigger beforeAsync, beforeFetch
 		console.log("fetch", options);
 		return _core.net.http.get(options);
 	},
+
 	parse: function parse(response) {
 		if (Object.keys(response).length > 0) {
 			console.log("Parsing response: ", undefined, response);
@@ -438,6 +445,7 @@ Object.assign(BaseModel.prototype, {
 			return false;
 		}
 	},
+
 	serialize: function serialize() {}
 });
 
@@ -501,85 +509,83 @@ var Product = function Product(options) {
 	};
 
 	Object.assign(this, BaseView.prototype, options);
-	Obkect.assign(this.attributes, defaults);
+	Object.assign(this.values, defaults);
 };
 exports.Product = Product;
 
 },{"./core":6}],8:[function(require,module,exports){
-"use strict";
+'use strict';
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
 	value: true
 });
 exports.BaseView = BaseView;
 
-var _components = require("./components");
+var _components = require('./components');
 
 function BaseView(el) {
-	var _this = this;
-
-	var _arguments = arguments;
-
-	"use strict";
-
 	var opts = arguments[1] === undefined ? {} : arguments[1];
-	Object.assign(BaseView.prototype, {
-		el: null,
-		model: null,
-		collection: null,
-		template: null,
-		childViews: {},
-
-		render: function render() {
-			return _this;
-		},
-
-		registerComponents: function registerComponents() {
-			console.log("registering child components for: ", _this, _arguments);
-
-			var components = _this.el.children;
-			debugger;
-			if (components.length) {
-				console.log(components, typeof components, Object.keys(_components.resolver));
-				try {
-					[].filter.call(components, function (node, idx, arr) {
-						return node.dataset.component;
-					});
-				} catch (e) {
-					console.error(e);
-					throw e;
-				}
-
-				try {
-					console.log("component: ", components);
-					[].forEach.call(components, function (componentEl) {
-						var componentId = componentEl.dataset.component;
-						if (!_this.childViews[componentId]) {
-							_this.childViews[componentId] = [];
-						}
-
-						if (_components.resolver[componentId]) {
-							_this.childViews[componentId].push(new _components.resolver[componentId](componentEl));
-							console.log("registered component: ", _components.resolver[componentId], componentEl, _this.childViews);
-						} else {
-							throw new ReferenceError(componentId + " not found in component resolver.", _components.resolver);
-						}
-					});
-				} catch (e) {
-					console.error(e);
-					throw e;
-				}
-			} else {
-				console.info("No child components to register.");
-			}
-			return _this;
-		}
-	});
 }
 
 ;
 
-exports["default"] = { BaseView: BaseView };
+Object.assign(BaseView.prototype, {
+	options: {},
+	el: null,
+	model: null,
+	collection: null,
+	template: null,
+	childViews: {},
+
+	render: function render() {
+		return this;
+	},
+
+	registerComponents: function registerComponents() {
+		var _this = this;
+
+		console.log('registering child components for: ', this, arguments);
+
+		var components = this.el.children;
+		//debugger;
+		if (components.length) {
+			console.log(components, typeof components, Object.keys(_components.resolver));
+			try {
+				[].filter.call(components, function (node, idx, arr) {
+					return node.dataset.component;
+				});
+			} catch (e) {
+				console.error(e);
+				throw e;
+			}
+
+			try {
+				console.log('component: ', components);
+				[].forEach.call(components, function (componentEl) {
+					var componentId = componentEl.dataset.component;
+					if (!_this.childViews[componentId]) {
+						_this.childViews[componentId] = [];
+					}
+
+					if (_components.resolver[componentId]) {
+						_this.childViews[componentId].push(new _components.resolver[componentId](componentEl));
+						console.log('registered component: ', _components.resolver[componentId], componentEl, _this.childViews);
+					} else {
+						throw new ReferenceError(componentId + ' not found in component resolver.', _components.resolver);
+					}
+				});
+			} catch (e) {
+				console.error(e);
+				throw e;
+			}
+		} else {
+			console.info('No child components to register.');
+		}
+		return this;
+	}
+});
+
+exports['default'] = { BaseView: BaseView };
 
 },{"./components":5}],9:[function(require,module,exports){
 // doT.js
@@ -3108,7 +3114,7 @@ module.exports = function (promiseConstructor) {
 
 var _modulesComponents = require("./modules/components");
 
-// TODO: this needs to be an application view
+// TODO: this needs to be an ApplicationView
 var e750 = (function () {
 	"use strict";
 
