@@ -183,7 +183,7 @@ function ProductList(el) {
 			}
 
 			el.innerHTML = html;
-			return true;
+			return _this;
 		}
 
 	});
@@ -215,7 +215,7 @@ function ProductList(el) {
 		console.error("Promise Rejected! ", _this, _arguments, document.cookie);
 	})["finally"](function () {
 		console.log("finally", _this, _arguments, options);
-		_this.registerComponents(_this);
+		_this.registerComponents();
 	});
 }
 
@@ -506,63 +506,76 @@ var Product = function Product(options) {
 exports.Product = Product;
 
 },{"./core":6}],8:[function(require,module,exports){
-'use strict';
+"use strict";
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 exports.BaseView = BaseView;
 
-var _components = require('./components');
+var _components = require("./components");
 
 function BaseView(el) {
+	var _this = this;
+
+	var _arguments = arguments;
+
+	"use strict";
+
 	var opts = arguments[1] === undefined ? {} : arguments[1];
+	Object.assign(BaseView.prototype, {
+		el: null,
+		model: null,
+		collection: null,
+		template: null,
+		childViews: {},
+
+		render: function render() {
+			return _this;
+		},
+
+		registerComponents: function registerComponents() {
+			console.log("registering child components for: ", _this, _arguments);
+
+			var components = _this.el.children;
+			debugger;
+			if (components.length) {
+				console.log(components, typeof components, Object.keys(_components.componentMap));
+				try {
+					[].filter.call(components, function (node, idx, arr) {
+						return node.dataset.component;
+					});
+				} catch (e) {
+					console.error(e);
+					throw e;
+				}
+
+				try {
+					console.log("component: ", components);
+					[].forEach.call(components, function (componentEl) {
+						var componentId = componentEl.dataset.component;
+						if (!_this.childViews[componentId]) {
+							_this.childViews[componentId] = [];
+						}
+						_this.childViews[componentId].push(new _components.componentMap[componentId](componentEl));
+
+						console.log("component: ", _components.componentMap[componentId], componentEl, _this.childViews);
+					});
+				} catch (e) {
+					console.error(e);
+					throw e;
+				}
+			} else {
+				console.info("No child components to register.");
+			}
+			return _this;
+		}
+	});
 }
 
 ;
 
-Object.assign(BaseView.prototype, {
-	el: null,
-	model: null,
-	collection: null,
-	template: null,
-	childViews: {},
-
-	render: function render() {},
-
-	registerComponents: function registerComponents(scope) {
-		console.log('registering child components for: ', scope);
-
-		var components = scope.el.children;
-
-		if (components.length) {
-			console.log(components, typeof components, Object.keys(_components.componentMap));
-			try {
-				[].filter.call(components, function (node, idx, arr) {
-					return node.dataset.component;
-				});
-			} catch (e) {
-				console.error(e);
-				throw e;
-			}
-
-			try {
-				console.log('component: ', components);
-				[].forEach.call(components, function (componentEl) {
-					var componentId = componentEl.dataset.component;
-					scope.childViews[componentId] = new _components.componentMap[componentId](componentEl);
-					console.log('component: ', _components.componentMap[componentId], componentEl, scope.childViews);
-				});
-			} catch (e) {
-				console.error(e);
-			}
-		} else {
-			console.info('No child components to register.');
-		}
-	}
-});
-
-exports['default'] = { BaseView: BaseView };
+exports["default"] = { BaseView: BaseView };
 
 },{"./components":5}],9:[function(require,module,exports){
 // doT.js

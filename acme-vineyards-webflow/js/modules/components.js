@@ -28,7 +28,7 @@ export function ProductList(el, opts = {}) {
 			}
 
 			el.innerHTML = html;
-			return true;
+			return this;
 		}
 
 	});
@@ -64,7 +64,7 @@ export function ProductList(el, opts = {}) {
 		})
 		.finally(() => {
 			console.log('finally', this, arguments, options);
-			this.registerComponents(this);
+			this.registerComponents();
 		});
 }
 
