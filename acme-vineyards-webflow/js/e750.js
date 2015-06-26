@@ -1,10 +1,13 @@
 //import 'core-js'; // Node module
 import {resolver} from "./modules/components";
+import {Emitter} from "./modules/events";
 
 // TODO: this needs to be an ApplicationView
-var e750 = (function(){
+var e750 = Emitter.mixin(function(){
 	"use strict";
-
+	this.on("registerComponents.complete", function(){
+		console.log("received registerComponents.complete", this, arguments);
+	});
 	var componentInstances = [];
 
 	function init(){
@@ -34,6 +37,7 @@ var e750 = (function(){
 	return {
 		start: init
 	}
-})(window, undefined);
+});
 
-document.addEventListener('DOMContentLoaded', e750.start);
+var app = new e750();
+document.addEventListener('DOMContentLoaded', app.start);

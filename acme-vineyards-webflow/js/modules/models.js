@@ -42,7 +42,15 @@ Object.assign(BaseModel.prototype, {
 		}
 	},
 
-	serialize: function() {}
+	toJSON: function() {
+		JSON.stringify(this.values);
+	},
+
+	toMeta: function(){
+		this.values.map(() => {
+			console.log(this, arguments);
+		});
+	}
 });
 
 
@@ -58,7 +66,7 @@ export var Product = function (options) {
 		additional_description: "",
 		aging: "",
 		alcohol: "",
-		appellation: "y",
+		appellation: "",
 		blend: "",
 		bottle_count: "",
 		bottle_size: "",

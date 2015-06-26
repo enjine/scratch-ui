@@ -35,6 +35,10 @@ export function ProductList(el, opts = {}) {
 
 	this.el = el;
 
+	this.on("registerComponents.complete", function(){
+		console.log("received registerComponents.complete", this, arguments);
+	});
+
 
 	var defaults = {
 		//url: "https://api.securecheckout.com/v1/cart/products/",
@@ -64,7 +68,7 @@ export function ProductList(el, opts = {}) {
 		})
 		.finally(() => {
 			console.log('finally', this, arguments, options);
-			this.registerComponents();
+			this.updateChildren();
 		});
 }
 

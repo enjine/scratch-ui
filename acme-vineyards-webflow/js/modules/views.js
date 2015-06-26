@@ -1,60 +1,64 @@
 import {resolver} from "./components";
+import {Emitter} from "./events";
 
 export function BaseView(el, opts = {}) {};
 
 Object.assign(BaseView.prototype, {
-		options: {},
-		el: null,
-		model: null,
-		collection: null,
-		template: null,
-		childViews: {},
+	options: {},
+	el: null,
+	model: null,
+	collection: null,
+	template: null,
+	childViews: {},
 
-		render: function() {
-			return this;
-		},
+	render: function () {
+		return this;
+	},
 
-		registerComponents: function() {
-			console.log('registering child components for: ', this, arguments);
+	updateChildren: function () {
+		console.log('registering child components for: ', this, arguments);
 
-			let components = this.el.children;
-			//debugger;
-			if (components.length) {
-				console.log(components, typeof components, Object.keys(resolver));
-				try {
-					[].filter.call(components, (node, idx, arr) => {
-						return node.dataset.component;
-					})
-				} catch (e) {
-					console.error(e);
-					throw e;
-				}
-
-				try {
-					console.log('component: ', components);
-					[].forEach.call(components, (componentEl) => {
-						let componentId = componentEl.dataset.component;
-						if (!this.childViews[componentId]) {
-							this.childViews[componentId] = [];
-						}
-
-						if(resolver[componentId]){
-							this.childViews[componentId].push(new resolver[componentId](componentEl));
-							console.log('registered component: ', resolver[componentId], componentEl, this.childViews);
-						}else{
-							throw new ReferenceError(componentId + " not found in component resolver.", resolver)
-						}
-
-					});
-				} catch (e) {
-					console.error(e);
-					throw e;
-				}
-			} else {
-				console.info('No child components to register.')
+		let components = this.el.children;
+		//debugger;
+		if (components.length) {
+			console.log(components, typeof components, Object.keys(resolver));
+			try {
+				[].filter.call(components, (node, idx, arr) => {
+					return node.dataset.component;
+				})
+			} catch (e) {
+				console.error(e);
+				throw e;
 			}
-			return this;
+
+			try {
+				console.log('component: ', components);
+				[].forEach.call(components, (componentEl) => {
+					let componentId = componentEl.dataset.component;
+					if (!this.childViews[componentId]) {
+						this.childViews[componentId] = [];
+					}
+
+					if (resolver[componentId]) {
+						this.childViews[componentId].push(new resolver[componentId](componentEl));
+						console.log('registered component: ', resolver[componentId], componentEl, this.childViews);
+					} else {
+						throw new ReferenceError(componentId + " not found in component resolver.", resolver)
+					}
+
+				});
+			} catch (e) {
+				console.error(e);
+				throw e;
+			}
+		} else {
+			console.info('No child components to register.')
 		}
-	});
+		this.emit("registerComponents.complete", {test:true}, 'poop');
+		return this;
+	}
+});
+
+Emitter.mixin(BaseView);
 
 export default {BaseView}
