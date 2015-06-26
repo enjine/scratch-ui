@@ -54,7 +54,7 @@ Object.assign(BaseView.prototype, {
 		} else {
 			console.info('No child components to register.')
 		}
-		this.emit("registerComponents.complete", {test:true}, 'poop');
+		this.emit("registerComponents.complete", {test:true}, "wham!", [{whoo:"hoo"}]);
 		return this;
 	}
 });
