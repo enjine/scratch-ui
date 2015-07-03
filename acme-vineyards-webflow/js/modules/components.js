@@ -3,7 +3,7 @@ import {BaseView} from "./views";
 import {ProductCollection} from "./collections";
 import {ui} from './cart';
 
-export var resolver = {
+export var Resolver = {
 		"ui/header": BaseView,
 		"ui/slider": BaseView,
 		"ui/intro": BaseView,
@@ -11,6 +11,12 @@ export var resolver = {
 		"cart/product-list": ui.productList,
 		"cart/product/simple": ui.baseProduct
 	};
+
+export function Application() {}
+Object.assign(Application.prototype, BaseView.prototype, {
+	componentInstances: {},
+	start: function(){}
+});
 
 export function Product() {
 	Object.assign(this, BaseView.prototype);

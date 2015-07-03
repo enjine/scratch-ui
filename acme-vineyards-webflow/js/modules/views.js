@@ -1,7 +1,10 @@
-import {resolver} from "./components";
-import {Emitter} from "./events";
+import {Resolver} from "./components";
+import {Emitter, PubSub} from "./events";
 
 export function BaseView(el, opts = {}) {};
+
+Emitter(BaseView);
+PubSub(BaseView);
 
 Object.assign(BaseView.prototype, {
 	options: {},
@@ -21,7 +24,7 @@ Object.assign(BaseView.prototype, {
 		let components = this.el.children;
 		//debugger;
 		if (components.length) {
-			console.log(components, typeof components, Object.keys(resolver));
+			console.log(components, typeof components, Object.keys(Resolver));
 			try {
 				[].filter.call(components, (node, idx, arr) => {
 					return node.dataset.component;
@@ -39,11 +42,11 @@ Object.assign(BaseView.prototype, {
 						this.childViews[componentId] = [];
 					}
 
-					if (resolver[componentId]) {
-						this.childViews[componentId].push(new resolver[componentId](componentEl));
-						console.log('registered component: ', resolver[componentId], componentEl, this.childViews);
+					if (Resolver[componentId]) {
+						this.childViews[componentId].push(new Resolver[componentId](componentEl));
+						console.log('registered component: ', Resolver[componentId], componentEl, this.childViews);
 					} else {
-						throw new ReferenceError(componentId + " not found in component resolver.", resolver)
+						throw new ReferenceError(componentId + " not found in component resolver.", Resolver)
 					}
 
 				});
@@ -59,6 +62,6 @@ Object.assign(BaseView.prototype, {
 	}
 });
 
-Emitter.mixin(BaseView);
+
 
 export default {BaseView}

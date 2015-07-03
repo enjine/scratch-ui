@@ -146,6 +146,7 @@ function ProductCollection(options) {
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
+exports.Application = Application;
 exports.Product = Product;
 exports.ProductList = ProductList;
 exports.AddToCart = AddToCart;
@@ -158,7 +159,7 @@ var _collections = require("./collections");
 
 var _cart = require("./cart");
 
-var resolver = {
+var Resolver = {
 	"ui/header": _views.BaseView,
 	"ui/slider": _views.BaseView,
 	"ui/intro": _views.BaseView,
@@ -167,7 +168,14 @@ var resolver = {
 	"cart/product/simple": _cart.ui.baseProduct
 };
 
-exports.resolver = resolver;
+exports.Resolver = Resolver;
+
+function Application() {}
+
+Object.assign(Application.prototype, _views.BaseView.prototype, {
+	componentInstances: {},
+	start: function start() {}
+});
 
 function Product() {
 	Object.assign(this, _views.BaseView.prototype);
@@ -409,10 +417,7 @@ Object.defineProperty(exports, '__esModule', {
 	value: true
 });
 exports.Emitter = Emitter;
-
-function Emitter() {}
-
-Emitter.mixin = function (destObject) {
+var mixin = function mixin(destObject) {
 	var props = Object.keys(this.prototype);
 	console.log('attempting mixin', props);
 	for (var i = 0; i < props.length; i++) {
@@ -425,26 +430,35 @@ Emitter.mixin = function (destObject) {
 	return destObject;
 };
 
+function Emitter(obj) {
+	if (obj) return Emitter.mixin(obj);
+}
+
+Emitter.mixin = mixin;
+
 Object.assign(Emitter.prototype, {
 	on: function on(event, handler) {
 		this._events = this._events || {};
-		this._events[event] = this._events[event] || [];
-		this._events[event].push(handler);
+		(this._events[event] = this._events[event] || []).push(handler);
+		console.log('registering ON event handler:', this, event, handler);
+		return this;
 	},
 
 	once: function once(event, handler) {
 		var _this = this;
 
 		this.on(event, function (data) {
-			handler(data);
 			_this.off(event, handler);
+			handler(data);
 		});
+		return this;
 	},
 
 	off: function off(event, handler) {
 		this._events = this._events || {};
 		if (event in this._events === false) return;
 		this._events[event].splice(this._events[event].indexOf(handler), 1);
+		return this;
 	},
 
 	emit: function emit(event) {
@@ -464,16 +478,25 @@ Object.assign(Emitter.prototype, {
 	}
 });
 
-var Listener = function Listener() {};exports.Listener = Listener;
+var Listener = function Listener(obj) {
+	if (obj) return Listener.mixin(obj);
+};exports.Listener = Listener;
 //aka observer...
+Listener.mixin = mixin;
+
 Object.assign(Listener.prototype, {
 	listenTo: function listenTo(object, event, handler, context, options) {},
 
 	stopListening: function stopListening(object, event) {}
 });
 
-var Broadcaster = function Broadcaster() {};
-Object.assign(Broadcaster.prototype, {
+var PubSub = function PubSub(obj) {
+	if (obj) return PubSub.mixin(obj);
+};
+exports.PubSub = PubSub;
+PubSub.mixin = mixin;
+
+Object.assign(PubSub.prototype, {
 	publish: function publish(channel, message, options) {},
 
 	subscribe: function subscribe(channel, options) {},
@@ -484,15 +507,24 @@ Object.assign(Broadcaster.prototype, {
 var Mediator = function Mediator() {
 	var subscribers = [],
 	    eventMap = {};
+
+	function addSubscriber(event, handler) {
+		console.log('subscribed: ', event, handler);
+		if (!subscribers[event]) {
+			subscribers[event] = [];
+		}
+		subscribers[event].push(handler);
+		return this;
+	}
 };
 
 Object.assign(Mediator.prototype, {});
 
 var All = function All() {};
 exports.All = All;
-Object.assign(All, Emitter.prototype, Listener.prototype, Broadcaster.prototype);
+Object.assign(All, Emitter.prototype, Listener.prototype, PubSub.prototype);
 
-exports['default'] = { Mediator: Mediator, Emitter: Emitter, Listener: Listener, Broadcaster: Broadcaster };
+exports['default'] = { Mediator: Mediator, Emitter: Emitter, Listener: Listener, PubSub: PubSub };
 
 },{}],8:[function(require,module,exports){
 "use strict";
@@ -643,6 +675,9 @@ function BaseView(el) {
 
 ;
 
+_events.Emitter(BaseView);
+_events.PubSub(BaseView);
+
 Object.assign(BaseView.prototype, {
 	options: {},
 	el: null,
@@ -663,7 +698,7 @@ Object.assign(BaseView.prototype, {
 		var components = this.el.children;
 		//debugger;
 		if (components.length) {
-			console.log(components, typeof components, Object.keys(_components.resolver));
+			console.log(components, typeof components, Object.keys(_components.Resolver));
 			try {
 				[].filter.call(components, function (node, idx, arr) {
 					return node.dataset.component;
@@ -681,11 +716,11 @@ Object.assign(BaseView.prototype, {
 						_this.childViews[componentId] = [];
 					}
 
-					if (_components.resolver[componentId]) {
-						_this.childViews[componentId].push(new _components.resolver[componentId](componentEl));
-						console.log("registered component: ", _components.resolver[componentId], componentEl, _this.childViews);
+					if (_components.Resolver[componentId]) {
+						_this.childViews[componentId].push(new _components.Resolver[componentId](componentEl));
+						console.log("registered component: ", _components.Resolver[componentId], componentEl, _this.childViews);
 					} else {
-						throw new ReferenceError(componentId + " not found in component resolver.", _components.resolver);
+						throw new ReferenceError(componentId + " not found in component resolver.", _components.Resolver);
 					}
 				});
 			} catch (e) {
@@ -695,12 +730,10 @@ Object.assign(BaseView.prototype, {
 		} else {
 			console.info("No child components to register.");
 		}
-		this.emit("registerComponents.complete", { test: true }, "poop");
+		this.emit("registerComponents.complete", { test: true }, "wham!", [{ whoo: "hoo" }]);
 		return this;
 	}
 });
-
-_events.Emitter.mixin(BaseView);
 
 exports["default"] = { BaseView: BaseView };
 
@@ -3231,46 +3264,46 @@ module.exports = function (promiseConstructor) {
 
 var _modulesComponents = require("./modules/components");
 
-var _modulesEvents = require("./modules/events");
-
-// TODO: this needs to be an ApplicationView
-var e750 = _modulesEvents.Emitter.mixin(function () {
+var e750 = function e750() {
 	"use strict";
+
+	Object.assign(this, _modulesComponents.Application.prototype, {
+		start: function start() {
+			var _this = this;
+
+			var options = arguments[0] === undefined ? {} : arguments[0];
+
+			console.log("app init():", this, arguments);
+			console.log("cookies:", document.cookie);
+
+			var components = [].slice.call(document.querySelectorAll("[data-component]"));
+			var partials = [].slice.call(document.querySelectorAll("[data-partial]"));
+
+			console.log("E750.js prototype started....");
+			partials.forEach(function (partial) {
+				console.log("partial: ", partial);
+			});
+
+			// TODO: this needs to be put into a view manager that is on the BaseView prototype
+			components.forEach(function (componentEl) {
+				var componentId = componentEl.dataset.component;
+				console.log("component: ", _this, componentId, componentEl, _modulesComponents.Resolver[componentId]);
+				if (!_this.componentInstances[componentId]) {
+					_this.componentInstances[componentId] = [];
+				}
+				_this.componentInstances[componentId].push(new _modulesComponents.Resolver[componentId](componentEl));
+			});
+
+			console.log(this.componentInstances);
+		}
+	});
+
 	this.on("registerComponents.complete", function () {
 		console.log("received registerComponents.complete", this, arguments);
 	});
-	var componentInstances = [];
-
-	function init() {
-		console.log("cookies:", document.cookie);
-
-		var components = [].slice.call(document.querySelectorAll("[data-component]"));
-		var partials = [].slice.call(document.querySelectorAll("[data-partial]"));
-
-		console.log("E750.js prototype started....");
-		partials.forEach(function (partial) {
-			console.log("partial: ", partial);
-		});
-
-		// TODO: this needs to be put into a view manager that is on the BaseView prototype
-		components.forEach(function (componentEl) {
-			var componentId = componentEl.dataset.component;
-			console.log("component: ", componentId, componentEl, _modulesComponents.resolver[componentId]);
-			if (!componentInstances[componentId]) {
-				componentInstances[componentId] = [];
-			}
-			componentInstances[componentId].push(new _modulesComponents.resolver[componentId](componentEl));
-		});
-
-		console.log(componentInstances);
-	}
-
-	return {
-		start: init
-	};
-});
+};
 
 var app = new e750();
-document.addEventListener("DOMContentLoaded", app.start);
+document.addEventListener("DOMContentLoaded", app.start());
 
-},{"./modules/components":5,"./modules/events":7}]},{},[18]);
+},{"./modules/components":5}]},{},[18]);
