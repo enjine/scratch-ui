@@ -9,7 +9,15 @@ Object.assign(BaseCollection.prototype, {
 	models: [],
 	model: BaseModel,
 	fetch: BaseModel.prototype.fetch,
-	parse: function(){
+	toJSON: BaseModel.prototype.toJSON,
+	toMeta: BaseModel.prototype.toMeta
+});
+
+export function ProductCollection(options) {
+	Object.assign(this, BaseCollection.prototype, options);
+	this.model = Product;
+
+	this.parse = function(){
 		var response = BaseModel.prototype.parse.apply(this, arguments);
 		if(response === false){
 			return response;
@@ -26,14 +34,7 @@ Object.assign(BaseCollection.prototype, {
 			throw e;
 		}
 		return this.collection.models;
-	},
-	toJSON: BaseModel.prototype.toJSON,
-	toMeta: BaseModel.prototype.toMeta
-});
-
-export function ProductCollection(options) {
-	Object.assign(this, BaseCollection.prototype, options);
-	this.model = Product;
+	}
 	//BaseCollection.constructor(options);
 	console.log('product collection', this, arguments)
 }
