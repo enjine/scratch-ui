@@ -1,18 +1,7 @@
-var mixin = function (destObject) {
-	var props = Object.keys(this.prototype);
-	console.log('attempting mixin', props);
-	for (var i = 0; i < props.length; i++) {
-		if (typeof destObject === 'function') {
-			destObject.prototype[props[i]] = this.prototype[props[i]];
-		} else {
-			destObject[props[i]] = this.prototype[props[i]];
-		}
-	}
-	return destObject;
-};
+import {mixin} from './util';
 
 export function Emitter(obj) {
-	if(obj) return Emitter.mixin(obj);
+	if (obj) return Emitter.mixin(obj);
 }
 Emitter.mixin = mixin;
 
@@ -51,7 +40,7 @@ Object.assign(Emitter.prototype, {
 });
 
 export var Listener = function (obj) {
-	if(obj) return Listener.mixin(obj);
+	if (obj) return Listener.mixin(obj);
 }; //aka observer...
 Listener.mixin = mixin;
 
@@ -65,43 +54,111 @@ Object.assign(Listener.prototype, {
 	}
 });
 
+var Mediator = function (timestamp) {
+	console.log("NEW MEDIATOR: ", timestamp);
+
+	var subscribers = [],
+		instances = [],
+		eventMap = {};
+
+	var evented = function (instance) {
+		console.log('adding instance', instance)
+		instances.push(instance);
+	};
+
+	evented.prototype = {
+		/**
+		 * Broadcasts an event of the given name.
+		 * All instances that wish to receive a broadcast must implement the `receiveBroadcast` method, the event that is being broadcast will be passed to the implementation.
+		 * @param {String} name Event name.
+		 * @returns {undefined}
+		 */
+		broadcast: function (name) {
+			instances.forEach(function (instance) {
+				(instance.hasOwnProperty("receiveBroadcast") && typeof instance["receiveBroadcast"] === "function") &&
+				instance["receiveBroadcast"](name);
+			});
+		},
+		/**
+		 * Emits an event of the given name only to instances that are subscribed to it.
+		 * @param {String} name Event name.
+		 * @returns {undefined}
+		 */
+		emit: function (name) {
+			eventMap.hasOwnProperty(name) && eventMap[name].forEach(function (subscription) {
+				subscription.process.call(subscription.context);
+			});
+		},
+		/**
+		 * Registers the given action as a listener to the named event.
+		 * This method will first create an event identified by the given name if one does not exist already.
+		 * @param {String} name Event name.
+		 * @param {Function} action Listener.
+		 * @returns {Function} A deregistration function for this listener.
+		 */
+		on: function (name, action) {
+			eventMap.hasOwnProperty(name) || (eventMap[name] = []);
+			eventMap[name].push({
+				context: this,
+				process: action
+			});
+
+			var subscriptionIndex = eventMap[name].length - 1;
+
+			return function () {
+				eventMap[name].splice(subscriptionIndex, 1);
+			};
+		},
+		addSubscriber: function (obj, event, handler) {
+			console.log("subscribed: ", obj, event, handler);
+			if (!this.subscribers[obj]) {
+				this.subscribers[obj][event] = [];
+			}
+			if (!this.subscribers[obj][event]) {
+				this.subscribers[obj][event] = [];
+			}
+			this.subscribers[obj][event].push(handler);
+			return this;
+		},
+		removeSubscriber: function (obj, event, handler) {
+			if (this.subscribers[obj][event][handler]) {
+				delete this.subscribers[obj][event][handler];
+			}
+		}
+
+	};
+
+	return evented;
+};
+
+
 export var PubSub = function (obj) {
-	if(obj) return PubSub.mixin(obj);
+	if (obj) return PubSub.mixin(obj);
 };
 PubSub.mixin = mixin;
 
-Object.assign(PubSub.prototype, {
-	publish: function (channel, message, options) {
+Object.assign(PubSub.prototype, Mediator.prototype, {
 
+	publish: function (channel, message, options) {
+		this.mediator.broadcast(this, channel, message, options);
 	},
 
-	subscribe: function (channel, options) {
+	subscribe: function (channel, handler) {
+		this.mediator.addSubscriber(this, event, handler);
+	},
+
+	subscribeOnce: function (channel, handler) {
 
 	},
 
 	unsubscribe: function (channel) {
-
+		this.mediator.removeSubscriber(this, event, handler);
 	}
 });
 
-var Mediator = function () {
-	var subscribers = [],
-		eventMap = {};
 
-	function addSubscriber(event, handler){
-		console.log("subscribed: ", event, handler);
-		if(!subscribers[event]){
-			subscribers[event] = [];
-		}
-		subscribers[event].push(handler);
-		return this;
-	}
-
+export var All = function () {
 };
-
-Object.assign(Mediator.prototype, {});
-
-export var All = function () {};
 Object.assign(All, Emitter.prototype, Listener.prototype, PubSub.prototype);
 
 export default {Mediator, Emitter, Listener, PubSub}

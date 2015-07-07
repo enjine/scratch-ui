@@ -258,7 +258,7 @@ function AddToCart(el) {
 	console.log("ADD TO CART!", this, arguments);
 }
 
-},{"./cart":3,"./collections":4,"./core":6,"./views":9}],6:[function(require,module,exports){
+},{"./cart":3,"./collections":4,"./core":6,"./views":10}],6:[function(require,module,exports){
 'use strict';
 
 var _arguments = arguments;
@@ -410,37 +410,27 @@ var jst = {
 exports.jst = jst;
 exports['default'] = { net: net, storage: storage, jst: jst };
 
-},{"dot":11,"rsvp":12,"xhttp/custom":13}],7:[function(require,module,exports){
-'use strict';
+},{"dot":12,"rsvp":13,"xhttp/custom":14}],7:[function(require,module,exports){
+"use strict";
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 exports.Emitter = Emitter;
-var mixin = function mixin(destObject) {
-	var props = Object.keys(this.prototype);
-	console.log('attempting mixin', props);
-	for (var i = 0; i < props.length; i++) {
-		if (typeof destObject === 'function') {
-			destObject.prototype[props[i]] = this.prototype[props[i]];
-		} else {
-			destObject[props[i]] = this.prototype[props[i]];
-		}
-	}
-	return destObject;
-};
+
+var _util = require("./util");
 
 function Emitter(obj) {
 	if (obj) return Emitter.mixin(obj);
 }
 
-Emitter.mixin = mixin;
+Emitter.mixin = _util.mixin;
 
 Object.assign(Emitter.prototype, {
 	on: function on(event, handler) {
 		this._events = this._events || {};
 		(this._events[event] = this._events[event] || []).push(handler);
-		console.log('registering ON event handler:', this, event, handler);
+		console.log("registering ON event handler:", this, event, handler);
 		return this;
 	},
 
@@ -466,7 +456,7 @@ Object.assign(Emitter.prototype, {
 			args[_key - 1] = arguments[_key];
 		}
 
-		console.log.apply(console, ['EMITTTED EVENT:', this].concat(args));
+		console.log.apply(console, ["EMITTTED EVENT:", this].concat(args));
 		this._events = this._events || {};
 		if (event in this._events === false) return;
 		for (var i = 0; i < this._events[event].length; i++) {
@@ -482,7 +472,7 @@ var Listener = function Listener(obj) {
 	if (obj) return Listener.mixin(obj);
 };exports.Listener = Listener;
 //aka observer...
-Listener.mixin = mixin;
+Listener.mixin = _util.mixin;
 
 Object.assign(Listener.prototype, {
 	listenTo: function listenTo(object, event, handler, context, options) {},
@@ -490,43 +480,112 @@ Object.assign(Listener.prototype, {
 	stopListening: function stopListening(object, event) {}
 });
 
+var Mediator = function Mediator(timestamp) {
+	console.log("NEW MEDIATOR: ", timestamp);
+
+	var subscribers = [],
+	    instances = [],
+	    eventMap = {};
+
+	var evented = function evented(instance) {
+		console.log("adding instance", instance);
+		instances.push(instance);
+	};
+
+	evented.prototype = {
+		/**
+   * Broadcasts an event of the given name.
+   * All instances that wish to receive a broadcast must implement the `receiveBroadcast` method, the event that is being broadcast will be passed to the implementation.
+   * @param {String} name Event name.
+   * @returns {undefined}
+   */
+		broadcast: function broadcast(name) {
+			instances.forEach(function (instance) {
+				instance.hasOwnProperty("receiveBroadcast") && typeof instance["receiveBroadcast"] === "function" && instance["receiveBroadcast"](name);
+			});
+		},
+		/**
+   * Emits an event of the given name only to instances that are subscribed to it.
+   * @param {String} name Event name.
+   * @returns {undefined}
+   */
+		emit: function emit(name) {
+			eventMap.hasOwnProperty(name) && eventMap[name].forEach(function (subscription) {
+				subscription.process.call(subscription.context);
+			});
+		},
+		/**
+   * Registers the given action as a listener to the named event.
+   * This method will first create an event identified by the given name if one does not exist already.
+   * @param {String} name Event name.
+   * @param {Function} action Listener.
+   * @returns {Function} A deregistration function for this listener.
+   */
+		on: function on(name, action) {
+			eventMap.hasOwnProperty(name) || (eventMap[name] = []);
+			eventMap[name].push({
+				context: this,
+				process: action
+			});
+
+			var subscriptionIndex = eventMap[name].length - 1;
+
+			return function () {
+				eventMap[name].splice(subscriptionIndex, 1);
+			};
+		},
+		addSubscriber: function addSubscriber(obj, event, handler) {
+			console.log("subscribed: ", obj, event, handler);
+			if (!this.subscribers[obj]) {
+				this.subscribers[obj][event] = [];
+			}
+			if (!this.subscribers[obj][event]) {
+				this.subscribers[obj][event] = [];
+			}
+			this.subscribers[obj][event].push(handler);
+			return this;
+		},
+		removeSubscriber: function removeSubscriber(obj, event, handler) {
+			if (this.subscribers[obj][event][handler]) {
+				delete this.subscribers[obj][event][handler];
+			}
+		}
+
+	};
+
+	return evented;
+};
+
 var PubSub = function PubSub(obj) {
 	if (obj) return PubSub.mixin(obj);
 };
 exports.PubSub = PubSub;
-PubSub.mixin = mixin;
+PubSub.mixin = _util.mixin;
 
-Object.assign(PubSub.prototype, {
-	publish: function publish(channel, message, options) {},
+Object.assign(PubSub.prototype, Mediator.prototype, {
 
-	subscribe: function subscribe(channel, options) {},
+	publish: function publish(channel, message, options) {
+		this.mediator.broadcast(this, channel, message, options);
+	},
 
-	unsubscribe: function unsubscribe(channel) {}
-});
+	subscribe: function subscribe(channel, handler) {
+		this.mediator.addSubscriber(this, event, handler);
+	},
 
-var Mediator = function Mediator() {
-	var subscribers = [],
-	    eventMap = {};
+	subscribeOnce: function subscribeOnce(channel, handler) {},
 
-	function addSubscriber(event, handler) {
-		console.log('subscribed: ', event, handler);
-		if (!subscribers[event]) {
-			subscribers[event] = [];
-		}
-		subscribers[event].push(handler);
-		return this;
+	unsubscribe: function unsubscribe(channel) {
+		this.mediator.removeSubscriber(this, event, handler);
 	}
-};
-
-Object.assign(Mediator.prototype, {});
+});
 
 var All = function All() {};
 exports.All = All;
 Object.assign(All, Emitter.prototype, Listener.prototype, PubSub.prototype);
 
-exports['default'] = { Mediator: Mediator, Emitter: Emitter, Listener: Listener, PubSub: PubSub };
+exports["default"] = { Mediator: Mediator, Emitter: Emitter, Listener: Listener, PubSub: PubSub };
 
-},{}],8:[function(require,module,exports){
+},{"./util":9}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -658,6 +717,29 @@ var Product = function Product(options) {
 exports.Product = Product;
 
 },{"./core":6}],9:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+	value: true
+});
+exports.mixin = mixin;
+
+function mixin(destObject) {
+	var props = Object.keys(this.prototype);
+	console.log('attempting mixin', props);
+	for (var i = 0; i < props.length; i++) {
+		if (typeof destObject === 'function') {
+			destObject.prototype[props[i]] = this.prototype[props[i]];
+		} else {
+			destObject[props[i]] = this.prototype[props[i]];
+		}
+	}
+	return destObject;
+}
+
+exports['default'] = { mixin: mixin };
+
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -737,7 +819,7 @@ Object.assign(BaseView.prototype, {
 
 exports["default"] = { BaseView: BaseView };
 
-},{"./components":5,"./events":7}],10:[function(require,module,exports){
+},{"./components":5,"./events":7}],11:[function(require,module,exports){
 // doT.js
 // 2011-2014, Laura Doktorova, https://github.com/olado/doT
 // Licensed under the MIT license.
@@ -879,7 +961,7 @@ exports["default"] = { BaseView: BaseView };
 	};
 }());
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 /* doT + auto-compilation of doT templates
  *
  * 2012, Laura Doktorova, https://github.com/olado/doT
@@ -1024,7 +1106,7 @@ InstallDots.prototype.compileAll = function() {
 	return this.__rendermodule;
 };
 
-},{"./doT":10,"fs":1}],12:[function(require,module,exports){
+},{"./doT":11,"fs":1}],13:[function(require,module,exports){
 (function (process){
 /*!
  * @overview RSVP - a tiny implementation of Promises/A+.
@@ -2699,7 +2781,7 @@ InstallDots.prototype.compileAll = function() {
 
 
 }).call(this,require('_process'))
-},{"_process":2}],13:[function(require,module,exports){
+},{"_process":2}],14:[function(require,module,exports){
 'use strict'
 
 /**
@@ -2709,7 +2791,7 @@ InstallDots.prototype.compileAll = function() {
 
 module.exports = require('./lib/xhttp')
 
-},{"./lib/xhttp":17}],14:[function(require,module,exports){
+},{"./lib/xhttp":18}],15:[function(require,module,exports){
 'use strict'
 
 /**
@@ -2893,7 +2975,7 @@ Options.prototype.$simpleOptions = function() {
 
 module.exports = Options
 
-},{"./utils":16}],15:[function(require,module,exports){
+},{"./utils":17}],16:[function(require,module,exports){
 'use strict'
 
 /**
@@ -2949,7 +3031,7 @@ function parse (xhr) {
 
 module.exports = parse
 
-},{"./utils":16}],16:[function(require,module,exports){
+},{"./utils":17}],17:[function(require,module,exports){
 'use strict'
 
 /**
@@ -3063,7 +3145,7 @@ function formEncode (object) {
 }
 exports.formEncode = formEncode
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 'use strict'
 
 /**
@@ -3258,7 +3340,7 @@ module.exports = function (promiseConstructor) {
 
 }
 
-},{"./options":14,"./parse":15,"./utils":16}],18:[function(require,module,exports){
+},{"./options":15,"./parse":16,"./utils":17}],19:[function(require,module,exports){
 //import 'core-js'; // Node module
 "use strict";
 
@@ -3306,4 +3388,4 @@ var e750 = function e750() {
 var app = new e750();
 document.addEventListener("DOMContentLoaded", app.start());
 
-},{"./modules/components":5}]},{},[18]);
+},{"./modules/components":5}]},{},[19]);
