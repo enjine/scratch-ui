@@ -126,24 +126,7 @@ Object.assign(BaseCollection.prototype, {
 	models: [],
 	model: _models.BaseModel,
 	fetch: _models.BaseModel.prototype.fetch,
-	parse: function parse() {
-		var response = _models.BaseModel.prototype.parse.apply(this, arguments);
-		if (response === false) {
-			return response;
-		}
-		try {
-			for (var item in response) {
-				if (response.hasOwnProperty(item)) {
-					console.log('mapping response:', response[item]);
-					this.collection.models.push(new this.collection.model(response[item]));
-				}
-			}
-		} catch (e) {
-			console.error(e);
-			throw e;
-		}
-		return this.collection.models;
-	},
+	parse: _models.BaseModel.prototype.parse,
 	toJSON: _models.BaseModel.prototype.toJSON,
 	toMeta: _models.BaseModel.prototype.toMeta
 });
@@ -151,6 +134,25 @@ Object.assign(BaseCollection.prototype, {
 function ProductCollection(options) {
 	Object.assign(this, BaseCollection.prototype, options);
 	this.model = _models.Product;
+
+	this.parse = (function () {
+		var response = _models.BaseModel.prototype.parse.apply(this, arguments);
+		if (response === false) {
+			return response;
+		}
+		try {
+			for (var item in response) {
+				if (response.hasOwnProperty(item)) {
+					this.models.push(new this.model(response[item]));
+				}
+			}
+		} catch (e) {
+			console.error(e);
+			throw e;
+		}
+		return this.models;
+	}).bind(this);
+
 	//BaseCollection.constructor(options);
 	console.log('product collection', this, arguments);
 }

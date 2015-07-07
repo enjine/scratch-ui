@@ -9,6 +9,7 @@ Object.assign(BaseCollection.prototype, {
 	models: [],
 	model: BaseModel,
 	fetch: BaseModel.prototype.fetch,
+	parse: BaseModel.prototype.parse,
 	toJSON: BaseModel.prototype.toJSON,
 	toMeta: BaseModel.prototype.toMeta
 });
@@ -25,16 +26,16 @@ export function ProductCollection(options) {
 		try {
 			for(let item in response){
 				if(response.hasOwnProperty(item)){
-					console.log('mapping response:', response[item]);
-					this.collection.models.push(new this.collection.model(response[item]));
+					this.models.push(new this.model(response[item]));
 				}
 			}
 		} catch(e){
 			console.error(e)
 			throw e;
 		}
-		return this.collection.models;
-	}
+		return this.models;
+	}.bind(this);
+
 	//BaseCollection.constructor(options);
 	console.log('product collection', this, arguments)
 }
