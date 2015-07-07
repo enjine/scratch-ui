@@ -1,6 +1,4 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-
-},{}],2:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -92,7 +90,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],3:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -108,7 +106,7 @@ var ui = {
 };
 exports.ui = ui;
 
-},{"./components":5}],4:[function(require,module,exports){
+},{"./components":4}],3:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -119,7 +117,7 @@ exports.ProductCollection = ProductCollection;
 var _models = require('./models');
 
 var BaseCollection = function BaseCollection() {
-	var ptions = arguments[0] === undefined ? {} : arguments[0];
+	var options = arguments[0] === undefined ? {} : arguments[0];
 
 	Object.assign(this, options);
 };
@@ -128,7 +126,24 @@ Object.assign(BaseCollection.prototype, {
 	models: [],
 	model: _models.BaseModel,
 	fetch: _models.BaseModel.prototype.fetch,
-	parse: _models.BaseModel.prototype.parse,
+	parse: function parse() {
+		var response = _models.BaseModel.prototype.parse.apply(this, arguments);
+		if (response === false) {
+			return response;
+		}
+		try {
+			for (var item in response) {
+				if (response.hasOwnProperty(item)) {
+					console.log('mapping response:', response[item]);
+					this.collection.models.push(new this.collection.model(response[item]));
+				}
+			}
+		} catch (e) {
+			console.error(e);
+			throw e;
+		}
+		return this.collection.models;
+	},
 	toJSON: _models.BaseModel.prototype.toJSON,
 	toMeta: _models.BaseModel.prototype.toMeta
 });
@@ -140,7 +155,7 @@ function ProductCollection(options) {
 	console.log('product collection', this, arguments);
 }
 
-},{"./models":8}],5:[function(require,module,exports){
+},{"./models":7}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -193,7 +208,7 @@ function ProductList(el) {
 			    html = "";
 
 			for (var obj in results) {
-				html += template(results[obj]);
+				html += _core.jst.compile(template, results[obj]);
 			}
 
 			this.el.innerHTML = html;
@@ -258,7 +273,7 @@ function AddToCart(el) {
 	console.log("ADD TO CART!", this, arguments);
 }
 
-},{"./cart":3,"./collections":4,"./core":6,"./views":10}],6:[function(require,module,exports){
+},{"./cart":2,"./collections":3,"./core":5,"./views":9}],5:[function(require,module,exports){
 'use strict';
 
 var _arguments = arguments;
@@ -274,9 +289,9 @@ var _rsvp2 = _interopRequireDefault(_rsvp);
 
 //var xhttp = require('xhttp/custom')(Promise);
 
-var _dot = require('dot');
+var _templeton = require('templeton');
 
-var _dot2 = _interopRequireDefault(_dot);
+var _templeton2 = _interopRequireDefault(_templeton);
 
 var xhttp = require('xhttp/custom')(_rsvp2['default'].Promise);var net = {
 	http: {
@@ -402,7 +417,11 @@ var jst = {
 	templates: {},
 
 	getFromDOM: function getFromDOM(name) {
-		return _dot2['default'].template(document.getElementById(name).innerHTML);
+		return document.getElementById(name).innerHTML;
+	},
+
+	compile: function compile(templateStr, data, overrides) {
+		return _templeton2['default'].template(templateStr, data, overrides);
 	}
 
 };
@@ -410,7 +429,7 @@ var jst = {
 exports.jst = jst;
 exports['default'] = { net: net, storage: storage, jst: jst };
 
-},{"dot":12,"rsvp":13,"xhttp/custom":14}],7:[function(require,module,exports){
+},{"rsvp":10,"templeton":11,"xhttp/custom":12}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -501,7 +520,9 @@ var Mediator = function Mediator(timestamp) {
    */
 		broadcast: function broadcast(name) {
 			instances.forEach(function (instance) {
-				instance.hasOwnProperty("receiveBroadcast") && typeof instance["receiveBroadcast"] === "function" && instance["receiveBroadcast"](name);
+				if (instance.hasOwnProperty("receiveBroadcast") && typeof instance["receiveBroadcast"] === "function") {
+					instance["receiveBroadcast"](name);
+				}
 			});
 		},
 		/**
@@ -510,9 +531,11 @@ var Mediator = function Mediator(timestamp) {
    * @returns {undefined}
    */
 		emit: function emit(name) {
-			eventMap.hasOwnProperty(name) && eventMap[name].forEach(function (subscription) {
-				subscription.process.call(subscription.context);
-			});
+			if (eventMap.hasOwnProperty(name) && eventMap[name]) {
+				eventMap[name].forEach(function (subscription) {
+					subscription.process.call(subscription.context);
+				});
+			}
 		},
 		/**
    * Registers the given action as a listener to the named event.
@@ -522,7 +545,10 @@ var Mediator = function Mediator(timestamp) {
    * @returns {Function} A deregistration function for this listener.
    */
 		on: function on(name, action) {
-			eventMap.hasOwnProperty(name) || (eventMap[name] = []);
+			if (!eventMap.hasOwnProperty(name)) {
+				eventMap[name] = [];
+			}
+
 			eventMap[name].push({
 				context: this,
 				process: action
@@ -557,6 +583,7 @@ var Mediator = function Mediator(timestamp) {
 };
 
 var PubSub = function PubSub(obj) {
+	this.mediator = new Mediator(new Date());
 	if (obj) return PubSub.mixin(obj);
 };
 exports.PubSub = PubSub;
@@ -585,7 +612,7 @@ Object.assign(All, Emitter.prototype, Listener.prototype, PubSub.prototype);
 
 exports["default"] = { Mediator: Mediator, Emitter: Emitter, Listener: Listener, PubSub: PubSub };
 
-},{"./util":9}],8:[function(require,module,exports){
+},{"./util":8}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -711,12 +738,12 @@ var Product = function Product(options) {
 		quantity: ""
 	};
 
-	Object.assign(this, BaseView.prototype, options);
+	Object.assign(this, BaseModel.prototype, options);
 	Object.assign(this.values, defaults);
 };
 exports.Product = Product;
 
-},{"./core":6}],9:[function(require,module,exports){
+},{"./core":5}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -739,7 +766,7 @@ function mixin(destObject) {
 
 exports['default'] = { mixin: mixin };
 
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -819,294 +846,7 @@ Object.assign(BaseView.prototype, {
 
 exports["default"] = { BaseView: BaseView };
 
-},{"./components":5,"./events":7}],11:[function(require,module,exports){
-// doT.js
-// 2011-2014, Laura Doktorova, https://github.com/olado/doT
-// Licensed under the MIT license.
-
-(function() {
-	"use strict";
-
-	var doT = {
-		version: "1.0.3",
-		templateSettings: {
-			evaluate:    /\{\{([\s\S]+?(\}?)+)\}\}/g,
-			interpolate: /\{\{=([\s\S]+?)\}\}/g,
-			encode:      /\{\{!([\s\S]+?)\}\}/g,
-			use:         /\{\{#([\s\S]+?)\}\}/g,
-			useParams:   /(^|[^\w$])def(?:\.|\[[\'\"])([\w$\.]+)(?:[\'\"]\])?\s*\:\s*([\w$\.]+|\"[^\"]+\"|\'[^\']+\'|\{[^\}]+\})/g,
-			define:      /\{\{##\s*([\w\.$]+)\s*(\:|=)([\s\S]+?)#\}\}/g,
-			defineParams:/^\s*([\w$]+):([\s\S]+)/,
-			conditional: /\{\{\?(\?)?\s*([\s\S]*?)\s*\}\}/g,
-			iterate:     /\{\{~\s*(?:\}\}|([\s\S]+?)\s*\:\s*([\w$]+)\s*(?:\:\s*([\w$]+))?\s*\}\})/g,
-			varname:	"it",
-			strip:		true,
-			append:		true,
-			selfcontained: false,
-			doNotSkipEncoded: false
-		},
-		template: undefined, //fn, compile template
-		compile:  undefined  //fn, for express
-	}, _globals;
-
-	doT.encodeHTMLSource = function(doNotSkipEncoded) {
-		var encodeHTMLRules = { "&": "&#38;", "<": "&#60;", ">": "&#62;", '"': "&#34;", "'": "&#39;", "/": "&#47;" },
-			matchHTML = doNotSkipEncoded ? /[&<>"'\/]/g : /&(?!#?\w+;)|<|>|"|'|\//g;
-		return function(code) {
-			return code ? code.toString().replace(matchHTML, function(m) {return encodeHTMLRules[m] || m;}) : "";
-		};
-	};
-
-	_globals = (function(){ return this || (0,eval)("this"); }());
-
-	if (typeof module !== "undefined" && module.exports) {
-		module.exports = doT;
-	} else if (typeof define === "function" && define.amd) {
-		define(function(){return doT;});
-	} else {
-		_globals.doT = doT;
-	}
-
-	var startend = {
-		append: { start: "'+(",      end: ")+'",      startencode: "'+encodeHTML(" },
-		split:  { start: "';out+=(", end: ");out+='", startencode: "';out+=encodeHTML(" }
-	}, skip = /$^/;
-
-	function resolveDefs(c, block, def) {
-		return ((typeof block === "string") ? block : block.toString())
-		.replace(c.define || skip, function(m, code, assign, value) {
-			if (code.indexOf("def.") === 0) {
-				code = code.substring(4);
-			}
-			if (!(code in def)) {
-				if (assign === ":") {
-					if (c.defineParams) value.replace(c.defineParams, function(m, param, v) {
-						def[code] = {arg: param, text: v};
-					});
-					if (!(code in def)) def[code]= value;
-				} else {
-					new Function("def", "def['"+code+"']=" + value)(def);
-				}
-			}
-			return "";
-		})
-		.replace(c.use || skip, function(m, code) {
-			if (c.useParams) code = code.replace(c.useParams, function(m, s, d, param) {
-				if (def[d] && def[d].arg && param) {
-					var rw = (d+":"+param).replace(/'|\\/g, "_");
-					def.__exp = def.__exp || {};
-					def.__exp[rw] = def[d].text.replace(new RegExp("(^|[^\\w$])" + def[d].arg + "([^\\w$])", "g"), "$1" + param + "$2");
-					return s + "def.__exp['"+rw+"']";
-				}
-			});
-			var v = new Function("def", "return " + code)(def);
-			return v ? resolveDefs(c, v, def) : v;
-		});
-	}
-
-	function unescape(code) {
-		return code.replace(/\\('|\\)/g, "$1").replace(/[\r\t\n]/g, " ");
-	}
-
-	doT.template = function(tmpl, c, def) {
-		c = c || doT.templateSettings;
-		var cse = c.append ? startend.append : startend.split, needhtmlencode, sid = 0, indv,
-			str  = (c.use || c.define) ? resolveDefs(c, tmpl, def || {}) : tmpl;
-
-		str = ("var out='" + (c.strip ? str.replace(/(^|\r|\n)\t* +| +\t*(\r|\n|$)/g," ")
-					.replace(/\r|\n|\t|\/\*[\s\S]*?\*\//g,""): str)
-			.replace(/'|\\/g, "\\$&")
-			.replace(c.interpolate || skip, function(m, code) {
-				return cse.start + unescape(code) + cse.end;
-			})
-			.replace(c.encode || skip, function(m, code) {
-				needhtmlencode = true;
-				return cse.startencode + unescape(code) + cse.end;
-			})
-			.replace(c.conditional || skip, function(m, elsecase, code) {
-				return elsecase ?
-					(code ? "';}else if(" + unescape(code) + "){out+='" : "';}else{out+='") :
-					(code ? "';if(" + unescape(code) + "){out+='" : "';}out+='");
-			})
-			.replace(c.iterate || skip, function(m, iterate, vname, iname) {
-				if (!iterate) return "';} } out+='";
-				sid+=1; indv=iname || "i"+sid; iterate=unescape(iterate);
-				return "';var arr"+sid+"="+iterate+";if(arr"+sid+"){var "+vname+","+indv+"=-1,l"+sid+"=arr"+sid+".length-1;while("+indv+"<l"+sid+"){"
-					+vname+"=arr"+sid+"["+indv+"+=1];out+='";
-			})
-			.replace(c.evaluate || skip, function(m, code) {
-				return "';" + unescape(code) + "out+='";
-			})
-			+ "';return out;")
-			.replace(/\n/g, "\\n").replace(/\t/g, '\\t').replace(/\r/g, "\\r")
-			.replace(/(\s|;|\}|^|\{)out\+='';/g, '$1').replace(/\+''/g, "");
-			//.replace(/(\s|;|\}|^|\{)out\+=''\+/g,'$1out+=');
-
-		if (needhtmlencode) {
-			if (!c.selfcontained && _globals && !_globals._encodeHTML) _globals._encodeHTML = doT.encodeHTMLSource(c.doNotSkipEncoded);
-			str = "var encodeHTML = typeof _encodeHTML !== 'undefined' ? _encodeHTML : ("
-				+ doT.encodeHTMLSource.toString() + "(" + (c.doNotSkipEncoded || '') + "));"
-				+ str;
-		}
-		try {
-			return new Function(c.varname, str);
-		} catch (e) {
-			if (typeof console !== "undefined") console.log("Could not create a template function: " + str);
-			throw e;
-		}
-	};
-
-	doT.compile = function(tmpl, def) {
-		return doT.template(tmpl, null, def);
-	};
-}());
-
-},{}],12:[function(require,module,exports){
-/* doT + auto-compilation of doT templates
- *
- * 2012, Laura Doktorova, https://github.com/olado/doT
- * Licensed under the MIT license
- *
- * Compiles .def, .dot, .jst files found under the specified path.
- * It ignores sub-directories.
- * Template files can have multiple extensions at the same time.
- * Files with .def extension can be included in other files via {{#def.name}}
- * Files with .dot extension are compiled into functions with the same name and
- * can be accessed as renderer.filename
- * Files with .jst extension are compiled into .js files. Produced .js file can be
- * loaded as a commonJS, AMD module, or just installed into a global variable
- * (default is set to window.render).
- * All inline defines defined in the .jst file are
- * compiled into separate functions and are available via _render.filename.definename
- *
- * Basic usage:
- * var dots = require("dot").process({path: "./views"});
- * dots.mytemplate({foo:"hello world"});
- *
- * The above snippet will:
- * 1. Compile all templates in views folder (.dot, .def, .jst)
- * 2. Place .js files compiled from .jst templates into the same folder.
- *    These files can be used with require, i.e. require("./views/mytemplate").
- * 3. Return an object with functions compiled from .dot templates as its properties.
- * 4. Render mytemplate template.
- */
-
-var fs = require("fs"),
-	doT = module.exports = require("./doT");
-
-doT.process = function(options) {
-	//path, destination, global, rendermodule, templateSettings
-	return new InstallDots(options).compileAll();
-};
-
-function InstallDots(o) {
-	this.__path 		= o.path || "./";
-	if (this.__path[this.__path.length-1] !== '/') this.__path += '/';
-	this.__destination	= o.destination || this.__path;
-	if (this.__destination[this.__destination.length-1] !== '/') this.__destination += '/';
-	this.__global		= o.global || "window.render";
-	this.__rendermodule	= o.rendermodule || {};
-	this.__settings 	= o.templateSettings ? copy(o.templateSettings, copy(doT.templateSettings)) : undefined;
-	this.__includes		= {};
-}
-
-InstallDots.prototype.compileToFile = function(path, template, def) {
-	def = def || {};
-	var modulename = path.substring(path.lastIndexOf("/")+1, path.lastIndexOf("."))
-		, defs = copy(this.__includes, copy(def))
-		, settings = this.__settings || doT.templateSettings
-		, compileoptions = copy(settings)
-		, defaultcompiled = doT.template(template, settings, defs)
-		, exports = []
-		, compiled = ""
-		, fn;
-
-	for (var property in defs) {
-		if (defs[property] !== def[property] && defs[property] !== this.__includes[property]) {
-			fn = undefined;
-			if (typeof defs[property] === 'string') {
-				fn = doT.template(defs[property], settings, defs);
-			} else if (typeof defs[property] === 'function') {
-				fn = defs[property];
-			} else if (defs[property].arg) {
-				compileoptions.varname = defs[property].arg;
-				fn = doT.template(defs[property].text, compileoptions, defs);
-			}
-			if (fn) {
-				compiled += fn.toString().replace('anonymous', property);
-				exports.push(property);
-			}
-		}
-	}
-	compiled += defaultcompiled.toString().replace('anonymous', modulename);
-	fs.writeFileSync(path, "(function(){" + compiled
-		+ "var itself=" + modulename + ", _encodeHTML=(" + doT.encodeHTMLSource.toString() + "(" + (settings.doNotSkipEncoded || '') + "));"
-		+ addexports(exports)
-		+ "if(typeof module!=='undefined' && module.exports) module.exports=itself;else if(typeof define==='function')define(function(){return itself;});else {"
-		+ this.__global + "=" + this.__global + "||{};" + this.__global + "['" + modulename + "']=itself;}}());");
-};
-
-function addexports(exports) {
-	for (var ret ='', i=0; i< exports.length; i++) {
-		ret += "itself." + exports[i]+ "=" + exports[i]+";";
-	}
-	return ret;
-}
-
-function copy(o, to) {
-	to = to || {};
-	for (var property in o) {
-		to[property] = o[property];
-	}
-	return to;
-}
-
-function readdata(path) {
-	var data = fs.readFileSync(path);
-	if (data) return data.toString();
-	console.log("problems with " + path);
-}
-
-InstallDots.prototype.compilePath = function(path) {
-	var data = readdata(path);
-	if (data) {
-		return doT.template(data,
-					this.__settings || doT.templateSettings,
-					copy(this.__includes));
-	}
-};
-
-InstallDots.prototype.compileAll = function() {
-	console.log("Compiling all doT templates...");
-
-	var defFolder = this.__path,
-		sources = fs.readdirSync(defFolder),
-		k, l, name;
-
-	for( k = 0, l = sources.length; k < l; k++) {
-		name = sources[k];
-		if (/\.def(\.dot|\.jst)?$/.test(name)) {
-			console.log("Loaded def " + name);
-			this.__includes[name.substring(0, name.indexOf('.'))] = readdata(defFolder + name);
-		}
-	}
-
-	for( k = 0, l = sources.length; k < l; k++) {
-		name = sources[k];
-		if (/\.dot(\.def|\.jst)?$/.test(name)) {
-			console.log("Compiling " + name + " to function");
-			this.__rendermodule[name.substring(0, name.indexOf('.'))] = this.compilePath(defFolder + name);
-		}
-		if (/\.jst(\.dot|\.def)?$/.test(name)) {
-			console.log("Compiling " + name + " to file");
-			this.compileToFile(this.__destination + name.substring(0, name.indexOf('.')) + '.js',
-					readdata(defFolder + name));
-		}
-	}
-	return this.__rendermodule;
-};
-
-},{"./doT":11,"fs":1}],13:[function(require,module,exports){
+},{"./components":4,"./events":6}],10:[function(require,module,exports){
 (function (process){
 /*!
  * @overview RSVP - a tiny implementation of Promises/A+.
@@ -2781,7 +2521,214 @@ InstallDots.prototype.compileAll = function() {
 
 
 }).call(this,require('_process'))
-},{"_process":2}],14:[function(require,module,exports){
+},{"_process":1}],11:[function(require,module,exports){
+(function(g, f) {
+	if (typeof define==='function' && define.amd)
+		define([], f);
+	else if (typeof module==='object' && module.exports)
+		module.exports = f();
+	else
+		g.templeton = f();
+}(this, function() {
+	var keyPath = /(\.{2,}|\[(['"])([^\.]*?)\1\])/g,
+		trimDots = /(^\.|\.$)/g,
+		empty = {},
+		templeton;
+
+	function execHelper(name, text) {
+		var parts = name.split(':'),
+			id = parts[0],
+			h = templeton.helpers[id];
+		if (typeof h==='string') {
+			return templeton.template(h, text);
+		}
+		parts.splice(0, 1, text);
+		return h.apply(templeton.helpers, parts);
+	}
+
+	/** A simple template engine with iterators and extensible block helpers */
+	return (templeton = {
+
+		/** Allow "~" and "__path__" special keys? */
+		extendedKeys : true,
+
+		/** Helpers can be simple templates, or transformation functions */
+		helpers : {
+			link : '<a href="{{href}}">{{title}}</a>',
+
+			html : function(v) {
+				return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+			},
+
+			escape : function(v) {
+				return encodeURIComponent(v);
+			},
+
+			json : function(v) {
+				return JSON.stringify(v);
+			}
+		},
+
+		/** Custom modifiers registered as single-character key prefixes */
+		refs : {
+			/*
+			// Example ref: "{{@greeting.welcome}}"
+			'@' : function(fields, key, fallback) {
+				return templeton.delve(fields, 'locale.'+key, fallback);
+			}
+			*/
+		},
+
+		/**	Deal with types of blocks */
+		blockHelpers : {
+
+			_default : function(ctx) {
+				return this[ (ctx.value && ctx.value.splice) ? 'each' : 'if' ](ctx);
+			},
+
+			/** Basic iterator */
+			each : function(ctx) {
+				var out='', p, fields,
+					top = ctx.fields,
+					obj = ctx.value;
+				if (templeton.extendedKeys!==false) {
+					fields = {
+						'~' : top,
+						__path__ : ctx.id==='.' ? ctx.path : ctx.id
+					};
+				}
+				for (p in obj) {
+					if (obj.hasOwnProperty(p)) {
+						if (fields) {
+							fields.__key__ = p;
+						}
+						out += templeton.template(ctx.content, obj[p], fields);
+					}
+				}
+				return out;
+			},
+
+			/** Conditional block */
+			'if' : function(ctx) {
+				return ctx.value ? templeton.template(ctx.content, ctx.fields, ctx.overrides) : '';
+			},
+
+			/** Conditional block (inverted) */
+			'else' : function(ctx) {
+				return ctx.value ? '' : templeton.template(ctx.content, ctx.fields, ctx.overrides);
+			},
+
+			'unless' : function(ctx) {
+				return this['else'](ctx);
+			}
+
+		},
+
+		/** The guts. */
+		template : function(text, fields, _overrides) {
+			var tokenizer = /\{\{\{?([#\/\:]?)([^ \{\}\|]+)(?: ([^\{\}\|]*?))?(?:\|([^\{\}]*?))?\}?\}\}/g,
+				out = '',
+				t, j, r, f, index, mods, token, html,
+				stack = [],
+				ctx;
+			ctx = {
+				fields : fields || {},
+				overrides : _overrides || empty
+			};
+			ctx.path = (ctx.overrides.__path__?(ctx.overrides.__path__+'.'):'')+ctx.overrides.__key__;
+			tokenizer.lastIndex = 0;
+			while ( (token=tokenizer.exec(text)) ) {
+				if (stack.length===0) {
+					out += text.substring(index || 0, tokenizer.lastIndex - token[0].length);
+				}
+				t = token[1];
+				if (!t || (t!=='#' && t!==':' && t!=='/')) {
+					f = token[2];
+					if (stack.length===0) {
+						if (t) {
+							r = templeton.refs[t](fields, f, null);
+						}
+						else {
+							r = ctx.overrides[f] || templeton.delve(fields, f, null);
+						}
+						if (r===null) {
+							out += token[0];
+						}
+						else {
+							html = token[0].charAt(2)!=='{';
+							if (token[4]) {
+								mods = token[4].split('|');
+								for (j=0; j<mods.length; j++) {
+									if (templeton.helpers.hasOwnProperty(mods[j])) {
+										if (mods[j]==='html') {
+											html = false;
+										}
+										r = execHelper(mods[j], r);
+									}
+								}
+							}
+							if (html) {
+								r = templeton.helpers.html(r);
+							}
+							out += r;
+						}
+					}
+				}
+				else {
+					if (t==='/' || t===':') {
+						ctx.id = stack.pop();
+						ctx.value = ctx.overrides[ctx.id] || templeton.delve(fields, ctx.id, null);
+						if (stack.length===0) {
+							ctx.content = text.substring(ctx.blockStart, tokenizer.lastIndex - token[0].length);
+							r = templeton.blockHelpers[ctx.blockHelper](ctx);
+							if (r && typeof(r)==='string') {
+								out += r;
+							}
+						}
+						ctx.previousBlockHelper = ctx.blockHelper;
+						ctx.previousId = ctx.id;
+						ctx.previousValue = ctx.value;
+					}
+					if (t==='#' || t===':') {
+						if (!token[3]) token.splice(2, 0, '_default');
+						stack.push(t===':' ? ctx.id : token[3]);
+						if (stack.length===1) {
+							ctx.blockHelper = token[2];
+							ctx.blockStart = tokenizer.lastIndex;
+						}
+						index = null;
+					}
+				}
+				index = tokenizer.lastIndex;
+			}
+			out += text.substring(index);
+			return out;
+		},
+
+		delve : function(obj, key, fallback) {
+			var c=obj, i, l;
+			if (key==='.') {
+				return obj.hasOwnProperty('.') ? obj['.'] : obj;
+			}
+			if (key.indexOf('.')===-1) {
+				return obj.hasOwnProperty(key) ? obj[key] : fallback;
+			}
+			if (key.indexOf('[')!==-1) {
+				key = key.replace(keyPath,'.$2');
+			}
+			key = key.replace(trimDots,'').split('.');
+			for (i=0, l=key.length; i<l; i++) {
+				if (!c.hasOwnProperty(key[i])) {
+					return fallback;
+				}
+				c = c[key[i]];
+			}
+			return c;
+		}
+	});
+}));
+
+},{}],12:[function(require,module,exports){
 'use strict'
 
 /**
@@ -2791,7 +2738,7 @@ InstallDots.prototype.compileAll = function() {
 
 module.exports = require('./lib/xhttp')
 
-},{"./lib/xhttp":18}],15:[function(require,module,exports){
+},{"./lib/xhttp":16}],13:[function(require,module,exports){
 'use strict'
 
 /**
@@ -2975,7 +2922,7 @@ Options.prototype.$simpleOptions = function() {
 
 module.exports = Options
 
-},{"./utils":17}],16:[function(require,module,exports){
+},{"./utils":15}],14:[function(require,module,exports){
 'use strict'
 
 /**
@@ -3031,7 +2978,7 @@ function parse (xhr) {
 
 module.exports = parse
 
-},{"./utils":17}],17:[function(require,module,exports){
+},{"./utils":15}],15:[function(require,module,exports){
 'use strict'
 
 /**
@@ -3145,7 +3092,7 @@ function formEncode (object) {
 }
 exports.formEncode = formEncode
 
-},{}],18:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 'use strict'
 
 /**
@@ -3340,7 +3287,7 @@ module.exports = function (promiseConstructor) {
 
 }
 
-},{"./options":15,"./parse":16,"./utils":17}],19:[function(require,module,exports){
+},{"./options":13,"./parse":14,"./utils":15}],17:[function(require,module,exports){
 //import 'core-js'; // Node module
 "use strict";
 
@@ -3388,4 +3335,4 @@ var e750 = function e750() {
 var app = new e750();
 document.addEventListener("DOMContentLoaded", app.start());
 
-},{"./modules/components":5}]},{},[19]);
+},{"./modules/components":4}]},{},[17]);

@@ -30,7 +30,7 @@ export function ProductList(el, opts = {}) {
 				html = "";
 
 			for (let obj in results) {
-				html += template(results[obj]);
+				html += jst.compile(template, results[obj]);
 			}
 
 			this.el.innerHTML = html;

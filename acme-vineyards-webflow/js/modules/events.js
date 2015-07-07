@@ -75,8 +75,9 @@ var Mediator = function (timestamp) {
 		 */
 		broadcast: function (name) {
 			instances.forEach(function (instance) {
-				(instance.hasOwnProperty("receiveBroadcast") && typeof instance["receiveBroadcast"] === "function") &&
-				instance["receiveBroadcast"](name);
+				if(instance.hasOwnProperty("receiveBroadcast") && typeof instance["receiveBroadcast"] === "function"){
+					instance["receiveBroadcast"](name);
+				}
 			});
 		},
 		/**
@@ -85,9 +86,11 @@ var Mediator = function (timestamp) {
 		 * @returns {undefined}
 		 */
 		emit: function (name) {
-			eventMap.hasOwnProperty(name) && eventMap[name].forEach(function (subscription) {
-				subscription.process.call(subscription.context);
-			});
+			if(eventMap.hasOwnProperty(name) && eventMap[name]){
+				eventMap[name].forEach(function (subscription) {
+					subscription.process.call(subscription.context);
+				});
+			}
 		},
 		/**
 		 * Registers the given action as a listener to the named event.
@@ -97,7 +100,10 @@ var Mediator = function (timestamp) {
 		 * @returns {Function} A deregistration function for this listener.
 		 */
 		on: function (name, action) {
-			eventMap.hasOwnProperty(name) || (eventMap[name] = []);
+			if(!eventMap.hasOwnProperty(name)){
+				eventMap[name] = []
+			}
+
 			eventMap[name].push({
 				context: this,
 				process: action
@@ -133,6 +139,7 @@ var Mediator = function (timestamp) {
 
 
 export var PubSub = function (obj) {
+	this.mediator = new Mediator(new Date());
 	if (obj) return PubSub.mixin(obj);
 };
 PubSub.mixin = mixin;

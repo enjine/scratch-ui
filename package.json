@@ -1,13 +1,13 @@
 {
-  "name": "WebFlow",
+  "name": "e750-Webflow",
   "version": "0.0.0",
   "description": "750Commerce",
   "main": "index.js",
   "dependencies": {
     "babel": "^5.5.5",
     "core-js": "^0.9.8",
-    "dot": "^1.0.3",
     "rsvp": "^3.0.18",
+    "templeton": "^2.1.1",
     "xhttp": "^0.0.6"
   },
   "devDependencies": {

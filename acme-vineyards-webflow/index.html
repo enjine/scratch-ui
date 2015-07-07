@@ -97,28 +97,21 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/placeholders/3.0.2/placeholders.min.js"></script>
 		<![endif]-->
 
-		<script type="text/template" id="example/iterator">
-			{{? it.length}}
-				{{~ it :v}}
-				{{~}}
-			{{?}}
-		</script>
-
 		<script type="text/template" id="product/simple">
 			<div class="div-block-product" data-component="cart/product/simple">
-				<img src="{{=it.image}}">
+				<img src="{{image}}">
 
 				<div class="div-block-product-information">
-					<h1 class="h1-product-title">{{=it.name}}</h1>
+					<h1 class="h1-product-title">{{name}}</h1>
 
-					<h2 class="h2-product-subtitle">{{=it.brand}} <em> by {{=it.winemaker}}</em></h2>
+					<h2 class="h2-product-subtitle">{{blend}} <em> by {{winemaker}}</em></h2>
 
-					<p class="paragraph-product-description">{{=it.description}}</p>
+					<p class="paragraph-product-description">{{description}}</p>
 
 					<div class="w-clearfix div-block-product-add-to-cart">
 						<div class="div-block-product-pricing">
-							<div class="product-price">${{=it.price}}</div>
-							<div class="product-price compare">{{=it.retail_price}}</div>
+							<div class="product-price">${{price}}</div>
+							<div class="product-price compare">{{retail_price}}</div>
 						</div>
 						<div class="w-form form-wrapper" data-component="cart/add">
 							<form class="w-clearfix form" id="email-form" name="email-form" data-name="Email Form">

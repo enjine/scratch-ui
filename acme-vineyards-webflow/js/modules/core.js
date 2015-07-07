@@ -1,7 +1,7 @@
 import RSVP from 'rsvp';
 var xhttp = require('xhttp/custom')(RSVP.Promise);
 //var xhttp = require('xhttp/custom')(Promise);
-import doT from 'dot';
+import templeton from 'templeton';
 
 export var net = {
 	http: {
@@ -126,7 +126,11 @@ export var jst = {
 	templates: {},
 
 	getFromDOM: (name) => {
-		return doT.template(document.getElementById(name).innerHTML);
+		return document.getElementById(name).innerHTML;
+	},
+
+	compile: (templateStr, data, overrides) => {
+		return templeton.template(templateStr, data, overrides);
 	}
 
 };

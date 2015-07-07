@@ -113,7 +113,7 @@ export var Product = function (options) {
 		quantity: ""
 	};
 
-	Object.assign(this, BaseView.prototype, options);
+	Object.assign(this, BaseModel.prototype, options);
 	Object.assign(this.values, defaults);
 
 };
