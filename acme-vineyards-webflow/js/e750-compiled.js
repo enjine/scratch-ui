@@ -151,6 +151,7 @@ function ProductCollection(options) {
 	Object.assign(this, BaseCollection.prototype, options);
 	this.model = _models.Product;
 
+	//BaseCollection.constructor(options);
 	console.log('product collection', this, arguments);
 }
 
@@ -237,7 +238,7 @@ function ProductList(el) {
 
 	Object.assign(options, defaults, opts);
 
-	this.collection.fetch(options).then(this.collection.parse.bind(this), function (reason) {
+	this.collection.fetch(options).then(this.collection.parse.bind(this.collection), function (reason) {
 		console.error("Parsing Failed! ", _this, _arguments);
 	}).then(function (response) {
 		_this.render(response);

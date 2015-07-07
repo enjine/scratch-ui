@@ -61,7 +61,7 @@ export function ProductList(el, opts = {}) {
 	Object.assign(options, defaults, opts);
 
 	this.collection.fetch(options)
-		.then(this.collection.parse.bind(this), (reason) => {
+		.then(this.collection.parse.bind(this.collection), (reason) => {
 			console.error("Parsing Failed! ", this, arguments);
 		})
 		.then((response) => {

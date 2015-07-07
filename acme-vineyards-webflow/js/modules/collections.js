@@ -34,6 +34,7 @@ export function ProductCollection(options) {
 	Object.assign(this, BaseCollection.prototype, options);
 	this.model = Product;
 
+	//BaseCollection.constructor(options);
 	console.log('product collection', this, arguments)
 }
 
