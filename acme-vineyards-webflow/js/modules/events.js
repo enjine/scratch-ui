@@ -141,7 +141,6 @@ export function Emitter(obj) {
 }
 Emitter.mixin = mixin;
 Emitter.createDelegate = function(){
-	console.log('createDelegate', this, arguments, arguments.length, isNode(arguments[0]), isElement(arguments[0]));
 	var delegate, event, handler;
 	if(!isNode(arguments[0]) && !isElement(arguments[0])){
 		delegate = this.el;
@@ -152,6 +151,7 @@ Emitter.createDelegate = function(){
 		event = arguments[1];
 		handler = arguments[2];
 	}
+	console.log('createDelegate', this, arguments, arguments.length, isNode(arguments[0]), isElement(arguments[0]), [delegate, event, handler]);
 	return [delegate, event, handler];
 };
 

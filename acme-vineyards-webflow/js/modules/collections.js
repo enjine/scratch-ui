@@ -9,22 +9,25 @@ Object.assign(BaseCollection.prototype, {
 	models: [],
 	model: BaseModel,
 	fetch: BaseModel.prototype.fetch,
-	parse: function(){
-		var response = BaseModel.prototype.parse.apply(this, arguments);
-		if(response === false){
-			return response;
-		}
+	parse: function(data){
+		console.log('incoming model data:', data);;
 		try {
-			for(let item in response){
-				if(response.hasOwnProperty(item)){
-					this.models.push(new this.model(response[item]));
+			for(let item in data){
+				if(data.hasOwnProperty(item)){
+					// ! ! ISSUES ! !
+					debugger;
+					let m = new this.model(data[item]);
+					console.log('new model:', m, item, 'data:', data[item]);
+					this.models.push(m);
 				}
 			}
+			console.log('collection set:', this.models);
 		} catch(e){
 			console.error(e)
 			throw e;
 		}
-		return this.models;
+
+		return this;
 	},
 	toJSON: BaseModel.prototype.toJSON,
 	toMeta: BaseModel.prototype.toMeta

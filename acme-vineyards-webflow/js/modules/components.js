@@ -20,20 +20,49 @@ Object.assign(Application.prototype, BaseView.prototype, {
 	}
 });
 
-export function Product() {
-	Object.assign(this, BaseView.prototype);
+export function Product(options={}) {
+	Object.assign(this, BaseView.prototype, {
+		render: () => {
+			console.log('^model vals^^ ',this.model.values);
+			console.log('^model ser^^ ',this.model.serialize());
+			this.el.innerHTML = jst.compile(this.template, this.model.serialize()) || "";
+
+			this.on('focus', () => {
+				console.log('onFocus', this, arguments);
+			});
+
+			console.log('Product render', this, arguments)
+			return this
+		}
+	});
+
+	this.el = document.createElement(options.el || 'div');
+	this.model = options.model || null;
+	this.template = options.template || null;
+
+
+
 }
 
 export function ProductList(el, opts = {}) {
 
 	Object.assign(this, BaseView.prototype, opts, {
-		render: (results) => {
-			console.log('* render *')
-			var template = jst.getFromDOM("product/simple"),
-				html = "";
+		parse: () => {
 
-			for (let obj in results) {
-				html += jst.compile(template, results[obj]);
+		},
+		render: () => {
+			console.log('* render *',this.collection);
+			var template = jst.getFromDOM("product/simple"),
+				html = "",
+				products = this.collection.models,
+				product;
+
+			for (let i=0; i<products.length; i++) {
+				let model = products[i];
+				console.log('rrr', i, model, products);
+				product = new Product({model:model, template:template});
+				console.log('result:', product);
+				html +=  product.render().el.innerHTML;
 			}
 
 			this.el.innerHTML = html;
@@ -75,8 +104,8 @@ export function ProductList(el, opts = {}) {
 		.then(this.collection.parse.bind(this.collection), (reason) => {
 			console.error("Parsing Failed! ", this, arguments);
 		})
-		.then((response) => {
-			this.render(response);
+		.then(() => {
+			this.render();
 		}, (reason) => {
 			console.error("Render Failed! ", this, arguments);
 		})

@@ -5,9 +5,11 @@ var _attributes = {
 	_some_other_global_property: null,
 	all: function () {
 		let values = {};
-		for (let p in this.getOwnPropertyNames) {
-			values[p] = _attributes[p];
-		}
+		Object.getOwnPropertyNames(this).map((p) => {
+			values[p] = this[p];
+		});
+
+		return values;
 	}
 };
 
@@ -32,14 +34,27 @@ Object.assign(BaseModel.prototype, {
 		return net.http.get(options);
 	},
 
-	parse: function(response) {
-		if (Object.keys(response).length > 0) {
-			console.log("Parsing response: ", this, response);
-			return response;
+	parse: function(data) {
+		if (Object.keys(data).length > 0) {
+			//console.log("Parsing MODEL data: ", data);
+			for(let prop in data){
+				if(data.hasOwnProperty(prop)){
+					//console.log('setting ', prop, "=", data[prop]);
+					//Object.assign(this.values,{prop: data[prop]});
+					this.values[prop] = data[prop];
+					//console.log('set:',this.values[prop]);
+				}
+			}
+			console.log('eep', this.values.all());
 		} else {
-			console.error("Response has zero length.");
-			return false;
+			console.error("data has zero length.");
 		}
+
+		return this;
+	},
+
+	serialize: function(){
+		return this.values.all();
 	},
 
 	toJSON: function() {
@@ -54,7 +69,7 @@ Object.assign(BaseModel.prototype, {
 });
 
 
-export var Product = function (options) {
+export var Product = function (props) {
 	let defaults = {
 		id: "",
 		name: "",
@@ -113,7 +128,10 @@ export var Product = function (options) {
 		quantity: ""
 	};
 
-	Object.assign(this, BaseModel.prototype, options);
+	Object.assign(this, BaseModel.prototype);
 	Object.assign(this.values, defaults);
+	if(props){
+		this.parse(props);
+	}
 
 };

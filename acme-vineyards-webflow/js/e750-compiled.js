@@ -126,22 +126,24 @@ Object.assign(BaseCollection.prototype, {
 	models: [],
 	model: _models.BaseModel,
 	fetch: _models.BaseModel.prototype.fetch,
-	parse: function parse() {
-		var response = _models.BaseModel.prototype.parse.apply(this, arguments);
-		if (response === false) {
-			return response;
-		}
+	parse: function parse(data) {
+		console.log('incoming model data:', data);;
 		try {
-			for (var item in response) {
-				if (response.hasOwnProperty(item)) {
-					this.models.push(new this.model(response[item]));
+			for (var item in data) {
+				if (data.hasOwnProperty(item)) {
+					debugger;
+					var m = new this.model(data[item]);
+					console.log('new model:', m, item, 'data:', data[item]);
+					this.models.push(m);
 				}
 			}
+			console.log('collection set:', this.models);
 		} catch (e) {
 			console.error(e);
 			throw e;
 		}
-		return this.models;
+
+		return this;
 	},
 	toJSON: _models.BaseModel.prototype.toJSON,
 	toMeta: _models.BaseModel.prototype.toMeta
@@ -193,37 +195,66 @@ Object.assign(Application.prototype, _views.BaseView.prototype, {
 });
 
 function Product() {
-	Object.assign(this, _views.BaseView.prototype);
+	var _this = this,
+	    _arguments = arguments;
+
+	var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+	Object.assign(this, _views.BaseView.prototype, {
+		render: function render() {
+			console.log("^model vals^^ ", _this.model.values);
+			console.log("^model ser^^ ", _this.model.serialize());
+			_this.el.innerHTML = _core.jst.compile(_this.template, _this.model.serialize()) || "";
+
+			_this.on("focus", function () {
+				console.log("onFocus", _this, _arguments);
+			});
+
+			console.log("Product render", _this, _arguments);
+			return _this;
+		}
+	});
+
+	this.el = document.createElement(options.el || "div");
+	this.model = options.model || null;
+	this.template = options.template || null;
 }
 
 function ProductList(el) {
-	var _this = this,
-	    _arguments = arguments;
+	var _this2 = this,
+	    _arguments2 = arguments;
 
 	var opts = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
 	Object.assign(this, _views.BaseView.prototype, opts, {
-		render: function render(results) {
-			console.log("* render *");
+		parse: function parse() {},
+		render: function render() {
+			console.log("* render *", _this2.collection);
 			var template = _core.jst.getFromDOM("product/simple"),
-			    html = "";
+			    html = "",
+			    products = _this2.collection.models,
+			    product;
 
-			for (var obj in results) {
-				html += _core.jst.compile(template, results[obj]);
+			for (var i = 0; i < products.length; i++) {
+				var model = products[i];
+				console.log("rrr", i, model, products);
+				product = new Product({ model: model, template: template });
+				console.log("result:", product);
+				html += product.render().el.innerHTML;
 			}
 
-			_this.el.innerHTML = html;
-			return _this;
+			_this2.el.innerHTML = html;
+			return _this2;
 		},
 
 		onComponentsLoaded: function onComponentsLoaded() {
-			console.log("Product List received componentsLoaded", _this, _arguments);
-			_this.on(_this.el, "click", function (e) {
-				console.log("CLICKED", _this, e);
+			console.log("Product List received componentsLoaded", _this2, _arguments2);
+			_this2.on(_this2.el, "click", function (e) {
+				console.log("CLICKED", _this2, e);
 			});
 
-			_this.on(_this.el, "submit", function (e) {
-				console.log("SUBMITTED", _this, e);
+			_this2.on(_this2.el, "submit", function (e) {
+				console.log("SUBMITTED", _this2, e);
 				e.preventDefault();
 				return false;
 			});
@@ -248,16 +279,16 @@ function ProductList(el) {
 	Object.assign(options, defaults, opts);
 
 	this.collection.fetch(options).then(this.collection.parse.bind(this.collection), function (reason) {
-		console.error("Parsing Failed! ", _this, _arguments);
-	}).then(function (response) {
-		_this.render(response);
+		console.error("Parsing Failed! ", _this2, _arguments2);
+	}).then(function () {
+		_this2.render();
 	}, function (reason) {
-		console.error("Render Failed! ", _this, _arguments);
+		console.error("Render Failed! ", _this2, _arguments2);
 	})["catch"](function (reason) {
-		console.error("Promise Rejected! ", _this, _arguments, document.cookie);
+		console.error("Promise Rejected! ", _this2, _arguments2, document.cookie);
 	})["finally"](function () {
-		console.log("finally", _this, _arguments, options);
-		_this.updateChildren();
+		console.log("finally", _this2, _arguments2, options);
+		_this2.updateChildren();
 	});
 
 	console.log("component subscription");
@@ -266,7 +297,7 @@ function ProductList(el) {
 	console.log("component event handling");
 
 	this.on("componentsLoaded", function () {
-		console.log("ProductList closure loaded", _this, _arguments);
+		console.log("ProductList closure loaded", _this2, _arguments2);
 	});
 }
 
@@ -607,7 +638,6 @@ function Emitter(obj) {
 
 Emitter.mixin = _util.mixin;
 Emitter.createDelegate = function () {
-	console.log('createDelegate', this, arguments, arguments.length, (0, _util.isNode)(arguments[0]), (0, _util.isElement)(arguments[0]));
 	var delegate, event, handler;
 	if (!(0, _util.isNode)(arguments[0]) && !(0, _util.isElement)(arguments[0])) {
 		delegate = this.el;
@@ -618,6 +648,7 @@ Emitter.createDelegate = function () {
 		event = arguments[1];
 		handler = arguments[2];
 	}
+	console.log('createDelegate', this, arguments, arguments.length, (0, _util.isNode)(arguments[0]), (0, _util.isElement)(arguments[0]), [delegate, event, handler]);
 	return [delegate, event, handler];
 };
 
@@ -754,23 +785,27 @@ Object.assign(All, Emitter.prototype, Listener.prototype, PubSub.prototype);
 exports['default'] = { Emitter: Emitter, Listener: Listener, PubSub: PubSub };
 
 },{"./util":8}],7:[function(require,module,exports){
-"use strict";
+'use strict';
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
 	value: true
 });
 exports.BaseModel = BaseModel;
 
-var _core = require("./core");
+var _core = require('./core');
 
 var _attributes = {
 	_guid: null,
 	_some_other_global_property: null,
 	all: function all() {
+		var _this = this;
+
 		var values = {};
-		for (var p in this.getOwnPropertyNames) {
-			values[p] = _attributes[p];
-		}
+		Object.getOwnPropertyNames(this).map(function (p) {
+			values[p] = _this[p];
+		});
+
+		return values;
 	}
 };
 
@@ -791,18 +826,31 @@ Object.assign(BaseModel.prototype, {
   */
 	fetch: function fetch(options) {
 		// TODO: trigger beforeAsync, beforeFetch
-		console.log("fetch", this, arguments);
+		console.log('fetch', this, arguments);
 		return _core.net.http.get(options);
 	},
 
-	parse: function parse(response) {
-		if (Object.keys(response).length > 0) {
-			console.log("Parsing response: ", this, response);
-			return response;
+	parse: function parse(data) {
+		if (Object.keys(data).length > 0) {
+			//console.log("Parsing MODEL data: ", data);
+			for (var prop in data) {
+				if (data.hasOwnProperty(prop)) {
+					//console.log('setting ', prop, "=", data[prop]);
+					//Object.assign(this.values,{prop: data[prop]});
+					this.values[prop] = data[prop];
+					//console.log('set:',this.values[prop]);
+				}
+			}
+			console.log('eep', this.values.all());
 		} else {
-			console.error("Response has zero length.");
-			return false;
+			console.error('data has zero length.');
 		}
+
+		return this;
+	},
+
+	serialize: function serialize() {
+		return this.values.all();
 	},
 
 	toJSON: function toJSON() {
@@ -810,76 +858,79 @@ Object.assign(BaseModel.prototype, {
 	},
 
 	toMeta: function toMeta() {
-		var _this = this,
+		var _this2 = this,
 		    _arguments = arguments;
 
 		this.values.map(function () {
-			console.log(_this, _arguments);
+			console.log(_this2, _arguments);
 		});
 	}
 });
 
-var Product = function Product(options) {
+var Product = function Product(props) {
 	var defaults = {
-		id: "",
-		name: "",
-		sku: "",
-		price: "",
-		description: "",
-		status: "",
-		accolades_01: "",
-		additional_description: "",
-		aging: "",
-		alcohol: "",
-		appellation: "",
-		blend: "",
-		bottle_count: "",
-		bottle_size: "",
-		case_production: "",
-		country: "",
-		farming_method: "",
-		featured_product: "",
-		free_shipping: "",
-		harvest_date: "",
-		image: "",
-		image_alt: "",
-		max_purchase_quantity: "",
-		new_product: "",
-		not_availible_message: "",
-		oak: "",
-		ph: "",
-		qb_account: "",
-		qb_class: "",
-		qb_sku: "",
-		region: "",
-		release_date: "",
-		residual_sugar: "",
-		retail_price: "",
-		short_description: "",
-		soil: "",
-		starting_quantity: "",
-		status_availability: "",
-		subtitle: "",
-		sub_region: "",
-		ta: "",
-		upc: "",
-		varietal: "",
-		vineyard: "",
-		vintage: "",
-		winemaker: "",
-		wine_type: "",
+		id: '',
+		name: '',
+		sku: '',
+		price: '',
+		description: '',
+		status: '',
+		accolades_01: '',
+		additional_description: '',
+		aging: '',
+		alcohol: '',
+		appellation: '',
+		blend: '',
+		bottle_count: '',
+		bottle_size: '',
+		case_production: '',
+		country: '',
+		farming_method: '',
+		featured_product: '',
+		free_shipping: '',
+		harvest_date: '',
+		image: '',
+		image_alt: '',
+		max_purchase_quantity: '',
+		new_product: '',
+		not_availible_message: '',
+		oak: '',
+		ph: '',
+		qb_account: '',
+		qb_class: '',
+		qb_sku: '',
+		region: '',
+		release_date: '',
+		residual_sugar: '',
+		retail_price: '',
+		short_description: '',
+		soil: '',
+		starting_quantity: '',
+		status_availability: '',
+		subtitle: '',
+		sub_region: '',
+		ta: '',
+		upc: '',
+		varietal: '',
+		vineyard: '',
+		vintage: '',
+		winemaker: '',
+		wine_type: '',
 		categories: { // this should be an array
 			2: {
-				id: "",
-				name: "",
-				sort: ""
+				id: '',
+				name: '',
+				sort: ''
 			}
 		},
-		quantity: ""
+		quantity: ''
 	};
 
-	Object.assign(this, BaseModel.prototype, options);
+	Object.assign(this, BaseModel.prototype);
 	Object.assign(this.values, defaults);
+	if (props) {
+		this.parse(props);
+	}
 };
 exports.Product = Product;
 
