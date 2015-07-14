@@ -15,13 +15,12 @@ var _attributes = {
 
 
 export function BaseModel(options = {}) {
+	this.options = options;
 	this.values = Object.create(_attributes);
-	Object.assign(this.options, options);
 }
 
 
 Object.assign(BaseModel.prototype, {
-	options: {},
 
 	/**
 	 * returns an A+ promise
@@ -129,7 +128,8 @@ export var Product = function (props) {
 	};
 
 	Object.assign(this, BaseModel.prototype);
-	Object.assign(this.values, defaults);
+	BaseModel.apply(this, arguments);
+
 	if(props){
 		this.parse(props);
 	}

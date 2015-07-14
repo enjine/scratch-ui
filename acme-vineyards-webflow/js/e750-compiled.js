@@ -131,7 +131,6 @@ Object.assign(BaseCollection.prototype, {
 		try {
 			for (var item in data) {
 				if (data.hasOwnProperty(item)) {
-					debugger;
 					var m = new this.model(data[item]);
 					console.log('new model:', m, item, 'data:', data[item]);
 					this.models.push(m);
@@ -812,12 +811,11 @@ var _attributes = {
 function BaseModel() {
 	var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-	Object.assign(this.options, options);
+	this.options = options;
+	this.values = Object.create(_attributes);
 }
 
 Object.assign(BaseModel.prototype, {
-	options: {},
-	values: Object.create(_attributes),
 
 	/**
   * returns an A+ promise
@@ -927,7 +925,8 @@ var Product = function Product(props) {
 	};
 
 	Object.assign(this, BaseModel.prototype);
-	Object.assign(this.values, defaults);
+	BaseModel.apply(this, arguments);
+
 	if (props) {
 		this.parse(props);
 	}

@@ -14,8 +14,6 @@ Object.assign(BaseCollection.prototype, {
 		try {
 			for(let item in data){
 				if(data.hasOwnProperty(item)){
-					// ! ! ISSUES ! !
-					debugger;
 					let m = new this.model(data[item]);
 					console.log('new model:', m, item, 'data:', data[item]);
 					this.models.push(m);
