@@ -4,18 +4,20 @@ import {ProductCollection} from "./collections";
 import {ui} from './cart';
 
 export var Resolver = {
-		"ui/header": BaseView,
-		"ui/slider": BaseView,
-		"ui/intro": BaseView,
-		"cart/add": ui.addToCart,
-		"cart/product-list": ui.productList,
-		"cart/product/simple": ui.baseProduct
-	};
+	"ui/header": BaseView,
+	"ui/slider": BaseView,
+	"ui/intro": BaseView,
+	"cart/add": ui.addToCart,
+	"cart/product-list": ui.productList,
+	"cart/product/simple": ui.baseProduct
+};
 
-export function Application() {}
+export function Application() {
+}
 Object.assign(Application.prototype, BaseView.prototype, {
 	componentInstances: {},
-	start: function(){}
+	start: function () {
+	}
 });
 
 export function Product() {
@@ -25,7 +27,8 @@ export function Product() {
 export function ProductList(el, opts = {}) {
 
 	Object.assign(this, BaseView.prototype, opts, {
-		render: function(results) {
+		render: (results) => {
+			console.log('* render *')
 			var template = jst.getFromDOM("product/simple"),
 				html = "";
 
@@ -35,16 +38,25 @@ export function ProductList(el, opts = {}) {
 
 			this.el.innerHTML = html;
 			return this;
-		}.bind(this)
+		},
+
+		onComponentsLoaded: () => {
+			console.log("Product List received componentsLoaded", this, arguments);
+			this.on(this.el, 'click', (e) => {
+				console.log('CLICKED', this, e);
+			});
+
+			this.on(this.el, 'submit', (e) => {
+				console.log('SUBMITTED', this, e);
+				e.preventDefault();
+				return false;
+			});
+		}
 
 	});
 
 	this.el = el;
-
-	this.on("registerComponents.complete", function(){
-		console.log("received registerComponents.complete", this, arguments);
-	});
-
+	this.collection = new ProductCollection();
 
 	var defaults = {
 		//url: "https://api.securecheckout.com/v1/cart/products/",
@@ -56,7 +68,6 @@ export function ProductList(el, opts = {}) {
 		}
 	}, options = {};
 
-	this.collection = new ProductCollection();
 
 	Object.assign(options, defaults, opts);
 
@@ -76,14 +87,22 @@ export function ProductList(el, opts = {}) {
 			console.log('finally', this, arguments, options);
 			this.updateChildren();
 		});
+
+	console.log('component subscription');
+	this.subscribe('componentsLoaded', this.onComponentsLoaded);
+
+	console.log('component event handling');
+
+	this.on('componentsLoaded', () => {
+		console.log('ProductList closure loaded', this, arguments);
+	});
+
+
 }
 
 
-export function AddToCart(el, opts = {}){
-	Object.assign(this, BaseView.prototype, {
-
-
-	});
+export function AddToCart(el, opts = {}) {
+	Object.assign(this, BaseView.prototype, {});
 
 	var defaults = {
 		//url: "https://api.securecheckout.com/v1/cart/products/",

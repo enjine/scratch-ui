@@ -1,6 +1,6 @@
 import RSVP from 'rsvp';
 var xhttp = require('xhttp/custom')(RSVP.Promise);
-//var xhttp = require('xhttp/custom')(Promise);
+//var xhttp = require('xhttp/custom')(Promise); // native ES6 Promise
 import templeton from 'templeton';
 
 export var net = {

@@ -364,7 +364,7 @@ module.exports = function($, _) {
 
   function addListeners() {
     listening = true;
-
+    /*
     // Handle form submission for Webflow forms
     $doc.on('submit', namespace + ' form', function(evt) {
       var data = $.data(this, namespace);
@@ -373,6 +373,7 @@ module.exports = function($, _) {
         data.handler(data);
       }
     });
+    */
   }
 
   // Reset data common to all submit handlers

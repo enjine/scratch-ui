@@ -1,8 +1,9 @@
-//import 'core-js'; // Node module
+import 'core-js'; // Node module
 import {Application, Resolver} from "./modules/components";
 
 var e750 = function () {
 	"use strict";
+
 
 	Object.assign(this, Application.prototype, {
 		start: function (options = {}) {
@@ -28,12 +29,17 @@ var e750 = function () {
 			});
 
 			console.log(this.componentInstances);
+		},
+
+		onComponentsLoaded: function() {
+			console.log("App received onComponentsLoaded", this, arguments);
 		}
 	});
 
-	this.on("registerComponents.complete", function () {
-		console.log("received registerComponents.complete", this, arguments);
-	});
+	console.log('app subscription');
+	this.subscribe('componentsLoaded', this.onComponentsLoaded);
+
+
 
 };
 
