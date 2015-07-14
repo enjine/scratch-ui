@@ -120,10 +120,11 @@ var BaseCollection = function BaseCollection() {
 	var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
 	Object.assign(this, options);
+
+	this.models = [];
 };
 
 Object.assign(BaseCollection.prototype, {
-	models: [],
 	model: _models.BaseModel,
 	fetch: _models.BaseModel.prototype.fetch,
 	parse: function parse(data) {
@@ -149,7 +150,9 @@ Object.assign(BaseCollection.prototype, {
 });
 
 function ProductCollection(options) {
-	Object.assign(this, BaseCollection.prototype, options);
+	Object.assign(this, BaseCollection.prototype);
+	BaseCollection.apply(this, arguments);
+
 	this.model = _models.Product;
 
 	//BaseCollection.constructor(options);

@@ -3,10 +3,11 @@ import {BaseModel, Product} from './models';
 
 var BaseCollection = function(options = {}) {
 	Object.assign(this, options);
+
+	this.models = [];
 };
 
 Object.assign(BaseCollection.prototype, {
-	models: [],
 	model: BaseModel,
 	fetch: BaseModel.prototype.fetch,
 	parse: function(data){
@@ -32,7 +33,9 @@ Object.assign(BaseCollection.prototype, {
 });
 
 export function ProductCollection(options) {
-	Object.assign(this, BaseCollection.prototype, options);
+	Object.assign(this, BaseCollection.prototype);
+	BaseCollection.apply(this, arguments);
+
 	this.model = Product;
 
 	//BaseCollection.constructor(options);
