@@ -99,22 +99,27 @@ Object.defineProperty(exports, "__esModule", {
 
 var _components = require("./components");
 
+var _viewsJs = require("./views.js");
+
 var ui = {
+	view: _viewsJs.BaseView,
 	productList: _components.ProductList,
 	addToCart: _components.AddToCart,
 	baseProduct: _components.Product
 };
 exports.ui = ui;
 
-},{"./components":4}],3:[function(require,module,exports){
-'use strict';
+},{"./components":4,"./views.js":9}],3:[function(require,module,exports){
+"use strict";
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 exports.ProductCollection = ProductCollection;
 
-var _models = require('./models');
+var _models = require("./models");
+
+var _events = require("./events");
 
 var BaseCollection = function BaseCollection() {
 	var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
@@ -124,20 +129,23 @@ var BaseCollection = function BaseCollection() {
 	this.models = [];
 };
 
+(0, _events.Emitter)(BaseCollection);
+(0, _events.PubSub)(BaseCollection);
+
 Object.assign(BaseCollection.prototype, {
 	model: _models.BaseModel,
 	fetch: _models.BaseModel.prototype.fetch,
 	parse: function parse(data) {
-		console.log('incoming model data:', data);;
+		//console.log('incoming model data:', data);;
 		try {
 			for (var item in data) {
 				if (data.hasOwnProperty(item)) {
 					var m = new this.model(data[item]);
-					console.log('new model:', m, item, 'data:', data[item]);
+					//console.log('new model:', m, item, 'data:', data[item]);
 					this.models.push(m);
 				}
 			}
-			console.log('collection set:', this.models);
+			//console.log('collection set:', this.models);
 		} catch (e) {
 			console.error(e);
 			throw e;
@@ -156,10 +164,10 @@ function ProductCollection(options) {
 	this.model = _models.Product;
 
 	//BaseCollection.constructor(options);
-	console.log('product collection', this, arguments);
+	//console.log('product collection', this, arguments)
 }
 
-},{"./models":7}],4:[function(require,module,exports){
+},{"./events":6,"./models":7}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -172,16 +180,18 @@ exports.AddToCart = AddToCart;
 
 var _core = require("./core");
 
+var _collections = require("./collections");
+
 var _views = require("./views");
 
-var _collections = require("./collections");
+var _models = require("./models");
 
 var _cart = require("./cart");
 
 var Resolver = {
-	"ui/header": _views.BaseView,
-	"ui/slider": _views.BaseView,
-	"ui/intro": _views.BaseView,
+	"ui/header": _cart.ui.view,
+	"ui/slider": _cart.ui.view,
+	"ui/intro": _cart.ui.view,
 	"cart/add": _cart.ui.addToCart,
 	"cart/product-list": _cart.ui.productList,
 	"cart/product/simple": _cart.ui.baseProduct
@@ -204,22 +214,25 @@ function Product() {
 
 	Object.assign(this, _views.BaseView.prototype, {
 		render: function render() {
-			console.log("^model vals^^ ", _this.model.values);
-			console.log("^model ser^^ ", _this.model.serialize());
 			_this.el.innerHTML = _core.jst.compile(_this.template, _this.model.serialize()) || "";
-
-			_this.on("focus", function () {
-				console.log("onFocus", _this, _arguments);
-			});
-
-			console.log("Product render", _this, _arguments);
 			return _this;
+		},
+
+		onComponentsLoaded: function onComponentsLoaded() {
+			console.log("product HERE!!", this, arguments);
+			this.emit("mouseenter");
 		}
 	});
 
 	this.el = document.createElement(options.el || "div");
-	this.model = options.model || null;
-	this.template = options.template || null;
+	this.model = options.model || _models.Product;
+	this.template = options.template || _core.jst.getFromDOM("product/simple");
+
+	this.subscribe("componentsLoaded", this.onComponentsLoaded.bind(this));
+
+	this.on("mouseenter", function () {
+		console.log("HOVERED", _this, _arguments);
+	});
 }
 
 function ProductList(el) {
@@ -229,37 +242,27 @@ function ProductList(el) {
 	var opts = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
 	Object.assign(this, _views.BaseView.prototype, opts, {
-		parse: function parse() {},
 		render: function render() {
-			console.log("* render *", _this2.collection);
-			var template = _core.jst.getFromDOM("product/simple"),
-			    html = "",
-			    products = _this2.collection.models,
-			    product;
+			try {
+				var html = "",
+				    products = _this2.collection.models,
+				    product = undefined;
 
-			for (var i = 0; i < products.length; i++) {
-				var model = products[i];
-				console.log("rrr", i, model, products);
-				product = new Product({ model: model, template: template });
-				console.log("result:", product);
-				html += product.render().el.innerHTML;
+				for (var i = 0; i < products.length; i++) {
+					var model = products[i];
+					product = new Product({ model: model });
+					html += product.render().el.innerHTML;
+				}
+
+				_this2.el.innerHTML = html;
+			} catch (e) {
+				throw e;
 			}
-
-			_this2.el.innerHTML = html;
 			return _this2;
 		},
 
 		onComponentsLoaded: function onComponentsLoaded() {
 			console.log("Product List received componentsLoaded", _this2, _arguments2);
-			_this2.on(_this2.el, "click", function (e) {
-				console.log("CLICKED", _this2, e);
-			});
-
-			_this2.on(_this2.el, "submit", function (e) {
-				console.log("SUBMITTED", _this2, e);
-				e.preventDefault();
-				return false;
-			});
 		}
 
 	});
@@ -298,8 +301,18 @@ function ProductList(el) {
 
 	console.log("component event handling");
 
-	this.on("componentsLoaded", function () {
+	this.on("otherEvent", function () {
 		console.log("ProductList closure loaded", _this2, _arguments2);
+	});
+
+	this.on("click", function (e) {
+		console.log("CLICKED", _this2, e);
+	});
+
+	this.on("submit", function (e) {
+		console.log("SUBMITTED", _this2, e);
+		e.preventDefault();
+		return false;
 	});
 }
 
@@ -324,7 +337,7 @@ function AddToCart(el) {
 	console.log("ADD TO CART!", this, arguments);
 }
 
-},{"./cart":2,"./collections":3,"./core":5,"./views":9}],5:[function(require,module,exports){
+},{"./cart":2,"./collections":3,"./core":5,"./models":7,"./views":9}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -513,7 +526,7 @@ Object.assign(EventBoss.prototype, {
 
 	findOrCreate: function findOrCreate() {
 		var events = this.events,
-		    evt;
+		    evt = undefined;
 
 		while (arguments.length > 0) {
 			evt = Array.prototype.shift.call(arguments);
@@ -526,48 +539,51 @@ Object.assign(EventBoss.prototype, {
 		return events;
 	},
 
-	addEvent: function addEvent(object, eventNames, fn) {
-		var subscriptionType = object.addEventListener ? 'addEventListener' : 'attachEvent';
-		(0, _util.handleDOMEvents)(subscriptionType, object, eventNames, fn);
+	addDOMEvent: function addDOMEvent(object, eventNames, handler) {
+		var bindType = object.addEventListener ? 'addEventListener' : 'attachEvent';
+		console.info('binding DOM Event: ', eventNames);
+		(0, _util.bindDOMEvents)(bindType, object, eventNames, handler);
 	},
 
-	removeEvent: function removeEvent(object, eventNames, fn) {
-		var subscriptionType = object.removeEventListener ? 'removeEventListener' : 'detachEvent';
-		(0, _util.handleDOMEvents)(subscriptionType, object, eventNames, fn);
+	removeDOMEvent: function removeDOMEvent(object, eventNames, handler) {
+		var bindType = object.removeEventListener ? 'removeEventListener' : 'detachEvent';
+		(0, _util.bindDOMEvents)(bindType, object, eventNames, handler);
 	},
 
-	dispatch: function dispatch(obj, event, data, options) {
-
-		var subscriptions,
+	dispatch: function dispatch(obj, event, data) {
+		var subscriptions = undefined,
 		    i = 0,
-		    eventType;
+		    eventType = undefined;
 
 		if (typeof event === 'string') {
 			event = this.createEvent(event);
 		}
 
-		console.log('dispatch', event, obj, data, options);
+		for (var _len = arguments.length, args = Array(_len > 3 ? _len - 3 : 0), _key = 3; _key < _len; _key++) {
+			args[_key - 3] = arguments[_key];
+		}
+
+		console.log.apply(console, ['Dispatching Event: ', event, obj, data].concat(args));
 
 		event.target = obj;
-		event.data = data;
+		event.data = { payload: data, args: [].concat(args) } || {};
 		eventType = event.type;
 		subscriptions = obj ? this.findOrCreate(obj, eventType) : this.findOrCreate(eventType);
 
 		console.log('subscriptions', subscriptions);
 
 		for (i; i < subscriptions.length; i += 1) {
-			console.log('dispatching event', subscriptions[i], event);
+			console.log('calling subscriber: ', event, subscriptions[i]);
 			try {
-				subscriptions[i](event);
+				subscriptions[i].apply(subscriptions, [event].concat(args));
 			} catch (e) {
 				throw e;
 			}
 		}
 	},
 
-	subscribe: function subscribe(obj, eventType, callback) {
-
-		var subscriptions,
+	subscribe: function subscribe(obj, eventType, handler) {
+		var subscriptions = undefined,
 		    isNewSubscription = false;
 		if (!obj) {
 			subscriptions = this.findOrCreate(eventType);
@@ -576,18 +592,19 @@ Object.assign(EventBoss.prototype, {
 		}
 
 		if (subscriptions.findIndex(function (item) {
-			return item === callback;
+			return item === handler;
 		}) === -1) {
-			subscriptions.push(callback);
+			subscriptions.push(handler);
 			isNewSubscription = true;
 		}
 
-		console.log('subscribe:', obj, eventType, callback);
+		console.log('subscribe:', obj, eventType, handler);
 		return isNewSubscription;
 	},
 
-	unsubscribe: function unsubscribe(obj, eventType, callback) {
-		var subscriptions, callbackIndex;
+	unsubscribe: function unsubscribe(obj, eventType, handler) {
+		var subscriptions = undefined,
+		    callbackIndex = undefined;
 
 		if (!obj) {
 			subscriptions = this.findOrCreate(eventType);
@@ -595,7 +612,7 @@ Object.assign(EventBoss.prototype, {
 			subscriptions = this.findOrCreate(obj, eventType);
 		}
 		callbackIndex = subscriptions.findIndex(function (item) {
-			return item === callback;
+			return item === handler;
 		});
 		if (callbackIndex !== -1) {
 			subscriptions.splice(callbackIndex, 1);
@@ -634,98 +651,6 @@ Object.assign(EventBoss.prototype, {
 
 });
 
-function Emitter(obj) {
-	if (obj) return Emitter.mixin(obj);
-}
-
-Emitter.mixin = _util.mixin;
-Emitter.createDelegate = function () {
-	var delegate, event, handler;
-	if (!(0, _util.isNode)(arguments[0]) && !(0, _util.isElement)(arguments[0])) {
-		delegate = this.el;
-		event = arguments[0];
-		handler = arguments[1];
-	} else {
-		delegate = arguments[0];
-		event = arguments[1];
-		handler = arguments[2];
-	}
-	console.log('createDelegate', this, arguments, arguments.length, (0, _util.isNode)(arguments[0]), (0, _util.isElement)(arguments[0]), [delegate, event, handler]);
-	return [delegate, event, handler];
-};
-
-Object.assign(Emitter.prototype, {
-	mediator: new EventBoss(),
-
-	/**
-  * for SINGLE events (non broadcast)
-  * @param delegate
-  * @param event
-  * @param handler
-  * @returns {on}
-  */
-	on: function on() {
-		var _Emitter$createDelegate$apply = Emitter.createDelegate.apply(this, arguments);
-
-		var _Emitter$createDelegate$apply2 = _slicedToArray(_Emitter$createDelegate$apply, 3);
-
-		var delegate = _Emitter$createDelegate$apply2[0];
-		var event = _Emitter$createDelegate$apply2[1];
-		var handler = _Emitter$createDelegate$apply2[2];
-
-		this.mediator.addEvent(delegate, event, handler);
-		console.log('registering ON event handler:', this, delegate, event, handler);
-		return this;
-	},
-
-	once: function once(delegate, event, handler) {
-		var _this = this;
-
-		this.on(delegate, event, function (data) {
-			_this.off(delegate, event, handler);
-			handler(data);
-		});
-		return this;
-	},
-
-	off: function off(event, handler) {
-		this._events = this._events || {};
-		if (event in this._events === false) return;
-		this._events[event].splice(this._events[event].indexOf(handler), 1);
-		return this;
-	},
-
-	emit: function emit(event) {
-		for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-			args[_key - 1] = arguments[_key];
-		}
-
-		console.log.apply(console, ['EMITTTED EVENT:', this].concat(args));
-		this._events = this._events || {};
-		if (event in this._events === false) return;
-		for (var i = 0; i < this._events[event].length; i++) {
-			var _events$event$i;
-
-			console.log.apply(console, [event].concat(args));
-			(_events$event$i = this._events[event][i]).call.apply(_events$event$i, [this].concat(args));
-		}
-		this.mediator.publish(event);
-	}
-});
-
-var Listener = function Listener(obj) {
-	if (obj) return Listener.mixin(obj);
-};exports.Listener = Listener;
-//aka observer...
-
-Listener.mixin = _util.mixin;
-
-Object.assign(Listener.prototype, {
-	listenTo: function listenTo(object, event, handler, context, options) {},
-
-	stopListening: function stopListening(object, event) {}
-});
-
 var PubSub = function PubSub(obj) {
 	if (obj) return PubSub.mixin(obj);
 };
@@ -734,7 +659,7 @@ exports.PubSub = PubSub;
 PubSub.mixin = _util.mixin;
 
 Object.assign(PubSub.prototype, {
-
+	mediator: new EventBoss(),
 	_once: {},
 
 	/**
@@ -744,14 +669,19 @@ Object.assign(PubSub.prototype, {
   * @param options
   * @returns {publish}
   */
-	publish: function publish(event, data, options) {
-		var _this2 = this;
+	publish: function publish(event, data) {
+		var _mediator,
+		    _this = this;
 
-		this.mediator.dispatch(this, event, data, options);
+		for (var _len2 = arguments.length, args = Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
+			args[_key2 - 2] = arguments[_key2];
+		}
+
+		(_mediator = this.mediator).dispatch.apply(_mediator, [this, event, data].concat(args));
 
 		if (this._once[event]) {
 			this._once[event].forEach(function (i, handler) {
-				_this2.mediator.unsubscribe(_this2, event, handler);
+				_this.mediator.unsubscribe(_this, event, handler);
 			});
 		}
 
@@ -780,6 +710,116 @@ Object.assign(PubSub.prototype, {
 	}
 });
 
+function Emitter(obj) {
+	if (obj) return Emitter.mixin(obj);
+}
+
+Emitter.mixin = _util.mixin;
+Emitter.createDelegate = function () {
+	var delegate, event, handler;
+	if ((0, _util.isNode)(arguments[0]) && (0, _util.isElement)(arguments[0])) {
+		delegate = arguments[0];
+		event = arguments[1];
+		handler = arguments[2];
+	} else {
+		delegate = this.el;
+		event = arguments[0];
+		handler = arguments[1];
+	}
+	//console.log('createDelegate', this, arguments, arguments.length, isNode(arguments[0]), isElement(arguments[0]), [delegate, event, handler]);
+	return [delegate, event, handler];
+};
+
+Object.assign(Emitter.prototype, PubSub.prototype, {
+
+	/**
+  * for SINGLE events (non broadcast)
+  * @param delegate
+  * @param event
+  * @param handler
+  * @returns {on}
+  */
+	on: function on() {
+		var _Emitter$createDelegate$apply = Emitter.createDelegate.apply(this, arguments);
+
+		var _Emitter$createDelegate$apply2 = _slicedToArray(_Emitter$createDelegate$apply, 3);
+
+		var delegate = _Emitter$createDelegate$apply2[0];
+		var event = _Emitter$createDelegate$apply2[1];
+		var handler = _Emitter$createDelegate$apply2[2];
+
+		if ((0, _util.isNativeEvent)(event)) {
+			this.mediator.addDOMEvent(delegate, event, handler);
+		} else {
+			this.subscribe(event, handler);
+		}
+
+		console.log('registering ON event handler:', this, delegate, event, handler);
+		return this;
+	},
+
+	once: function once() {
+		var _this2 = this;
+
+		var _Emitter$createDelegate$apply3 = Emitter.createDelegate.apply(this, arguments);
+
+		var _Emitter$createDelegate$apply32 = _slicedToArray(_Emitter$createDelegate$apply3, 3);
+
+		var delegate = _Emitter$createDelegate$apply32[0];
+		var event = _Emitter$createDelegate$apply32[1];
+		var handler = _Emitter$createDelegate$apply32[2];
+
+		this.on(delegate, event, function () {
+			_this2.off(delegate, event, handler);
+			handler.apply(undefined, arguments);
+		});
+		return this;
+	},
+
+	off: function off() {
+		var _Emitter$createDelegate$apply4 = Emitter.createDelegate.apply(this, arguments);
+
+		var _Emitter$createDelegate$apply42 = _slicedToArray(_Emitter$createDelegate$apply4, 3);
+
+		var delegate = _Emitter$createDelegate$apply42[0];
+		var event = _Emitter$createDelegate$apply42[1];
+		var handler = _Emitter$createDelegate$apply42[2];
+
+		this.mediator.removeDOMEvent(delegate, event, handler);
+		console.log('removing event handler:', this, delegate, event, handler);
+		return this;
+	},
+
+	emit: function emit(event, data) {
+		for (var _len3 = arguments.length, args = Array(_len3 > 2 ? _len3 - 2 : 0), _key3 = 2; _key3 < _len3; _key3++) {
+			args[_key3 - 2] = arguments[_key3];
+		}
+
+		console.log.apply(console, ['EMIT:', this, data].concat(args));
+		if ((0, _util.isNativeEvent)(event)) {
+			this.el.dispatchEvent(new Event(event));
+		} else {
+			var _mediator2;
+
+			(_mediator2 = this.mediator).dispatch.apply(_mediator2, [this, event, data].concat(args));
+		}
+		return this;
+	}
+});
+
+var Listener = function Listener(obj) {
+	if (obj) return Listener.mixin(obj);
+};exports.Listener = Listener;
+//aka observer...
+
+Listener.mixin = _util.mixin;
+
+Object.assign(Listener.prototype, {
+	listenTo: function listenTo(object, event, handler, context, options) {},
+
+	stopListening: function stopListening(object, event) {}
+});
+
 var All = function All() {};
 exports.All = All;
 Object.assign(All, Emitter.prototype, Listener.prototype, PubSub.prototype);
@@ -787,18 +827,19 @@ Object.assign(All, Emitter.prototype, Listener.prototype, PubSub.prototype);
 exports['default'] = { Emitter: Emitter, Listener: Listener, PubSub: PubSub };
 
 },{"./util":8}],7:[function(require,module,exports){
-'use strict';
+"use strict";
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 exports.BaseModel = BaseModel;
 
-var _core = require('./core');
+var _core = require("./core");
+
+var _events = require("./events");
 
 var _attributes = {
 	_guid: null,
-	_some_other_global_property: null,
 	all: function all() {
 		var _this = this;
 
@@ -818,6 +859,9 @@ function BaseModel() {
 	this.values = Object.create(_attributes);
 }
 
+(0, _events.Emitter)(BaseModel);
+(0, _events.PubSub)(BaseModel);
+
 Object.assign(BaseModel.prototype, {
 
 	/**
@@ -827,24 +871,19 @@ Object.assign(BaseModel.prototype, {
   */
 	fetch: function fetch(options) {
 		// TODO: trigger beforeAsync, beforeFetch
-		console.log('fetch', this, arguments);
+		console.log("fetch", this, arguments);
 		return _core.net.http.get(options);
 	},
 
 	parse: function parse(data) {
 		if (Object.keys(data).length > 0) {
-			//console.log("Parsing MODEL data: ", data);
 			for (var prop in data) {
 				if (data.hasOwnProperty(prop)) {
-					//console.log('setting ', prop, "=", data[prop]);
-					//Object.assign(this.values,{prop: data[prop]});
 					this.values[prop] = data[prop];
-					//console.log('set:',this.values[prop]);
 				}
 			}
-			console.log('eep', this.values.all());
 		} else {
-			console.error('data has zero length.');
+			console.error("data has zero length.");
 		}
 
 		return this;
@@ -870,61 +909,61 @@ Object.assign(BaseModel.prototype, {
 
 var Product = function Product(props) {
 	var defaults = {
-		id: '',
-		name: '',
-		sku: '',
-		price: '',
-		description: '',
-		status: '',
-		accolades_01: '',
-		additional_description: '',
-		aging: '',
-		alcohol: '',
-		appellation: '',
-		blend: '',
-		bottle_count: '',
-		bottle_size: '',
-		case_production: '',
-		country: '',
-		farming_method: '',
-		featured_product: '',
-		free_shipping: '',
-		harvest_date: '',
-		image: '',
-		image_alt: '',
-		max_purchase_quantity: '',
-		new_product: '',
-		not_availible_message: '',
-		oak: '',
-		ph: '',
-		qb_account: '',
-		qb_class: '',
-		qb_sku: '',
-		region: '',
-		release_date: '',
-		residual_sugar: '',
-		retail_price: '',
-		short_description: '',
-		soil: '',
-		starting_quantity: '',
-		status_availability: '',
-		subtitle: '',
-		sub_region: '',
-		ta: '',
-		upc: '',
-		varietal: '',
-		vineyard: '',
-		vintage: '',
-		winemaker: '',
-		wine_type: '',
+		id: "",
+		name: "",
+		sku: "",
+		price: "",
+		description: "",
+		status: "",
+		accolades_01: "",
+		additional_description: "",
+		aging: "",
+		alcohol: "",
+		appellation: "",
+		blend: "",
+		bottle_count: "",
+		bottle_size: "",
+		case_production: "",
+		country: "",
+		farming_method: "",
+		featured_product: "",
+		free_shipping: "",
+		harvest_date: "",
+		image: "",
+		image_alt: "",
+		max_purchase_quantity: "",
+		new_product: "",
+		not_availible_message: "",
+		oak: "",
+		ph: "",
+		qb_account: "",
+		qb_class: "",
+		qb_sku: "",
+		region: "",
+		release_date: "",
+		residual_sugar: "",
+		retail_price: "",
+		short_description: "",
+		soil: "",
+		starting_quantity: "",
+		status_availability: "",
+		subtitle: "",
+		sub_region: "",
+		ta: "",
+		upc: "",
+		varietal: "",
+		vineyard: "",
+		vintage: "",
+		winemaker: "",
+		wine_type: "",
 		categories: { // this should be an array
 			2: {
-				id: '',
-				name: '',
-				sort: ''
+				id: "",
+				name: "",
+				sort: ""
 			}
 		},
-		quantity: ''
+		quantity: ""
 	};
 
 	Object.assign(this, BaseModel.prototype);
@@ -934,18 +973,21 @@ var Product = function Product(props) {
 		this.parse(props);
 	}
 };
-exports.Product = Product;
 
-},{"./core":5}],8:[function(require,module,exports){
+exports.Product = Product;
+exports["default"] = { BaseModel: BaseModel, Product: Product };
+
+},{"./core":5,"./events":6}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
 	value: true
 });
 exports.mixin = mixin;
-exports.handleDOMEvents = handleDOMEvents;
+exports.bindDOMEvents = bindDOMEvents;
 exports.isNode = isNode;
 exports.isElement = isElement;
+exports.isNativeEvent = isNativeEvent;
 
 function mixin(destObject) {
 	var props = Object.keys(this.prototype);
@@ -960,14 +1002,13 @@ function mixin(destObject) {
 	return destObject;
 }
 
-function handleDOMEvents(subscriptionType, object, eventNames, handler) {
-	console.log('handleDOM', this, arguments);
+function bindDOMEvents(bindType, object, eventNames, handler) {
 	var i = 0,
 	    events = eventNames.split(' '),
 	    prefix = object.addEventListener ? '' : 'on';
 
 	for (i; i < events.length; i += 1) {
-		object[subscriptionType](prefix + events[i], handler, false);
+		object[bindType](prefix + events[i], handler, false);
 	}
 }
 
@@ -984,7 +1025,11 @@ function isElement(o) {
 	o && typeof o === 'object' && o !== null && o.nodeType === 1 && typeof o.nodeName === 'string';
 }
 
-exports['default'] = { mixin: mixin, handleDOMEvents: handleDOMEvents, isNode: isNode, isElement: isElement };
+function isNativeEvent(eventname) {
+	return typeof document.body['on' + eventname] !== 'undefined';
+}
+
+exports['default'] = { mixin: mixin, bindDOMEvents: bindDOMEvents, isNativeEvent: isNativeEvent, isNode: isNode, isElement: isElement };
 
 },{}],9:[function(require,module,exports){
 "use strict";
@@ -1023,10 +1068,9 @@ Object.assign(BaseView.prototype, {
 		var _this = this;
 
 		console.log("registering child components for: ", this, arguments);
-
 		var components = this.el.children;
-		//debugger;
 		if (components.length) {
+			this.emit("willUpdateChildren");
 			console.log(components, typeof components, Object.keys(_components.Resolver));
 			try {
 				[].filter.call(components, function (node, idx, arr) {
@@ -1038,7 +1082,7 @@ Object.assign(BaseView.prototype, {
 			}
 
 			try {
-				console.log("component: ", components);
+				//console.log('component: ', components);
 				[].forEach.call(components, function (componentEl) {
 					var componentId = componentEl.dataset.component;
 					if (!_this.childViews[componentId]) {
@@ -1047,7 +1091,7 @@ Object.assign(BaseView.prototype, {
 
 					if (_components.Resolver[componentId]) {
 						_this.childViews[componentId].push(new _components.Resolver[componentId](componentEl));
-						console.log("registered component: ", _components.Resolver[componentId], componentEl, _this.childViews);
+						//console.log('registered component: ', Resolver[componentId], componentEl, this.childViews);
 					} else {
 						throw new ReferenceError(componentId + " not found in component resolver.", _components.Resolver);
 					}
@@ -1059,8 +1103,9 @@ Object.assign(BaseView.prototype, {
 		} else {
 			console.info("No child components to register.");
 		}
-		this.emit("componentsLoaded", { test: true }, "wham!", [{ whoo: "hoo" }]);
-		this.publish("componentsLoaded", { test: true }, {});
+
+		this.publish("componentsLoaded", components.length);
+
 		return this;
 	}
 });
@@ -6951,34 +6996,37 @@ var _modulesComponents = require("./modules/components");
 var e750 = function e750() {
 	"use strict";
 
+	var _this2 = this,
+	    _arguments = arguments;
+
 	Object.assign(this, _modulesComponents.Application.prototype, {
 		start: function start() {
 			var _this = this;
 
 			var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-			console.log("app init():", this, arguments);
-			console.log("cookies:", document.cookie);
+			//console.log('app init():', this, arguments);
+			//console.log('cookies:', document.cookie);
 
 			var components = [].slice.call(document.querySelectorAll("[data-component]"));
 			var partials = [].slice.call(document.querySelectorAll("[data-partial]"));
 
 			console.log("E750.js prototype started....");
-			partials.forEach(function (partial) {
-				console.log("partial: ", partial);
-			});
+			/*partials.forEach((partial) => {
+   	console.log('partial: ', partial);
+   });*/
 
 			// TODO: this needs to be put into a view manager that is on the BaseView prototype
 			components.forEach(function (componentEl) {
 				var componentId = componentEl.dataset.component;
-				console.log("component: ", _this, componentId, componentEl, _modulesComponents.Resolver[componentId]);
+				//console.log('component: ', this, componentId, componentEl, Resolver[componentId]);
 				if (!_this.componentInstances[componentId]) {
 					_this.componentInstances[componentId] = [];
 				}
 				_this.componentInstances[componentId].push(new _modulesComponents.Resolver[componentId](componentEl));
 			});
 
-			console.log(this.componentInstances);
+			//console.log(this.componentInstances);
 		},
 
 		onComponentsLoaded: function onComponentsLoaded() {
@@ -6988,6 +7036,10 @@ var e750 = function e750() {
 
 	console.log("app subscription");
 	this.subscribe("componentsLoaded", this.onComponentsLoaded);
+
+	this.on("willUpdateChildren", function () {
+		console.log("App yip yip", _this2, _arguments);
+	});
 };
 
 var app = new e750();

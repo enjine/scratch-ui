@@ -11,14 +11,13 @@ export function mixin(destObject) {
 	return destObject;
 }
 
-export function handleDOMEvents(subscriptionType, object, eventNames, handler) {
-	console.log('handleDOM', this, arguments);
+export function bindDOMEvents(bindType, object, eventNames, handler) {
 	var i = 0,
 		events = eventNames.split(' '),
 		prefix = object.addEventListener ? '' : 'on';
 
 	for (i; i < events.length; i += 1) {
-		object[subscriptionType](prefix + events[i], handler, false);
+		object[bindType](prefix + events[i], handler, false);
 	}
 }
 
@@ -38,4 +37,8 @@ export function isElement(o){
 );
 }
 
-export default {mixin, handleDOMEvents, isNode, isElement}
+export function isNativeEvent(eventname) {
+    return typeof document.body["on" + eventname] !== "undefined";
+}
+
+export default {mixin, bindDOMEvents, isNativeEvent, isNode, isElement}

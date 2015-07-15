@@ -1,4 +1,4 @@
-import {mixin, handleDOMEvents, isNode, isElement} from './util';
+import {mixin, bindDOMEvents, isNativeEvent, isNode, isElement} from './util';
 
 
 export function nEvent(type = '', data = {}, target = null) {
@@ -16,7 +16,7 @@ function EventBoss() {
 Object.assign(EventBoss.prototype, {
 
 	findOrCreate: function () {
-		var events = this.events,
+		let events = this.events,
 			evt;
 
 		while (arguments.length > 0) {
@@ -30,28 +30,28 @@ Object.assign(EventBoss.prototype, {
 		return events;
 	},
 
-	addEvent: function (object, eventNames, fn) {
-		var subscriptionType = object.addEventListener ? 'addEventListener' : 'attachEvent';
-		handleDOMEvents(subscriptionType, object, eventNames, fn);
+	addDOMEvent: function (object, eventNames, handler) {
+		let bindType = object.addEventListener ? 'addEventListener' : 'attachEvent';
+		console.info('binding DOM Event: ', eventNames)
+		bindDOMEvents(bindType, object, eventNames, handler);
 	},
 
-	removeEvent: function (object, eventNames, fn) {
-		var subscriptionType = object.removeEventListener ? 'removeEventListener' : 'detachEvent';
-		handleDOMEvents(subscriptionType, object, eventNames, fn);
+	removeDOMEvent: function (object, eventNames, handler) {
+		let bindType = object.removeEventListener ? 'removeEventListener' : 'detachEvent';
+		bindDOMEvents(bindType, object, eventNames, handler);
 	},
 
-	dispatch: function (obj, event, data, options) {
-
-		var subscriptions, i = 0, eventType;
+	dispatch: function (obj, event, data, ...args) {
+		let subscriptions, i = 0, eventType;
 
 		if (typeof event === 'string') {
 			event = this.createEvent(event);
 		}
 
-		console.log('dispatch', event, obj, data, options);
+		console.log('Dispatching Event: ', event, obj, data, ...args);
 
 		event.target = obj;
-		event.data = data;
+		event.data = {payload:data, args: [...args]} || {};
 		eventType = event.type;
 		subscriptions = obj ? this.findOrCreate(obj, eventType) : this.findOrCreate(eventType);
 
@@ -59,9 +59,9 @@ Object.assign(EventBoss.prototype, {
 
 
 		for (i; i < subscriptions.length; i += 1) {
-			console.log('dispatching event', subscriptions[i], event);
+			console.log('calling subscriber: ', event, subscriptions[i]);
 			try {
-				subscriptions[i](event);
+				subscriptions[i](event, ...args);
 			} catch (e) {
 				throw e;
 			}
@@ -69,9 +69,8 @@ Object.assign(EventBoss.prototype, {
 		}
 	},
 
-	subscribe: function (obj, eventType, callback) {
-
-		var subscriptions,
+	subscribe: function (obj, eventType, handler) {
+		let subscriptions,
 			isNewSubscription = false;
 		if (!obj) {
 			subscriptions = this.findOrCreate(eventType);
@@ -79,17 +78,17 @@ Object.assign(EventBoss.prototype, {
 			subscriptions = this.findOrCreate(obj, eventType);
 		}
 
-		if (subscriptions.findIndex((item) => {return item === callback}) === -1) {
-			subscriptions.push(callback);
+		if (subscriptions.findIndex((item) => {return item === handler}) === -1) {
+			subscriptions.push(handler);
 			isNewSubscription = true;
 		}
 
-		console.log('subscribe:', obj, eventType, callback);
+		console.log('subscribe:', obj, eventType, handler);
 		return isNewSubscription;
 	},
 
-	unsubscribe: function (obj, eventType, callback) {
-		var subscriptions, callbackIndex;
+	unsubscribe: function (obj, eventType, handler) {
+		let subscriptions, callbackIndex;
 
 		if (!obj) {
 			subscriptions = this.findOrCreate(eventType);
@@ -97,7 +96,7 @@ Object.assign(EventBoss.prototype, {
 			subscriptions = this.findOrCreate(obj, eventType);
 		}
 		callbackIndex = subscriptions.findIndex((item) => {
-			return item === callback;
+			return item === handler;
 		});
 		if (callbackIndex !== -1) {
 			subscriptions.splice(callbackIndex, 1);
@@ -105,12 +104,12 @@ Object.assign(EventBoss.prototype, {
 	},
 
 	createEvent: function (type) {
-		var event = new nEvent(type);
+		let event = new nEvent(type);
 		return event;
 	},
 
 	getTarget: function (evt) {
-		var e = evt || window.event,
+		let e = evt || window.event,
 			target = e.target || e.srcElement || e.touches[0].target;
 		return target;
 	},
@@ -136,86 +135,6 @@ Object.assign(EventBoss.prototype, {
 
 });
 
-export function Emitter(obj) {
-	if (obj) return Emitter.mixin(obj);
-}
-Emitter.mixin = mixin;
-Emitter.createDelegate = function(){
-	var delegate, event, handler;
-	if(!isNode(arguments[0]) && !isElement(arguments[0])){
-		delegate = this.el;
-		event = arguments[0];
-		handler = arguments[1];
-	}else{
-		delegate = arguments[0];
-		event = arguments[1];
-		handler = arguments[2];
-	}
-	console.log('createDelegate', this, arguments, arguments.length, isNode(arguments[0]), isElement(arguments[0]), [delegate, event, handler]);
-	return [delegate, event, handler];
-};
-
-Object.assign(Emitter.prototype, {
-	mediator: new EventBoss(),
-
-	/**
-	 * for SINGLE events (non broadcast)
-	 * @param delegate
-	 * @param event
-	 * @param handler
-	 * @returns {on}
-	 */
-	on: function () {
-		let [delegate, event, handler] = Emitter.createDelegate.apply(this, arguments);
-		this.mediator.addEvent(delegate, event, handler);
-		console.log("registering ON event handler:", this, delegate, event, handler);
-		return this;
-	},
-
-	once: function (delegate, event, handler) {
-		this.on(delegate, event, (data) => {
-			this.off(delegate, event, handler);
-			handler(data);
-		});
-		return this;
-	},
-
-	off: function (event, handler) {
-		this._events = this._events || {};
-		if (event in this._events === false)    return;
-		this._events[event].splice(this._events[event].indexOf(handler), 1);
-		return this;
-	},
-
-	emit: function (event, ...args) {
-		console.log("EMITTTED EVENT:", this, ...args);
-		this._events = this._events || {};
-		if (event in this._events === false) return;
-		for (var i = 0; i < this._events[event].length; i++) {
-			console.log(event, ...args);
-			this._events[event][i].call(this, ...args);
-		}
-		this.mediator.publish(event);
-	}
-});
-
-export var Listener = function (obj) {
-	if (obj) return Listener.mixin(obj);
-}; //aka observer...
-
-Listener.mixin = mixin;
-
-Object.assign(Listener.prototype, {
-	listenTo: function (object, event, handler, context, options) {
-
-	},
-
-	stopListening: function (object, event) {
-
-	}
-});
-
-
 export var PubSub = function (obj) {
 	if (obj) return PubSub.mixin(obj);
 };
@@ -223,7 +142,7 @@ export var PubSub = function (obj) {
 PubSub.mixin = mixin;
 
 Object.assign(PubSub.prototype, {
-
+	mediator: new EventBoss(),
 	_once: {},
 
 	/**
@@ -233,8 +152,8 @@ Object.assign(PubSub.prototype, {
 	 * @param options
 	 * @returns {publish}
 	 */
-	publish: function (event, data, options) {
-		this.mediator.dispatch(this, event, data, options);
+	publish: function (event, data, ...args) {
+		this.mediator.dispatch(this, event, data, ...args);
 
 		if(this._once[event]){
 			this._once[event].forEach((i, handler) => {
@@ -265,6 +184,90 @@ Object.assign(PubSub.prototype, {
 
 	unsubscribe: function (event) {
 		this.mediator.unsubscribe(this, event, handler);
+	}
+});
+
+export function Emitter(obj) {
+	if (obj) return Emitter.mixin(obj);
+}
+
+Emitter.mixin = mixin;
+Emitter.createDelegate = function(){
+	var delegate, event, handler;
+	if(isNode(arguments[0]) && isElement(arguments[0])){
+		delegate = arguments[0];
+		event = arguments[1];
+		handler = arguments[2];
+	}else{
+		delegate = this.el;
+		event = arguments[0];
+		handler = arguments[1];
+	}
+	//console.log('createDelegate', this, arguments, arguments.length, isNode(arguments[0]), isElement(arguments[0]), [delegate, event, handler]);
+	return [delegate, event, handler];
+};
+
+Object.assign(Emitter.prototype, PubSub.prototype, {
+
+	/**
+	 * for SINGLE events (non broadcast)
+	 * @param delegate
+	 * @param event
+	 * @param handler
+	 * @returns {on}
+	 */
+	on: function () {
+		let [delegate, event, handler] = Emitter.createDelegate.apply(this, arguments);
+		if(isNativeEvent(event)){
+			this.mediator.addDOMEvent(delegate, event, handler);
+		}else{
+			this.subscribe(event, handler);
+		}
+
+		console.log("registering ON event handler:", this, delegate, event, handler);
+		return this;
+	},
+
+	once: function () {
+		let [delegate, event, handler] = Emitter.createDelegate.apply(this, arguments);
+		this.on(delegate, event, (...data) => {
+			this.off(delegate, event, handler);
+			handler(...data);
+		});
+		return this;
+	},
+
+	off: function () {
+		let [delegate, event, handler] = Emitter.createDelegate.apply(this, arguments);
+		this.mediator.removeDOMEvent(delegate, event, handler);
+		console.log("removing event handler:", this, delegate, event, handler);
+		return this;
+	},
+
+	emit: function (event, data, ...args) {
+		console.log("EMIT:", this, data, ...args);
+		if(isNativeEvent(event)){
+			this.el.dispatchEvent(new Event(event));
+		}else{
+			this.mediator.dispatch(this, event, data, ...args);
+		}
+		return this;
+	}
+});
+
+export var Listener = function (obj) {
+	if (obj) return Listener.mixin(obj);
+}; //aka observer...
+
+Listener.mixin = mixin;
+
+Object.assign(Listener.prototype, {
+	listenTo: function (object, event, handler, context, options) {
+
+	},
+
+	stopListening: function (object, event) {
+
 	}
 });
 

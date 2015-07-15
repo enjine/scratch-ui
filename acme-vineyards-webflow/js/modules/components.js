@@ -1,12 +1,13 @@
 import {net, jst, storage} from "./core";
-import {BaseView} from "./views";
 import {ProductCollection} from "./collections";
+import {BaseView} from "./views";
+import {Product as ProductModel} from "./models";
 import {ui} from './cart';
 
 export var Resolver = {
-	"ui/header": BaseView,
-	"ui/slider": BaseView,
-	"ui/intro": BaseView,
+	"ui/header": ui.view,
+	"ui/slider": ui.view,
+	"ui/intro": ui.view,
 	"cart/add": ui.addToCart,
 	"cart/product-list": ui.productList,
 	"cart/product/simple": ui.baseProduct
@@ -23,63 +24,53 @@ Object.assign(Application.prototype, BaseView.prototype, {
 export function Product(options={}) {
 	Object.assign(this, BaseView.prototype, {
 		render: () => {
-			console.log('^model vals^^ ',this.model.values);
-			console.log('^model ser^^ ',this.model.serialize());
 			this.el.innerHTML = jst.compile(this.template, this.model.serialize()) || "";
-
-			this.on('focus', () => {
-				console.log('onFocus', this, arguments);
-			});
-
-			console.log('Product render', this, arguments)
 			return this
+		},
+
+		onComponentsLoaded: function(){
+			console.log('product HERE!!', this, arguments);
+			this.emit('mouseenter')
 		}
 	});
 
 	this.el = document.createElement(options.el || 'div');
-	this.model = options.model || null;
-	this.template = options.template || null;
+	this.model = options.model || ProductModel;
+	this.template = options.template || jst.getFromDOM("product/simple");
 
+	this.subscribe("componentsLoaded", this.onComponentsLoaded.bind(this));
 
+	this.on('mouseenter', () => {
+		console.log('HOVERED', this, arguments);
+	});
 
 }
 
 export function ProductList(el, opts = {}) {
 
 	Object.assign(this, BaseView.prototype, opts, {
-		parse: () => {
-
-		},
 		render: () => {
-			console.log('* render *',this.collection);
-			var template = jst.getFromDOM("product/simple"),
-				html = "",
+			try {
+				let html = "",
 				products = this.collection.models,
 				product;
 
 			for (let i=0; i<products.length; i++) {
 				let model = products[i];
-				console.log('rrr', i, model, products);
-				product = new Product({model:model, template:template});
-				console.log('result:', product);
+				product = new Product({model:model});
 				html +=  product.render().el.innerHTML;
 			}
 
 			this.el.innerHTML = html;
+			}catch(e){
+				throw e;
+			}
 			return this;
 		},
 
 		onComponentsLoaded: () => {
 			console.log("Product List received componentsLoaded", this, arguments);
-			this.on(this.el, 'click', (e) => {
-				console.log('CLICKED', this, e);
-			});
 
-			this.on(this.el, 'submit', (e) => {
-				console.log('SUBMITTED', this, e);
-				e.preventDefault();
-				return false;
-			});
 		}
 
 	});
@@ -122,8 +113,18 @@ export function ProductList(el, opts = {}) {
 
 	console.log('component event handling');
 
-	this.on('componentsLoaded', () => {
+	this.on('otherEvent', () => {
 		console.log('ProductList closure loaded', this, arguments);
+	});
+
+	this.on('click', (e) => {
+			console.log('CLICKED', this, e);
+	});
+
+	this.on('submit', (e) => {
+		console.log('SUBMITTED', this, e);
+		e.preventDefault();
+		return false;
 	});
 
 

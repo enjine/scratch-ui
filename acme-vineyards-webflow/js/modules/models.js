@@ -1,8 +1,8 @@
 import {net} from "./core";
+import {Emitter, PubSub} from "./events";
 
 var _attributes = {
 	_guid: null,
-	_some_other_global_property: null,
 	all: function () {
 		let values = {};
 		Object.getOwnPropertyNames(this).map((p) => {
@@ -19,6 +19,8 @@ export function BaseModel(options = {}) {
 	this.values = Object.create(_attributes);
 }
 
+Emitter(BaseModel);
+PubSub(BaseModel);
 
 Object.assign(BaseModel.prototype, {
 
@@ -35,16 +37,11 @@ Object.assign(BaseModel.prototype, {
 
 	parse: function(data) {
 		if (Object.keys(data).length > 0) {
-			//console.log("Parsing MODEL data: ", data);
 			for(let prop in data){
 				if(data.hasOwnProperty(prop)){
-					//console.log('setting ', prop, "=", data[prop]);
-					//Object.assign(this.values,{prop: data[prop]});
 					this.values[prop] = data[prop];
-					//console.log('set:',this.values[prop]);
 				}
 			}
-			console.log('eep', this.values.all());
 		} else {
 			console.error("data has zero length.");
 		}
@@ -135,3 +132,5 @@ export var Product = function (props) {
 	}
 
 };
+
+export default {BaseModel, Product}

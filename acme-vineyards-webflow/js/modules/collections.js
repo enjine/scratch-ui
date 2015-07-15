@@ -1,4 +1,5 @@
 import {BaseModel, Product} from './models';
+import {Emitter, PubSub} from "./events";
 
 
 var BaseCollection = function(options = {}) {
@@ -7,20 +8,23 @@ var BaseCollection = function(options = {}) {
 	this.models = [];
 };
 
+Emitter(BaseCollection);
+PubSub(BaseCollection);
+
 Object.assign(BaseCollection.prototype, {
 	model: BaseModel,
 	fetch: BaseModel.prototype.fetch,
 	parse: function(data){
-		console.log('incoming model data:', data);;
+		//console.log('incoming model data:', data);;
 		try {
 			for(let item in data){
 				if(data.hasOwnProperty(item)){
 					let m = new this.model(data[item]);
-					console.log('new model:', m, item, 'data:', data[item]);
+					//console.log('new model:', m, item, 'data:', data[item]);
 					this.models.push(m);
 				}
 			}
-			console.log('collection set:', this.models);
+			//console.log('collection set:', this.models);
 		} catch(e){
 			console.error(e)
 			throw e;
@@ -39,6 +43,6 @@ export function ProductCollection(options) {
 	this.model = Product;
 
 	//BaseCollection.constructor(options);
-	console.log('product collection', this, arguments)
+	//console.log('product collection', this, arguments)
 }
 
