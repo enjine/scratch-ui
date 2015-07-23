@@ -269,7 +269,7 @@ function ProductList(el) {
 				for (var i = 0; i < products.length; i++) {
 					var model = products[i];
 					product = new Product({ model: model });
-					product.model.set("quantities", window.app.fixtures.quantities);
+					product.model.set("quantities", window.e750.FIXTURES.quantities);
 					product.render();
 					_this3.addChildView(product);
 					html += product.el.outerHTML;
@@ -7087,7 +7087,7 @@ var e750 = function e750() {
 			this.bootstrap();
 			//console.log('app init():', this, arguments);
 			//console.log('cookies:', document.cookie);
-			console.log("E750.js prototype started....");
+			console.log("E750.js started....");
 			this.attachNestedComponents();
 			//TODO: implement this
 			//this.attachPartials();
