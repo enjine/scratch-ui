@@ -113,13 +113,12 @@
 							<div class="product-price">${{price}}</div>
 							<div class="product-price compare">{{retail_price}}</div>
 						</div>
+
 						<div class="w-form form-wrapper" data-component="cart/add">
 							<form class="w-clearfix form" id="email-form" name="email-form" data-name="Email Form">
 								<select class="w-select quantity" id="Quantity" name="Quantity" data-name="Quantity">
 									<option value="">Qty.</option>
-									<option value="First">First Choice</option>
-									<option value="Second">Second Choice</option>
-									<option value="Third">Third Choice</option>
+									{{#quantities}}<option value="{{.}}">{{.}}</option>{{/quantities}}
 								</select>
 								<input class="w-button submit-button" type="submit" value="Add to Cart"
 										data-wait="Please wait...">
@@ -131,12 +130,22 @@
 								<p>Oops! Something went wrong while submitting the form</p>
 							</div>
 						</div>
+
 					</div>
 				</div>
 			</div>
 		</script>
 
 
+		<script>
+			window.e750 = {
+				FIXTURES: {
+					quantities: [1,2,3,4,5,6,7,8,9,10]
+				}
+			}
+		</script>
 		<script type="text/javascript" src="js/e750-compiled.js"></script>
+
+
 	</body>
 </html>

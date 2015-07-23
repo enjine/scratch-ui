@@ -1,6 +1,5 @@
 export function mixin(destObject) {
 	var props = Object.keys(this.prototype);
-	console.log('attempting mixin', props);
 	for (var i = 0; i < props.length; i++) {
 		if (typeof destObject === 'function') {
 			destObject.prototype[props[i]] = this.prototype[props[i]];
@@ -41,4 +40,10 @@ export function isNativeEvent(eventname) {
     return typeof document.body["on" + eventname] !== "undefined";
 }
 
-export default {mixin, bindDOMEvents, isNativeEvent, isNode, isElement}
+export function htmlToDom(HTMLString) {
+		let tmp = document.createElement("div");
+		tmp.innerHTML = HTMLString;
+		return tmp.firstElementChild;
+	}
+
+export default {mixin, bindDOMEvents, isNativeEvent, isNode, isElement, htmlToDom}

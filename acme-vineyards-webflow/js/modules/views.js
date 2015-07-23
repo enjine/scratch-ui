@@ -1,31 +1,51 @@
 import {Resolver} from "./components";
 import {Emitter, PubSub} from "./events";
 
-export function BaseView(el, opts = {}) {};
+export function BaseView(el, opts = {}) {
+	this.options = {};
+	this.el = null;
+	this.model = null;
+	this.collection = null;
+	this.template = null;
+	this.childViews = {};
+}
 
 Emitter(BaseView);
 PubSub(BaseView);
 
 Object.assign(BaseView.prototype, {
-	options: {},
-	el: null,
-	model: null,
-	collection: null,
-	template: null,
-	childViews: {},
+	defaults: {
+		el: "div"
+	},
 
 	render: function () {
 		return this;
 	},
 
-	updateChildren: function () {
-		console.log('registering child components for: ', this, arguments);
-		let components = this.el.children;
+	addChildView: function(view){
+		let componentId = Resolver.getComponentId(view);
+		if (!this.childViews[componentId]) {
+			this.childViews[componentId] = [];
+		}
+		this.childViews[componentId].push(view);
+		return this;
+	},
+
+	attachNestedComponents: function(){
+		return this.updateChildren('[data-component]');
+	},
+
+	updateChildren: function (selector) {
+
+		let components = selector ? this.el.querySelectorAll(selector) : this.el.children;
+
+		//console.log('registering child components for: ', this, components);
+
 		if (components.length) {
 			this.emit("willUpdateChildren");
-			console.log(components, typeof components, Object.keys(Resolver));
+			//console.log(components, typeof components, Object.keys(Resolver));
 			try {
-				[].filter.call(components, (node, idx, arr) => {
+				[].filter.call(components, (node) => {
 					return node.dataset.component;
 				})
 			} catch (e) {
@@ -34,7 +54,7 @@ Object.assign(BaseView.prototype, {
 			}
 
 			try {
-				//console.log('component: ', components);
+				//console.log('components: ', components);
 				[].forEach.call(components, (componentEl) => {
 					let componentId = componentEl.dataset.component;
 					if (!this.childViews[componentId]) {
@@ -43,11 +63,11 @@ Object.assign(BaseView.prototype, {
 
 					if (Resolver[componentId]) {
 						this.childViews[componentId].push(new Resolver[componentId](componentEl));
-						//console.log('registered component: ', Resolver[componentId], componentEl, this.childViews);
+						//console.info('registered component: ', componentId, Resolver[componentId]);
 					} else {
 						throw new ReferenceError(componentId + " not found in component resolver.", Resolver)
 					}
-
+					this.emit("didUpdateChildren");
 				});
 			} catch (e) {
 				console.error(e);
@@ -57,8 +77,7 @@ Object.assign(BaseView.prototype, {
 			console.info('No child components to register.')
 		}
 
-		this.publish('componentsLoaded', components.length);
-
+		this.emit("componentsLoaded");
 		return this;
 	}
 });

@@ -194,75 +194,96 @@ var Resolver = {
 	"ui/intro": _cart.ui.view,
 	"cart/add": _cart.ui.addToCart,
 	"cart/product-list": _cart.ui.productList,
-	"cart/product/simple": _cart.ui.baseProduct
+	"cart/product/simple": _cart.ui.baseProduct,
+	getComponentId: function getComponentId(view) {
+		var _this = this;
+
+		return Object.getOwnPropertyNames(this).filter(function (componentId) {
+			return view.__proto__.constructor === _this[componentId];
+		})[0] || null;
+	}
 };
 
 exports.Resolver = Resolver;
 
-function Application() {}
+function Application() {
+	"use strict";
+	_views.BaseView.apply(this, arguments);
+}
 
 Object.assign(Application.prototype, _views.BaseView.prototype, {
-	componentInstances: {},
-	start: function start() {}
+	start: function start() {
+		return this;
+	},
+	attachPartials: function attachPartials() {
+		return this.updateChildren("[data-partial]");
+	}
 });
 
 function Product() {
-	var _this = this,
-	    _arguments = arguments;
+	var _this2 = this;
 
 	var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
+	_views.BaseView.apply(this, arguments);
+
 	Object.assign(this, _views.BaseView.prototype, {
 		render: function render() {
-			_this.el.innerHTML = _core.jst.compile(_this.template, _this.model.serialize()) || "";
-			return _this;
+			try {
+				_this2.el = _core.jst.compile(_this2.template, _this2.model.serialize());
+				_this2.attachNestedComponents();
+				return _this2;
+			} catch (e) {
+				console.error(e);
+				throw e;
+			}
 		},
 
 		onComponentsLoaded: function onComponentsLoaded() {
-			console.log("product HERE!!", this, arguments);
-			this.emit("mouseenter");
+			console.log("Product received componentsLoaded", this, arguments);
 		}
 	});
 
-	this.el = document.createElement(options.el || "div");
+	this.el = document.createElement(options.el || this.defaults.el);
 	this.model = options.model || _models.Product;
 	this.template = options.template || _core.jst.getFromDOM("product/simple");
 
-	this.subscribe("componentsLoaded", this.onComponentsLoaded.bind(this));
-
-	this.on("mouseenter", function () {
-		console.log("HOVERED", _this, _arguments);
-	});
+	this.subscribeOnce("componentsLoaded", this.onComponentsLoaded);
 }
 
 function ProductList(el) {
-	var _this2 = this,
-	    _arguments2 = arguments;
+	var _this3 = this,
+	    _arguments = arguments;
 
-	var opts = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-	Object.assign(this, _views.BaseView.prototype, opts, {
+	_views.BaseView.apply(this, arguments);
+
+	Object.assign(this, _views.BaseView.prototype, {
 		render: function render() {
 			try {
 				var html = "",
-				    products = _this2.collection.models,
+				    products = _this3.collection.models,
 				    product = undefined;
 
 				for (var i = 0; i < products.length; i++) {
 					var model = products[i];
 					product = new Product({ model: model });
-					html += product.render().el.innerHTML;
+					product.model.set("quantities", window.app.fixtures.quantities);
+					product.render();
+					_this3.addChildView(product);
+					html += product.el.outerHTML;
 				}
 
-				_this2.el.innerHTML = html;
+				_this3.el.innerHTML = html;
 			} catch (e) {
 				throw e;
 			}
-			return _this2;
+			return _this3;
 		},
 
 		onComponentsLoaded: function onComponentsLoaded() {
-			console.log("Product List received componentsLoaded", _this2, _arguments2);
+			console.log("Product List received componentsLoaded", this, arguments);
 		}
 
 	});
@@ -270,8 +291,27 @@ function ProductList(el) {
 	this.el = el;
 	this.collection = new _collections.ProductCollection();
 
+	this.subscribeOnce("componentsLoaded", this.onComponentsLoaded);
+
+	this.on("otherEvent", function () {
+		console.log("ProductList closure loaded", _this3, _arguments);
+	});
+
+	this.on("willUpdateChildren", function () {
+		console.log("ProductList yip yip", this, "beep:", arguments);
+	});
+
+	this.on("click", function (e) {
+		console.log("CLICKED", _this3, e);
+	});
+
+	this.on("submit", function (e) {
+		console.log("SUBMITTED", _this3, e);
+		e.preventDefault();
+		return false;
+	});
+
 	var defaults = {
-		//url: "https://api.securecheckout.com/v1/cart/products/",
 		url: "/api/products/",
 		type: "json",
 		method: "GET",
@@ -279,51 +319,32 @@ function ProductList(el) {
 			"X-Auth-Token": document.cookie.split("=")[1]
 		}
 	},
-	    options = {};
+	    fetchOpts = {};
 
-	Object.assign(options, defaults, opts);
+	Object.assign(fetchOpts, defaults, options);
 
-	this.collection.fetch(options).then(this.collection.parse.bind(this.collection), function (reason) {
-		console.error("Parsing Failed! ", _this2, _arguments2);
+	this.collection.fetch(fetchOpts).then(this.collection.parse.bind(this.collection), function (reason) {
+		console.error("Parsing Failed! ", _this3, _arguments);
 	}).then(function () {
-		_this2.render();
+		_this3.render();
 	}, function (reason) {
-		console.error("Render Failed! ", _this2, _arguments2);
+		console.error("Render Failed! ", _this3, _arguments);
 	})["catch"](function (reason) {
-		console.error("Promise Rejected! ", _this2, _arguments2, document.cookie);
+		console.error("Promise Rejected! ", _this3, _arguments, document.cookie);
 	})["finally"](function () {
-		console.log("finally", _this2, _arguments2, options);
-		_this2.updateChildren();
-	});
-
-	console.log("component subscription");
-	this.subscribe("componentsLoaded", this.onComponentsLoaded);
-
-	console.log("component event handling");
-
-	this.on("otherEvent", function () {
-		console.log("ProductList closure loaded", _this2, _arguments2);
-	});
-
-	this.on("click", function (e) {
-		console.log("CLICKED", _this2, e);
-	});
-
-	this.on("submit", function (e) {
-		console.log("SUBMITTED", _this2, e);
-		e.preventDefault();
-		return false;
+		console.log("finally", _this3, _arguments, options);
+		//this.updateChildren();
 	});
 }
 
 function AddToCart(el) {
 	var opts = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
+	_views.BaseView.apply(this, arguments);
 	Object.assign(this, _views.BaseView.prototype, {});
 
 	var defaults = {
-		//url: "https://api.securecheckout.com/v1/cart/products/",
-		url: "/api/products/",
+		url: "/api/products/add",
 		type: "json",
 		method: "GET",
 		headers: {
@@ -333,8 +354,6 @@ function AddToCart(el) {
 	    options = {};
 
 	Object.assign(options, defaults, opts);
-
-	console.log("ADD TO CART!", this, arguments);
 }
 
 },{"./cart":2,"./collections":3,"./core":5,"./models":7,"./views":9}],5:[function(require,module,exports){
@@ -357,8 +376,17 @@ var _templeton = require('templeton');
 
 var _templeton2 = _interopRequireDefault(_templeton);
 
-var xhttp = require('xhttp/custom')(_rsvp2['default'].Promise);var net = {
-	http: {
+var _events = require('./events');
+
+var _util = require('./util');
+
+var xhttp = require('xhttp/custom')(_rsvp2['default'].Promise);
+
+var eventedHTTP = (0, _events.Emitter)({});
+(0, _events.PubSub)(eventedHTTP);
+
+var net = {
+	http: Object.assign(eventedHTTP, {
 		/**
    * Base ASYNC request function
    * returns an A+ promise
@@ -381,9 +409,10 @@ var xhttp = require('xhttp/custom')(_rsvp2['default'].Promise);var net = {
    * @returns {*}
    */
 		get: function get(options) {
+			this.emit('beforeAsync', options);
 			return this.ajax(options);
 		}
-	}
+	})
 };
 
 exports.net = net;
@@ -485,7 +514,7 @@ var jst = {
 	},
 
 	compile: function compile(templateStr, data, overrides) {
-		return _templeton2['default'].template(templateStr, data, overrides);
+		return (0, _util.htmlToDom)(_templeton2['default'].template(templateStr, data, overrides));
 	}
 
 };
@@ -493,7 +522,7 @@ var jst = {
 exports.jst = jst;
 exports['default'] = { net: net, storage: storage, jst: jst };
 
-},{"rsvp":113,"templeton":114,"xhttp/custom":115}],6:[function(require,module,exports){
+},{"./events":6,"./util":8,"rsvp":113,"templeton":114,"xhttp/custom":115}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -520,6 +549,7 @@ function nEvent() {
 
 function EventBoss() {
 	this.events = {};
+	this.once = {};
 }
 
 Object.assign(EventBoss.prototype, {
@@ -541,7 +571,7 @@ Object.assign(EventBoss.prototype, {
 
 	addDOMEvent: function addDOMEvent(object, eventNames, handler) {
 		var bindType = object.addEventListener ? 'addEventListener' : 'attachEvent';
-		console.info('binding DOM Event: ', eventNames);
+		//console.info('binding DOM Event: ', eventNames)
 		(0, _util.bindDOMEvents)(bindType, object, eventNames, handler);
 	},
 
@@ -551,6 +581,8 @@ Object.assign(EventBoss.prototype, {
 	},
 
 	dispatch: function dispatch(obj, event, data) {
+		var _this = this;
+
 		var subscriptions = undefined,
 		    i = 0,
 		    eventType = undefined;
@@ -559,23 +591,30 @@ Object.assign(EventBoss.prototype, {
 			event = this.createEvent(event);
 		}
 
+		//console.log('Dispatching Event: ', 'e:',event, 'o:',obj, 'd:',data, 'a:',...args);
+
+		event.target = obj;
+
 		for (var _len = arguments.length, args = Array(_len > 3 ? _len - 3 : 0), _key = 3; _key < _len; _key++) {
 			args[_key - 3] = arguments[_key];
 		}
 
-		console.log.apply(console, ['Dispatching Event: ', event, obj, data].concat(args));
-
-		event.target = obj;
 		event.data = { payload: data, args: [].concat(args) } || {};
 		eventType = event.type;
 		subscriptions = obj ? this.findOrCreate(obj, eventType) : this.findOrCreate(eventType);
 
-		console.log('subscriptions', subscriptions);
+		//console.log('subscriptions', subscriptions);
 
 		for (i; i < subscriptions.length; i += 1) {
-			console.log('calling subscriber: ', event, subscriptions[i]);
+			console.log('calling handler: ', subscriptions[i], 'event:', event);
 			try {
-				subscriptions[i].apply(subscriptions, [event].concat(args));
+				subscriptions[i](event);
+				if (this.once[eventType]) {
+					this.once[eventType].forEach(function (handler, i) {
+						_this.unsubscribe(_this, eventType, handler);
+						_this.once[eventType].splice(i, 1);
+					});
+				}
 			} catch (e) {
 				throw e;
 			}
@@ -598,7 +637,7 @@ Object.assign(EventBoss.prototype, {
 			isNewSubscription = true;
 		}
 
-		console.log('subscribe:', obj, eventType, handler);
+		//console.log('subscribe:', obj, eventType, handler,subscriptions);
 		return isNewSubscription;
 	},
 
@@ -606,16 +645,22 @@ Object.assign(EventBoss.prototype, {
 		var subscriptions = undefined,
 		    callbackIndex = undefined;
 
-		if (!obj) {
-			subscriptions = this.findOrCreate(eventType);
-		} else {
-			subscriptions = this.findOrCreate(obj, eventType);
-		}
-		callbackIndex = subscriptions.findIndex(function (item) {
-			return item === handler;
-		});
-		if (callbackIndex !== -1) {
-			subscriptions.splice(callbackIndex, 1);
+		try {
+			if (!obj) {
+				subscriptions = this.findOrCreate(eventType);
+			} else {
+				subscriptions = this.findOrCreate(obj, eventType);
+			}
+			callbackIndex = subscriptions.findIndex(function (item) {
+				return item === handler;
+			});
+			if (callbackIndex !== -1) {
+				//console.log('doin the unsub:', callbackIndex);
+				subscriptions.splice(callbackIndex, 1);
+			}
+		} catch (e) {
+			console.log(e);
+			throw e;
 		}
 	},
 
@@ -660,7 +705,6 @@ PubSub.mixin = _util.mixin;
 
 Object.assign(PubSub.prototype, {
 	mediator: new EventBoss(),
-	_once: {},
 
 	/**
   * for publishing broadcast messages
@@ -670,21 +714,13 @@ Object.assign(PubSub.prototype, {
   * @returns {publish}
   */
 	publish: function publish(event, data) {
-		var _mediator,
-		    _this = this;
+		var _mediator;
 
 		for (var _len2 = arguments.length, args = Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
 			args[_key2 - 2] = arguments[_key2];
 		}
 
 		(_mediator = this.mediator).dispatch.apply(_mediator, [this, event, data].concat(args));
-
-		if (this._once[event]) {
-			this._once[event].forEach(function (i, handler) {
-				_this.mediator.unsubscribe(_this, event, handler);
-			});
-		}
-
 		return this;
 	},
 
@@ -698,14 +734,14 @@ Object.assign(PubSub.prototype, {
 	},
 
 	subscribeOnce: function subscribeOnce(event, handler) {
-		if (!this._once[event].length) {
-			this._once[event] = [];
+		if (!this.mediator.once[event]) {
+			this.mediator.once[event] = [];
 		}
-		this._once[event].push(handler);
+		this.mediator.once[event].push(handler);
 		this.mediator.subscribe(this, event, handler);
 	},
 
-	unsubscribe: function unsubscribe(event) {
+	unsubscribe: function unsubscribe(event, handler) {
 		this.mediator.unsubscribe(this, event, handler);
 	}
 });
@@ -754,7 +790,7 @@ Object.assign(Emitter.prototype, PubSub.prototype, {
 			this.subscribe(event, handler);
 		}
 
-		console.log('registering ON event handler:', this, delegate, event, handler);
+		//console.log("registering ON event handler:", this, delegate, event, handler);
 		return this;
 	},
 
@@ -769,10 +805,15 @@ Object.assign(Emitter.prototype, PubSub.prototype, {
 		var event = _Emitter$createDelegate$apply32[1];
 		var handler = _Emitter$createDelegate$apply32[2];
 
-		this.on(delegate, event, function () {
-			_this2.off(delegate, event, handler);
-			handler.apply(undefined, arguments);
-		});
+		if ((0, _util.isNativeEvent)(event)) {
+			this.on(delegate, event, function () {
+				_this2.off(delegate, event, handler);
+				handler.apply(undefined, arguments);
+			});
+		} else {
+			this.subscribeOnce(event, handler);
+		}
+
 		return this;
 	},
 
@@ -786,22 +827,20 @@ Object.assign(Emitter.prototype, PubSub.prototype, {
 		var handler = _Emitter$createDelegate$apply42[2];
 
 		this.mediator.removeDOMEvent(delegate, event, handler);
-		console.log('removing event handler:', this, delegate, event, handler);
+		//console.log("removing event handler:", this, delegate, event, handler);
 		return this;
 	},
 
 	emit: function emit(event, data) {
-		for (var _len3 = arguments.length, args = Array(_len3 > 2 ? _len3 - 2 : 0), _key3 = 2; _key3 < _len3; _key3++) {
-			args[_key3 - 2] = arguments[_key3];
-		}
-
-		console.log.apply(console, ['EMIT:', this, data].concat(args));
+		//console.log(this.__proto__.constructor.name, "EMITTED:", event, data, ...args);
 		if ((0, _util.isNativeEvent)(event)) {
 			this.el.dispatchEvent(new Event(event));
 		} else {
-			var _mediator2;
+			for (var _len3 = arguments.length, args = Array(_len3 > 2 ? _len3 - 2 : 0), _key3 = 2; _key3 < _len3; _key3++) {
+				args[_key3 - 2] = arguments[_key3];
+			}
 
-			(_mediator2 = this.mediator).dispatch.apply(_mediator2, [this, event, data].concat(args));
+			this.publish.apply(this, [event, data].concat(args));
 		}
 		return this;
 	}
@@ -820,9 +859,9 @@ Object.assign(Listener.prototype, {
 	stopListening: function stopListening(object, event) {}
 });
 
-var All = function All() {};
-exports.All = All;
-Object.assign(All, Emitter.prototype, Listener.prototype, PubSub.prototype);
+var Evented = function Evented() {};
+exports.Evented = Evented;
+Object.assign(Evented, Emitter.prototype, Listener.prototype, PubSub.prototype);
 
 exports['default'] = { Emitter: Emitter, Listener: Listener, PubSub: PubSub };
 
@@ -870,7 +909,7 @@ Object.assign(BaseModel.prototype, {
   * @returns {*}
   */
 	fetch: function fetch(options) {
-		// TODO: trigger beforeAsync, beforeFetch
+		this.emit("beforeFetch");
 		console.log("fetch", this, arguments);
 		return _core.net.http.get(options);
 	},
@@ -886,6 +925,20 @@ Object.assign(BaseModel.prototype, {
 			console.error("data has zero length.");
 		}
 
+		return this;
+	},
+
+	get: function get(propName) {
+		try {
+			return this.values[propName];
+		} catch (e) {
+			console.error(e);
+			throw e;
+		}
+	},
+
+	set: function set(propName, value) {
+		this.values[propName] = value;
 		return this;
 	},
 
@@ -988,10 +1041,10 @@ exports.bindDOMEvents = bindDOMEvents;
 exports.isNode = isNode;
 exports.isElement = isElement;
 exports.isNativeEvent = isNativeEvent;
+exports.htmlToDom = htmlToDom;
 
 function mixin(destObject) {
 	var props = Object.keys(this.prototype);
-	console.log('attempting mixin', props);
 	for (var i = 0; i < props.length; i++) {
 		if (typeof destObject === 'function') {
 			destObject.prototype[props[i]] = this.prototype[props[i]];
@@ -1029,7 +1082,13 @@ function isNativeEvent(eventname) {
 	return typeof document.body['on' + eventname] !== 'undefined';
 }
 
-exports['default'] = { mixin: mixin, bindDOMEvents: bindDOMEvents, isNativeEvent: isNativeEvent, isNode: isNode, isElement: isElement };
+function htmlToDom(HTMLString) {
+	var tmp = document.createElement('div');
+	tmp.innerHTML = HTMLString;
+	return tmp.firstElementChild;
+}
+
+exports['default'] = { mixin: mixin, bindDOMEvents: bindDOMEvents, isNativeEvent: isNativeEvent, isNode: isNode, isElement: isElement, htmlToDom: htmlToDom };
 
 },{}],9:[function(require,module,exports){
 "use strict";
@@ -1045,35 +1104,52 @@ var _events = require("./events");
 
 function BaseView(el) {
 	var opts = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-}
 
-;
+	this.options = {};
+	this.el = null;
+	this.model = null;
+	this.collection = null;
+	this.template = null;
+	this.childViews = {};
+}
 
 (0, _events.Emitter)(BaseView);
 (0, _events.PubSub)(BaseView);
 
 Object.assign(BaseView.prototype, {
-	options: {},
-	el: null,
-	model: null,
-	collection: null,
-	template: null,
-	childViews: {},
+	defaults: {
+		el: "div"
+	},
 
 	render: function render() {
 		return this;
 	},
 
-	updateChildren: function updateChildren() {
+	addChildView: function addChildView(view) {
+		var componentId = _components.Resolver.getComponentId(view);
+		if (!this.childViews[componentId]) {
+			this.childViews[componentId] = [];
+		}
+		this.childViews[componentId].push(view);
+		return this;
+	},
+
+	attachNestedComponents: function attachNestedComponents() {
+		return this.updateChildren("[data-component]");
+	},
+
+	updateChildren: function updateChildren(selector) {
 		var _this = this;
 
-		console.log("registering child components for: ", this, arguments);
-		var components = this.el.children;
+		var components = selector ? this.el.querySelectorAll(selector) : this.el.children;
+
+		//console.log('registering child components for: ', this, components);
+
 		if (components.length) {
 			this.emit("willUpdateChildren");
-			console.log(components, typeof components, Object.keys(_components.Resolver));
+			//console.log(components, typeof components, Object.keys(Resolver));
 			try {
-				[].filter.call(components, function (node, idx, arr) {
+				[].filter.call(components, function (node) {
 					return node.dataset.component;
 				});
 			} catch (e) {
@@ -1082,7 +1158,7 @@ Object.assign(BaseView.prototype, {
 			}
 
 			try {
-				//console.log('component: ', components);
+				//console.log('components: ', components);
 				[].forEach.call(components, function (componentEl) {
 					var componentId = componentEl.dataset.component;
 					if (!_this.childViews[componentId]) {
@@ -1091,10 +1167,11 @@ Object.assign(BaseView.prototype, {
 
 					if (_components.Resolver[componentId]) {
 						_this.childViews[componentId].push(new _components.Resolver[componentId](componentEl));
-						//console.log('registered component: ', Resolver[componentId], componentEl, this.childViews);
+						//console.info('registered component: ', componentId, Resolver[componentId]);
 					} else {
 						throw new ReferenceError(componentId + " not found in component resolver.", _components.Resolver);
 					}
+					_this.emit("didUpdateChildren");
 				});
 			} catch (e) {
 				console.error(e);
@@ -1104,8 +1181,7 @@ Object.assign(BaseView.prototype, {
 			console.info("No child components to register.");
 		}
 
-		this.publish("componentsLoaded", components.length);
-
+		this.emit("componentsLoaded");
 		return this;
 	}
 });
@@ -6995,54 +7071,42 @@ var _modulesComponents = require("./modules/components");
 
 var e750 = function e750() {
 	"use strict";
-
-	var _this2 = this,
-	    _arguments = arguments;
+	_modulesComponents.Application.apply(this, arguments);
+	this.el = document.getElementsByTagName("body")[0];
 
 	Object.assign(this, _modulesComponents.Application.prototype, {
+		fixtures: {},
+		bootstrap: function bootstrap() {
+			if (window.e750.FIXTURES) {
+				this.fixtures = window.e750.FIXTURES;
+			}
+		},
 		start: function start() {
-			var _this = this;
-
 			var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
+			this.bootstrap();
 			//console.log('app init():', this, arguments);
 			//console.log('cookies:', document.cookie);
-
-			var components = [].slice.call(document.querySelectorAll("[data-component]"));
-			var partials = [].slice.call(document.querySelectorAll("[data-partial]"));
-
 			console.log("E750.js prototype started....");
-			/*partials.forEach((partial) => {
-   	console.log('partial: ', partial);
-   });*/
-
-			// TODO: this needs to be put into a view manager that is on the BaseView prototype
-			components.forEach(function (componentEl) {
-				var componentId = componentEl.dataset.component;
-				//console.log('component: ', this, componentId, componentEl, Resolver[componentId]);
-				if (!_this.componentInstances[componentId]) {
-					_this.componentInstances[componentId] = [];
-				}
-				_this.componentInstances[componentId].push(new _modulesComponents.Resolver[componentId](componentEl));
-			});
-
-			//console.log(this.componentInstances);
-		},
-
-		onComponentsLoaded: function onComponentsLoaded() {
-			console.log("App received onComponentsLoaded", this, arguments);
+			this.attachNestedComponents();
+			//TODO: implement this
+			//this.attachPartials();
 		}
 	});
 
-	console.log("app subscription");
-	this.subscribe("componentsLoaded", this.onComponentsLoaded);
+	this.onComponentsLoaded = function () {
+		console.log("App received onComponentsLoaded", this, arguments);
+	};
 
-	this.on("willUpdateChildren", function () {
-		console.log("App yip yip", _this2, _arguments);
+	this.subscribeOnce("componentsLoaded", this.onComponentsLoaded);
+
+	this.once("willUpdateChildren", function () {
+		console.log("App yip yip", this, arguments);
 	});
 };
 
 var app = new e750();
 document.addEventListener("DOMContentLoaded", app.start());
+console.log(app);
 
 },{"./modules/components":4,"core-js":10}]},{},[120]);

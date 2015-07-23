@@ -2,9 +2,14 @@ import RSVP from 'rsvp';
 var xhttp = require('xhttp/custom')(RSVP.Promise);
 //var xhttp = require('xhttp/custom')(Promise); // native ES6 Promise
 import templeton from 'templeton';
+import {Emitter, PubSub} from "./events";
+import {htmlToDom} from "./util";
+
+let eventedHTTP = Emitter({});
+PubSub(eventedHTTP);
 
 export var net = {
-	http: {
+	http: Object.assign(eventedHTTP, {
 		/**
 		 * Base ASYNC request function
 		 * returns an A+ promise
@@ -27,9 +32,10 @@ export var net = {
 		 * @returns {*}
 		 */
 		get: function (options) {
+			this.emit('beforeAsync', options);
 			return this.ajax(options);
 		}
-	}
+	})
 };
 
 export var storage = {
@@ -130,7 +136,7 @@ export var jst = {
 	},
 
 	compile: (templateStr, data, overrides) => {
-		return templeton.template(templateStr, data, overrides);
+		return htmlToDom(templeton.template(templateStr, data, overrides));
 	}
 
 };

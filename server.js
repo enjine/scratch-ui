@@ -58,7 +58,7 @@ pem.createCertificate({days: 1, selfSigned: true}, function (err, keys) {
 	 * 	=> http://localhost:8080/{mount_point} (/api)
 	 */
 	apiRouter.route('/products')
-		.get((req, res, next) =>{
+		.get((req, res, next) => {
 			let host ="api.securecheckout.com",
 				url = "/v1/cart/products/",
 				options = {

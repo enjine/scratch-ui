@@ -30,7 +30,7 @@ Object.assign(BaseModel.prototype, {
 	 * @returns {*}
 	 */
 	fetch: function(options) {
-		// TODO: trigger beforeAsync, beforeFetch
+		this.emit('beforeFetch');
 		console.log('fetch', this, arguments);
 		return net.http.get(options);
 	},
@@ -46,6 +46,20 @@ Object.assign(BaseModel.prototype, {
 			console.error("data has zero length.");
 		}
 
+		return this;
+	},
+
+	get: function(propName){
+		try {
+			return this.values[propName];
+		}catch(e){
+			console.error(e);
+			throw e;
+		}
+	},
+
+	set: function(propName, value){
+		this.values[propName] = value;
 		return this;
 	},
 
