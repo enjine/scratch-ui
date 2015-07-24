@@ -4,13 +4,11 @@ var https = require('https');
 var pem = require('pem');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
-var fs = require('fs');
 var rp = require('request-promise');
 var errors = require('request-promise/errors');
 
 
 // e750 modules
-var FIXTURES = require('./acme-vineyards-webflow/data.json');
 var routeFilters = require('./lib/filters');
 
 
@@ -18,7 +16,6 @@ var app;
 var port = process.env.PORT || 8080;        // set our port
 var sslPort = 4430;        // set our secure port
 var staticPath = path.resolve(__dirname, './acme-vineyards-webflow'); // static files
-var requireAuth = false;
 
 //support https
 pem.createCertificate({days: 1, selfSigned: true}, function (err, keys) {
@@ -58,15 +55,22 @@ pem.createCertificate({days: 1, selfSigned: true}, function (err, keys) {
 	 * 	=> http://localhost:8080/{mount_point} (/api)
 	 */
 	apiRouter.route('/products')
-		.get((req, res, next) => {
-			let host ="api.securecheckout.com",
-				url = "/v1/cart/products/",
+		.get((req, res) => {
+			function render (result){
+				res.setHeader('Content-Type', 'application/json');
+				//res.writeHead(200)
+				res.send(result);
+				res.end();
+			}
+
+			let host = 'api.securecheckout.com',
+				url = '/v1/cart/products/',
 				options = {
 						hostname: host,
 						uri: 'https://' + host + url,
 						method: 'GET',
 						headers: {
-							"X-Auth-Token": req.cookies.apikey
+							'X-Auth-Token': req.cookies.apikey
 						},
 						resolveWithFullResponse: true
 					};
@@ -77,45 +81,37 @@ pem.createCertificate({days: 1, selfSigned: true}, function (err, keys) {
 					if (r.statusCode === 200 && r.body) {
 						// success
 						//console.log("GOT: ", r.statusCode, r.body);
-						render(r.body)
-					}else{
+						render(r.body);
+					} else {
 						//fail
 						render(r.body);
 					}
 				}).catch(errors.RequestError, (reason) =>{
-					console.log("FAILED: RequestError -> ")
-					render(reason.body)
+					console.log('FAILED: RequestError -> ');
+					render(reason.body);
 				}).catch(errors.StatusCodeError, (reason) => {
-					console.log("FAILED: StatusCodeError -> ")
-					render(reason.body)
+					console.log('FAILED: StatusCodeError -> ');
+					render(reason.body);
 				});
-
-			function render(result){
-				res.setHeader('Content-Type', 'application/json');
-				//res.writeHead(200)
-				res.send(result);
-				res.end();
-			}
-
 		});
 
 	apiRouter.route('/token')
-		.get((req, res, next) => {
+		.get((req, res) => {
 			console.log('processing GET');
 			res.end();
 		})
-		.post((req, res, next) =>{
+		.post((req, res) =>{
 			console.log('processing POST');
 			res.end();
 		})
-		.put((req, res, next) => {
+		.put((req, res) => {
 			console.log('processing PUT');
 			res.end();
 		});
 
 // API index route
 	apiRouter.route('/')
-		.get((req, res, next) =>{
+		.get((req, res) =>{
 			console.log('this is the api:', req.route);
 			res.json({message: 'e750 REST API ready.'});
 			res.end();
@@ -126,9 +122,9 @@ pem.createCertificate({days: 1, selfSigned: true}, function (err, keys) {
 
 // APP ROUTES -------------------------------
 	appRouter.route('/ham')
-		.get((req, res, next) =>{
+		.get((req, res) =>{
 			res.setHeader('Content-Type', 'text/html');
-			res.send("<h1>Ham you say? Sure. Why not?</h1>");
+			res.send('<h1>Ham you say? Sure. Why not?</h1>');
 			res.end();
 		});
 
@@ -153,14 +149,14 @@ pem.createCertificate({days: 1, selfSigned: true}, function (err, keys) {
 	console.log('registered API routes:');
 	apiRouter.stack.forEach((r) => {
 		if (r.route && r.route.path) {
-			console.log(r.route.path)
+			console.log(r.route.path);
 		}
 	});
 
 	console.log('registered APP routes:');
 	appRouter.stack.forEach((r) => {
 		if (r.route && r.route.path) {
-			console.log(r.route.path)
+			console.log(r.route.path);
 		}
 	});
 });

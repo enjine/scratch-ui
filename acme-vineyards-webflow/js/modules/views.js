@@ -1,7 +1,7 @@
-import {Resolver} from "./components";
-import {Emitter, PubSub} from "./events";
+import {Resolver} from './components';
+import {Emitter, PubSub} from './events';
 
-export function BaseView(el, opts = {}) {
+export function BaseView (el, opts = {}) {
 	this.options = {};
 	this.el = null;
 	this.model = null;
@@ -15,14 +15,14 @@ PubSub(BaseView);
 
 Object.assign(BaseView.prototype, {
 	defaults: {
-		el: "div"
+		el: 'div'
 	},
 
 	render: function () {
 		return this;
 	},
 
-	addChildView: function(view){
+	addChildView: function (view){
 		let componentId = Resolver.getComponentId(view);
 		if (!this.childViews[componentId]) {
 			this.childViews[componentId] = [];
@@ -31,7 +31,7 @@ Object.assign(BaseView.prototype, {
 		return this;
 	},
 
-	attachNestedComponents: function(){
+	attachNestedComponents: function (){
 		return this.updateChildren('[data-component]');
 	},
 
@@ -42,12 +42,12 @@ Object.assign(BaseView.prototype, {
 		//console.log('registering child components for: ', this, components);
 
 		if (components.length) {
-			this.emit("willUpdateChildren");
+			this.emit('willUpdateChildren');
 			//console.log(components, typeof components, Object.keys(Resolver));
 			try {
 				[].filter.call(components, (node) => {
 					return node.dataset.component;
-				})
+				});
 			} catch (e) {
 				console.error(e);
 				throw e;
@@ -65,23 +65,21 @@ Object.assign(BaseView.prototype, {
 						this.childViews[componentId].push(new Resolver[componentId](componentEl));
 						//console.info('registered component: ', componentId, Resolver[componentId]);
 					} else {
-						throw new ReferenceError(componentId + " not found in component resolver.", Resolver)
+						throw new ReferenceError(componentId + ' not found in component resolver.', Resolver);
 					}
-					this.emit("didUpdateChildren");
+					this.emit('didUpdateChildren');
 				});
 			} catch (e) {
 				console.error(e);
 				throw e;
 			}
 		} else {
-			console.info('No child components to register.')
+			console.info('No child components to register.');
 		}
 
-		this.emit("componentsLoaded");
+		this.emit('componentsLoaded');
 		return this;
 	}
 });
 
-
-
-export default {BaseView}
+export default {BaseView};

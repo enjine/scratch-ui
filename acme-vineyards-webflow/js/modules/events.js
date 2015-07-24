@@ -1,7 +1,7 @@
 import {mixin, bindDOMEvents, isNativeEvent, isNode, isElement} from './util';
 
 
-export function nEvent(type = '', data = {}, target = null) {
+export function nEvent (type = '', data = {}, target = null) {
 	this.type = type;
 	this.data = data;
 	this.target = target;
@@ -9,7 +9,7 @@ export function nEvent(type = '', data = {}, target = null) {
 }
 
 
-function EventBoss() {
+function EventBoss () {
 	this.events = {};
 	this.once = {};
 }
@@ -42,11 +42,11 @@ Object.assign(EventBoss.prototype, {
 		bindDOMEvents(bindType, object, eventNames, handler);
 	},
 
-	dispatch: function (obj, event, data, ...args) {
-		let subscriptions, i = 0, eventType;
+	dispatch: function (obj, evt, data, ...args) {
+		let subscriptions, i = 0, event, eventType;
 
-		if (typeof event === 'string') {
-			event = this.createEvent(event);
+		if (typeof evt === 'string') {
+			event = this.createEvent(evt);
 		}
 
 		//console.log('Dispatching Event: ', 'e:',event, 'o:',obj, 'd:',data, 'a:',...args);
@@ -58,17 +58,17 @@ Object.assign(EventBoss.prototype, {
 
 		//console.log('subscriptions', subscriptions);
 
+		function removeOnceHandler (handler, j){
+			this.unsubscribe(this, eventType, handler);
+			this.once[eventType].splice(j, 1);
+		}
 
 		for (i; i < subscriptions.length; i += 1) {
 			console.log('calling handler: ', subscriptions[i], 'event:', event);
 			try {
 				subscriptions[i](event);
 				if (this.once[eventType]) {
-					this.once[eventType].forEach((handler, i) => {
-						this.unsubscribe(this, eventType, handler);
-						this.once[eventType].splice(i, 1);
-					});
-
+					this.once[eventType].forEach(removeOnceHandler.bind(this));
 				}
 			} catch (e) {
 				throw e;
@@ -86,7 +86,7 @@ Object.assign(EventBoss.prototype, {
 		}
 
 		if (subscriptions.findIndex((item) => {
-				return item === handler
+				return item === handler;
 			}) === -1) {
 			subscriptions.push(handler);
 			isNewSubscription = true;
@@ -114,7 +114,7 @@ Object.assign(EventBoss.prototype, {
 			}
 		} catch (e) {
 			console.log(e);
-			throw(e);
+			throw e;
 		}
 	},
 
@@ -193,7 +193,7 @@ Object.assign(PubSub.prototype, {
 	}
 });
 
-export function Emitter(obj) {
+export function Emitter (obj) {
 	if (obj) return Emitter.mixin(obj);
 }
 
@@ -242,7 +242,7 @@ Object.assign(Emitter.prototype, PubSub.prototype, {
 				handler(...data);
 			});
 		} else {
-			this.subscribeOnce(event, handler)
+			this.subscribeOnce(event, handler);
 		}
 
 		return this;
@@ -272,7 +272,7 @@ export var Listener = function (obj) {
 
 Listener.mixin = mixin;
 
-Object.assign(Listener.prototype, {
+/*Object.assign(Listener.prototype, {
 	listenTo: function (object, event, handler, context, options) {
 
 	},
@@ -280,11 +280,11 @@ Object.assign(Listener.prototype, {
 	stopListening: function (object, event) {
 
 	}
-});
+});*/
 
 
 export var Evented = function () {
 };
 Object.assign(Evented, Emitter.prototype, Listener.prototype, PubSub.prototype);
 
-export default {Emitter, Listener, PubSub}
+export default {Emitter, Listener, PubSub};

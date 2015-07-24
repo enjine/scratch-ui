@@ -1,4 +1,4 @@
-export function mixin(destObject) {
+export function mixin (destObject) {
 	var props = Object.keys(this.prototype);
 	for (var i = 0; i < props.length; i++) {
 		if (typeof destObject === 'function') {
@@ -10,7 +10,7 @@ export function mixin(destObject) {
 	return destObject;
 }
 
-export function bindDOMEvents(bindType, object, eventNames, handler) {
+export function bindDOMEvents (bindType, object, eventNames, handler) {
 	var i = 0,
 		events = eventNames.split(' '),
 		prefix = object.addEventListener ? '' : 'on';
@@ -21,29 +21,44 @@ export function bindDOMEvents(bindType, object, eventNames, handler) {
 }
 
 //Returns true if it is a DOM node
-export function isNode(o){
+export function isNode (o){
   return (
-    typeof Node === "object" ? o instanceof Node :
-    o && typeof o === "object" && typeof o.nodeType === "number" && typeof o.nodeName==="string"
+    typeof Node === 'object' ? o instanceof Node :
+    o && typeof o === 'object' && typeof o.nodeType === 'number' && typeof o.nodeName === 'string'
   );
 }
 
 //Returns true if it is a DOM element
-export function isElement(o){
+export function isElement (o){
   return (
-    typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
-    o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName==="string"
+    typeof HTMLElement === 'object' ? o instanceof HTMLElement : //DOM2
+    o && typeof o === 'object' && o !== null && o.nodeType === 1 && typeof o.nodeName === 'string'
 );
 }
 
-export function isNativeEvent(eventname) {
-    return typeof document.body["on" + eventname] !== "undefined";
+export function isNativeEvent (eventname) {
+    return typeof document.body['on' + eventname] !== 'undefined';
 }
 
-export function htmlToDom(HTMLString) {
-		let tmp = document.createElement("div");
-		tmp.innerHTML = HTMLString;
-		return tmp.firstElementChild;
+export function htmlToDom (HTMLString, stripScripts=false) {
+	let tmp = document.createElement('div');
+	tmp.innerHTML = HTMLString;
+
+	if (stripScripts){
+		let scripts = tmp.getElementsByTagName('script'),
+			i = scripts.length;
+		while (i--){
+			scripts[i].parentNode.removeChild(scripts[i]);
+		}
 	}
 
-export default {mixin, bindDOMEvents, isNativeEvent, isNode, isElement, htmlToDom}
+	return tmp.firstElementChild;
+}
+
+export function getConstructorName (obj){
+   var funcNameRegex = /function (.{1,})\(/;
+   var results = (funcNameRegex).exec((obj).constructor.toString());
+   return (results && results.length > 1) ? results[1] : '';
+}
+
+export default {getConstructorName, mixin, bindDOMEvents, isNativeEvent, isNode, isElement, htmlToDom};
