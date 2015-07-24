@@ -1,8 +1,9 @@
+import 'core-js';
 import {BaseModel, Product} from './models';
 import {Emitter, PubSub} from './events';
 
 
-var BaseCollection = function (options = {}) {
+export var BaseCollection = function (options = {}) {
 	Object.assign(this, options);
 
 	this.models = [];
@@ -36,7 +37,7 @@ Object.assign(BaseCollection.prototype, {
 	toMeta: BaseModel.prototype.toMeta
 });
 
-export function ProductCollection (options) {
+export function ProductCollection () {
 	Object.assign(this, BaseCollection.prototype);
 	BaseCollection.apply(this, arguments);
 

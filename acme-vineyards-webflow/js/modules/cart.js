@@ -1,5 +1,5 @@
 import {Product, ProductList, AddToCart} from './components';
-import {BaseView} from './views.js';
+import {BaseView} from './views';
 
 
 export var ui = {

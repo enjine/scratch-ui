@@ -1,3 +1,4 @@
+import 'core-js';
 import {mixin, bindDOMEvents, isNativeEvent, isNode, isElement} from './util';
 
 

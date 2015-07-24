@@ -1,3 +1,4 @@
+import 'core-js';
 import {jst} from './core';
 import {ProductCollection} from './collections';
 import {BaseView} from './views';

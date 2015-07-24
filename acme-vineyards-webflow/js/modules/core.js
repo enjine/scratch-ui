@@ -1,3 +1,4 @@
+import 'core-js';
 import RSVP from 'rsvp';
 var xhttp = require('xhttp/custom')(RSVP.Promise);
 //var xhttp = require('xhttp/custom')(Promise); // native ES6 Promise

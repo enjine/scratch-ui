@@ -1,31 +1,30 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-"use strict";
+'use strict';
 
-require("core-js");
+require('core-js');
 
 // Node module
 
-var _modulesComponents = require("./modules/components");
+var _modulesComponents = require('./modules/components');
 
 var e750 = function e750() {
-	"use strict";
 	_modulesComponents.Application.apply(this, arguments);
-	this.el = document.getElementsByTagName("body")[0];
+	this.el = document.getElementsByTagName('body')[0];
 
 	Object.assign(this, _modulesComponents.Application.prototype, {
 		fixtures: {},
-		bootstrap: function bootstrap() {
-			if (window.e750.FIXTURES) {
-				this.fixtures = window.e750.FIXTURES;
+		bootstrap: function bootstrap(options) {
+			if (options.fixtures) {
+				this.fixtures = options.fixtures;
 			}
 		},
 		start: function start() {
 			var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-			this.bootstrap();
+			this.bootstrap(options);
 			//console.log('app init():', this, arguments);
 			//console.log('cookies:', document.cookie);
-			console.log("E750.js started....");
+			console.log('E750.js started....');
 			this.attachNestedComponents();
 			//TODO: implement this
 			//this.attachPartials();
@@ -33,19 +32,18 @@ var e750 = function e750() {
 	});
 
 	this.onComponentsLoaded = function () {
-		console.log("App received onComponentsLoaded", this, arguments);
+		console.log('App received onComponentsLoaded', this, arguments);
 	};
 
-	this.subscribeOnce("componentsLoaded", this.onComponentsLoaded);
+	this.subscribeOnce('componentsLoaded', this.onComponentsLoaded);
 
-	this.once("willUpdateChildren", function () {
-		console.log("App yip yip", this, arguments);
+	this.once('willUpdateChildren', function () {
+		console.log('App yip yip', this, arguments);
 	});
 };
 
 var app = new e750();
-document.addEventListener("DOMContentLoaded", app.start());
-console.log(app);
+document.addEventListener('DOMContentLoaded', app.start({ fixtures: window.e750.FIXTURES }));
 
 },{"./modules/components":4,"core-js":11}],2:[function(require,module,exports){
 'use strict';
@@ -56,23 +54,25 @@ Object.defineProperty(exports, '__esModule', {
 
 var _components = require('./components');
 
-var _viewsJs = require('./views.js');
+var _views = require('./views');
 
 var ui = {
-	view: _viewsJs.BaseView,
+	view: _views.BaseView,
 	productList: _components.ProductList,
 	addToCart: _components.AddToCart,
 	baseProduct: _components.Product
 };
 exports.ui = ui;
 
-},{"./components":4,"./views.js":9}],3:[function(require,module,exports){
+},{"./components":4,"./views":9}],3:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
 	value: true
 });
 exports.ProductCollection = ProductCollection;
+
+require('core-js');
 
 var _models = require('./models');
 
@@ -86,6 +86,7 @@ var BaseCollection = function BaseCollection() {
 	this.models = [];
 };
 
+exports.BaseCollection = BaseCollection;
 (0, _events.Emitter)(BaseCollection);
 (0, _events.PubSub)(BaseCollection);
 
@@ -114,7 +115,7 @@ Object.assign(BaseCollection.prototype, {
 	toMeta: _models.BaseModel.prototype.toMeta
 });
 
-function ProductCollection(options) {
+function ProductCollection() {
 	Object.assign(this, BaseCollection.prototype);
 	BaseCollection.apply(this, arguments);
 
@@ -124,7 +125,7 @@ function ProductCollection(options) {
 	//console.log('product collection', this, arguments)
 }
 
-},{"./events":6,"./models":7}],4:[function(require,module,exports){
+},{"./events":6,"./models":7,"core-js":11}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -134,6 +135,8 @@ exports.Application = Application;
 exports.Product = Product;
 exports.ProductList = ProductList;
 exports.AddToCart = AddToCart;
+
+require('core-js');
 
 var _core = require('./core');
 
@@ -315,7 +318,7 @@ function AddToCart(el) {
 	Object.assign(options, defaults, opts);
 }
 
-},{"./cart":2,"./collections":3,"./core":5,"./models":7,"./views":9}],5:[function(require,module,exports){
+},{"./cart":2,"./collections":3,"./core":5,"./models":7,"./views":9,"core-js":11}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -324,6 +327,8 @@ Object.defineProperty(exports, '__esModule', {
 var _arguments = arguments;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+require('core-js');
 
 var _rsvp = require('rsvp');
 
@@ -482,7 +487,7 @@ var jst = {
 exports.jst = jst;
 exports['default'] = { net: net, storage: storage, jst: jst };
 
-},{"./events":6,"./util":8,"rsvp":114,"templeton":115,"xhttp/custom":116}],6:[function(require,module,exports){
+},{"./events":6,"./util":8,"core-js":11,"rsvp":114,"templeton":115,"xhttp/custom":116}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -493,6 +498,8 @@ var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = 
 
 exports.nEvent = nEvent;
 exports.Emitter = Emitter;
+
+require('core-js');
 
 var _util = require('./util');
 
@@ -809,9 +816,9 @@ Object.assign(Emitter.prototype, PubSub.prototype, {
 
 var Listener = function Listener(obj) {
 	if (obj) return Listener.mixin(obj);
-};exports.Listener = Listener;
-//aka observer...
+}; //aka observer...
 
+exports.Listener = Listener;
 Listener.mixin = _util.mixin;
 
 /*Object.assign(Listener.prototype, {
@@ -830,13 +837,15 @@ Object.assign(Evented, Emitter.prototype, Listener.prototype, PubSub.prototype);
 
 exports['default'] = { Emitter: Emitter, Listener: Listener, PubSub: PubSub };
 
-},{"./util":8}],7:[function(require,module,exports){
+},{"./util":8,"core-js":11}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
 	value: true
 });
 exports.BaseModel = BaseModel;
+
+require('core-js');
 
 var _core = require('./core');
 
@@ -996,7 +1005,7 @@ var Product = function Product(props) {
 exports.Product = Product;
 exports['default'] = { BaseModel: BaseModel, Product: Product };
 
-},{"./core":5,"./events":6}],8:[function(require,module,exports){
+},{"./core":5,"./events":6,"core-js":11}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1082,6 +1091,8 @@ Object.defineProperty(exports, '__esModule', {
 });
 exports.BaseView = BaseView;
 
+require('core-js');
+
 var _components = require('./components');
 
 var _events = require('./events');
@@ -1153,8 +1164,8 @@ Object.assign(BaseView.prototype, {
 						_this.childViews[componentId].push(new _components.Resolver[componentId](componentEl));
 						//console.info('registered component: ', componentId, Resolver[componentId]);
 					} else {
-						throw new ReferenceError(componentId + ' not found in component resolver.', _components.Resolver);
-					}
+							throw new ReferenceError(componentId + ' not found in component resolver.', _components.Resolver);
+						}
 					_this.emit('didUpdateChildren');
 				});
 			} catch (e) {
@@ -1172,7 +1183,7 @@ Object.assign(BaseView.prototype, {
 
 exports['default'] = { BaseView: BaseView };
 
-},{"./components":4,"./events":6}],10:[function(require,module,exports){
+},{"./components":4,"./events":6,"core-js":11}],10:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};

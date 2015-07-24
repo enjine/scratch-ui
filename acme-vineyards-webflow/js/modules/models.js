@@ -1,3 +1,4 @@
+import 'core-js';
 import {net} from './core';
 import {Emitter, PubSub} from './events';
 

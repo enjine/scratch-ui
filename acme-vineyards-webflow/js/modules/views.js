@@ -1,3 +1,4 @@
+import 'core-js';
 import {Resolver} from './components';
 import {Emitter, PubSub} from './events';
 
