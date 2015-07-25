@@ -39,11 +39,11 @@
     "tape": "^4.0.1"
   },
   "scripts": {
-    "lint": "eslint -c ./.eslintrc ./**/*.js ./acme-vineyards-webflow/js/**/*.js ./acme-vineyards-webflow/js/e750.js",
+    "lint": "eslint -c ./.eslintrc ./lib/client/*.js ./lib/client/**/*.js ./lib/server/*.js ./lib/cli/*.js",
     "test": "karma start",
-    "compile": "browserify acme-vineyards-webflow/js/e750.js -t [babelify --sourceMapRelative ./acme-vineyards-webflow] --outfile acme-vineyards-webflow/js/e750-compiled.js",
-    "build": "browserify -d acme-vineyards-webflow/js/e750.js -p [minifyify --map ./acme-vineyards-webflow/e750.js.map --output ./acme-vineyards-webflow/js/e750.js.map] --outfile acme-vineyards-webflow/js/e750-compiled.js",
-    "start": "babel-node server.js"
+    "compile": "browserify ./lib/client/main.js -t [babelify --sourceMapRelative ./lib] --outfile acme-vineyards-webflow/js/e750.js",
+    "build": "browserify -d ./lib/client/main.js -t [babelify --sourceMapRelative ./lib] -p [minifyify --map /js/e750.js.map --output ./acme-vineyards-webflow/js/e750.js.map] --outfile acme-vineyards-webflow/js/e750.min.js",
+    "start": "babel-node ./lib/server/main.js"
   },
   "author": "Alessandro Di Candia",
   "license": "ISCs"

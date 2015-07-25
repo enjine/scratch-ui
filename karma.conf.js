@@ -14,25 +14,24 @@ module.exports = function (config) {
 
 		// list of files / patterns to load in the browser
 		files: [
-			//'node_modules/karma-babel-preprocessor/node_modules/babel-core/browser-polyfill.js',
-			//'acme-vineyards-webflow/js/e750.js',
-			'acme-vineyards-webflow/js/modules/**/*.js',
+			'test/fixtures.js',
+			'lib/client/**/*.js',
+			'lib/server/**/*.js',
 			'test/**/**/*.js'
 		],
 
 
 		// list of files to exclude
 		exclude: [
-			'acme-vineyards-webflow/js/*-compiled.js',
-			'acme-vineyards-webflow/js/modernizr.js',
-			'acme-vineyards-webflow/js/webflow.js'
+			'lib/client/main.js'
 		],
 
 
 		// preprocess matching files before serving them to the browser
 		// available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
 		preprocessors: {
-			'acme-vineyards-webflow/js/**/*.js': ['browserify', 'sourcemap', 'coverage'],
+			'lib/client/**/*.js': ['browserify', 'sourcemap', 'coverage'],
+			'lib/server/**/*.js': ['browserify', 'sourcemap', 'coverage'],
 			'test/**/*.js': ['browserify']
 		},
 
@@ -54,7 +53,8 @@ module.exports = function (config) {
 		coverageReporter: {
 			instrumenters: {isparta: require('isparta')},
 			instrumenter: {
-				'acme-vineyards-webflow/js/**/*.js': 'isparta'
+				'lib/client/**/*.js': 'isparta',
+				'lib/server/**/*.js': 'isparta'
 			},
 			reporters: [
 				{
