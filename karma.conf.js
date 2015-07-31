@@ -12,26 +12,22 @@ module.exports = function (config) {
 		frameworks: ['browserify', 'tap'],
 
 
-		// list of files / patterns to load in the browser
+		// list of files / patterns to load in the browser test runner
 		files: [
-			'test/fixtures.js',
-			'lib/client/**/*.js',
-			'lib/server/**/*.js',
-			'test/**/**/*.js'
+			{pattern: 'lib/**/*.js', included: false},
+			{pattern: 'test/**/*.js', included: true}
 		],
 
 
 		// list of files to exclude
-		exclude: [
-			'lib/client/main.js'
-		],
-
+		exclude: [],
 
 		// preprocess matching files before serving them to the browser
 		// available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
 		preprocessors: {
-			'lib/client/**/*.js': ['browserify', 'sourcemap', 'coverage'],
-			'lib/server/**/*.js': ['browserify', 'sourcemap', 'coverage'],
+			// create the ES5 equivalents of these ES6 modules (these are loaded asynchronously)
+			'lib/**/*.js': ['browserify'],
+			// create the ES5 versions of the tests written in ES6 (these are included in the test runner page)
 			'test/**/*.js': ['browserify']
 		},
 
@@ -40,37 +36,10 @@ module.exports = function (config) {
 			transform: ['babelify']
 		},
 
-		babelPreprocessor: {
-			options: {
-				sourceMap: 'inline',
-				blacklist: ['useStrict']
-			},
-			sourceFileName: function (file) {
-				return file.originalPath;
-			}
-		},
-
-		coverageReporter: {
-			instrumenters: {isparta: require('isparta')},
-			instrumenter: {
-				'lib/client/**/*.js': 'isparta',
-				'lib/server/**/*.js': 'isparta'
-			},
-			reporters: [
-				{
-					type: 'text-summary',
-				},
-				{
-					type: 'html',
-					dir: 'coverage/'
-				}
-			]
-		},
-
 		// test results reporter to use
 		// possible values: 'dots', 'progress'
 		// available reporters: https://npmjs.org/browse/keyword/karma-reporter
-		reporters: ['progress', 'tape', 'coverage'],
+		reporters: ['tape'],
 
 
 		// web server port
@@ -83,11 +52,11 @@ module.exports = function (config) {
 
 		// level of logging
 		// possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-		logLevel: config.LOG_DEBUG,
+		logLevel: config.LOG_INFO,
 
 
 		// enable / disable watching file and executing tests whenever any file changes
-		autoWatch: false,
+		autoWatch: true,
 
 		customLaunchers: {
 			'ChromeES6': {
@@ -98,8 +67,8 @@ module.exports = function (config) {
 
 		// start these browsers
 		// available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-		//browsers: ['Chrome', 'ChromeCanary', 'Firefox', 'Safari', 'PhantomJS'],
-		browsers: ['ChromeES6'],
+		//browsers: ['ChromeES6', 'Chrome', 'ChromeCanary', 'Firefox', 'Safari', 'PhantomJS'],
+		browsers: ['Chrome'],
 
 
 		// Continuous Integration mode

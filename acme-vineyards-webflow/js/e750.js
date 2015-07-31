@@ -8,10 +8,9 @@ require('core-js');
 var _modulesComponents = require('./modules/components');
 
 var e750 = function e750() {
-	_modulesComponents.Application.apply(this, arguments);
 	this.el = document.getElementsByTagName('body')[0];
 
-	Object.assign(this, _modulesComponents.Application.prototype, {
+	Object.assign(this, {
 		fixtures: {},
 		bootstrap: function bootstrap(options) {
 			if (options.fixtures) {
@@ -41,6 +40,8 @@ var e750 = function e750() {
 		console.log('App yip yip', this, arguments);
 	});
 };
+
+e750.prototype = new _modulesComponents.Application();
 
 var app = new e750();
 document.addEventListener('DOMContentLoaded', app.start({ fixtures: window.e750.FIXTURES }));
@@ -88,7 +89,6 @@ var BaseCollection = function BaseCollection() {
 
 exports.BaseCollection = BaseCollection;
 (0, _events.Emitter)(BaseCollection);
-(0, _events.PubSub)(BaseCollection);
 
 Object.assign(BaseCollection.prototype, {
 	model: _models.BaseModel,
@@ -116,13 +116,12 @@ Object.assign(BaseCollection.prototype, {
 });
 
 function ProductCollection() {
-	this.model = _models.Product;
+	BaseCollection.apply(this, arguments);
 
-	//BaseCollection.constructor(options);
-	console.log('product collection', this, arguments, this instanceof BaseCollection);
+	this.model = _models.Product;
 }
 
-ProductCollection.prototype = new BaseCollection();
+Object.assign(ProductCollection.prototype, BaseCollection.prototype);
 
 },{"./events":6,"./models":7,"core-js":11}],4:[function(require,module,exports){
 'use strict';
@@ -147,6 +146,8 @@ var _models = require('./models');
 
 var _cart = require('./cart');
 
+console.log(_cart.ui);
+
 var Resolver = {
 	'ui/header': _cart.ui.view,
 	'ui/slider': _cart.ui.view,
@@ -159,7 +160,7 @@ var Resolver = {
 		var _this = this;
 
 		return Object.getOwnPropertyNames(this).filter(function (componentId) {
-			//console.log('Get ComponentId:', Object.getPrototypeOf(view), getConstructorName(view));
+			console.log('Get ComponentId:', Object.getPrototypeOf(view), view instanceof _views.BaseView);
 			return Object.getPrototypeOf(view).constructor === _this[componentId];
 		})[0] || null;
 	}
@@ -346,7 +347,6 @@ var _util = require('./util');
 var xhttp = require('xhttp/custom')(_rsvp2['default'].Promise);
 
 var eventedHTTP = (0, _events.Emitter)({});
-(0, _events.PubSub)(eventedHTTP);
 
 var net = {
 	http: Object.assign(eventedHTTP, {
@@ -576,7 +576,7 @@ Object.assign(EventBoss.prototype, {
 		}
 
 		for (i; i < subscriptions.length; i += 1) {
-			console.log('calling handler: ', subscriptions[i], 'event:', event);
+			//console.log('calling handler: ', subscriptions[i], 'event:', event);
 			try {
 				subscriptions[i](event);
 				if (this.once[eventType]) {
@@ -832,9 +832,9 @@ Listener.mixin = _util.mixin;
 
 var Evented = function Evented() {};
 exports.Evented = Evented;
-Object.assign(Evented, Emitter.prototype, Listener.prototype, PubSub.prototype);
+Object.assign(Evented, Emitter.prototype, Listener.prototype);
 
-exports['default'] = { Emitter: Emitter, Listener: Listener, PubSub: PubSub };
+exports['default'] = { Emitter: Emitter, Listener: Listener };
 
 },{"./util":8,"core-js":11}],7:[function(require,module,exports){
 'use strict';
@@ -869,9 +869,9 @@ function BaseModel() {
 
 	this.options = options;
 	this.values = Object.create(attributes);
-
-	_events.Emitter.apply(this);
 }
+
+(0, _events.Emitter)(BaseModel);
 
 Object.assign(BaseModel.prototype, {
 
@@ -933,6 +933,7 @@ Object.assign(BaseModel.prototype, {
 });
 
 var Product = function Product(props) {
+
 	var defaults = {
 		id: '',
 		name: '',
@@ -991,6 +992,7 @@ var Product = function Product(props) {
 		quantity: ''
 	};
 
+	BaseModel.apply(this, arguments);
 	Object.assign(this.values, defaults);
 
 	if (props) {
@@ -999,7 +1001,7 @@ var Product = function Product(props) {
 };
 
 exports.Product = Product;
-Product.prototype = new BaseModel();
+Object.assign(Product.prototype, BaseModel.prototype);
 
 exports['default'] = { BaseModel: BaseModel, Product: Product };
 
@@ -1107,7 +1109,6 @@ function BaseView(el) {
 }
 
 (0, _events.Emitter)(BaseView);
-(0, _events.PubSub)(BaseView);
 
 Object.assign(BaseView.prototype, {
 	defaults: {

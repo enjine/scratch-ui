@@ -5,6 +5,8 @@ test('Inherits from BaseCollection', (t) => {
 	t.plan(1);
 
 	let pc = new ProductCollection();
-	t.equals(Object.getPrototypeOf(pc), BaseCollection);
+	t.deepEqual(Object.getPrototypeOf(pc), BaseCollection.prototype);
+
+	t.end();
 
 });
