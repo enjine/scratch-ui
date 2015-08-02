@@ -166,11 +166,15 @@ describe('ProductCollection', () => {
 
 		});
 
-		it('Parses returned JSON into an array of Product models', () => {
+		it('Parses a non-empty response into an array of Product models', () => {
 			pc.parse(fakeResponse);
 			expect(pc.models).to.not.be.empty;
 			expect(pc.models).to.be.an.instanceof(Array);
 			expect(pc.models[0]).to.be.an.instanceof(Product);
+		});
+
+		it('Throws an error if response is empty.', () => {
+			expect(pc.parse.bind(pc, {})).to.throw(Error);
 		});
 
 	});

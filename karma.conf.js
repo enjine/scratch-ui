@@ -60,11 +60,7 @@ module.exports = function (config) {
 		coverageReporter: {
 			dir: './reports/coverage',
 			reporters: [
-				// reporters not supporting the `file` property
-				//{type: 'html', subdir: 'html'},
-				//{type: 'lcov', subdir: '.'},
-				{type: 'text', subdir: '.', file: 'text.txt'},
-				{type: 'text-summary', subdir: '.', file: 'text-summary.txt'}
+				{type: 'html', subdir: 'html'}
 			]
 		},
 
