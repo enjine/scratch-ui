@@ -1,4 +1,5 @@
-'use strict'
+'use strict';
+
 // Karma configuration
 // Generated on Thu Jul 23 2015 23:21:04 GMT-0400 (EDT)
 var istanbul = require('browserify-istanbul');
@@ -76,7 +77,7 @@ module.exports = function (config) {
 
 		// level of logging
 		// possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-		logLevel: config.LOG_DISABLE,
+		logLevel: config.LOG_INFO,
 
 
 		// enable / disable watching file and executing tests whenever any file changes
