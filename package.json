@@ -48,7 +48,8 @@
   "scripts": {
     "lint": "eslint -c ./.eslintrc ./lib/**/*.js ./test/**/**/*.js",
     "test": "karma start --single-run",
-    "coverage": "babel-node node_modules/.bin/isparta cover --report text --report html ./lib/client/main.js --dir ./reports/coverage",
+    "coverage": "babel-node node_modules/.bin/isparta cover --report text --report html --dir ./reports/coverage _mocha -- --reporter dot",
+    "istanbul": "istanbul cover --report html --dir ./reports/coverage _mocha -- --require babel/register",
     "compile": "browserify ./lib/client/main.js -t [babelify --sourceMapRelative ./lib] --outfile acme-vineyards-webflow/js/e750.js",
     "build": "browserify -d ./lib/client/main.js -t [babelify --sourceMapRelative ./lib] -p [minifyify --map /js/e750.js.map --output ./acme-vineyards-webflow/js/e750.js.map] --outfile acme-vineyards-webflow/js/e750.min.js",
     "start": "babel-node ./lib/server/main.js",
