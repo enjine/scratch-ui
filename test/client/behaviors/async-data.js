@@ -1,3 +1,4 @@
+/*eslint no-unused-expressions: 0*/
 import {settings} from '../../setup';
 
 
@@ -81,4 +82,4 @@ export var AsyncDataBehavior = {
 			});
 		});
 	}
-}
+};

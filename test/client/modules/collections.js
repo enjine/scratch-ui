@@ -1,6 +1,6 @@
+/*eslint no-unused-expressions: 0*/
 import {BaseCollection, ProductCollection} from '../../../lib/client/modules/collections';
-import {Product, BaseModel} from '../../../lib/client/modules/models';
-import {EventBoss, Emitter} from '../../../lib/client/modules/events';
+import {BaseModel, Product} from '../../../lib/client/modules/models';
 
 import {inherits} from '../../../lib/client/modules/util';
 import {EmitterMixinBehavior} from '../behaviors/emitter';
@@ -57,10 +57,11 @@ describe('Collections::ProductCollection', () => {
 	});
 
 	describe('Handles constructor arguments/options appropriately.', () => {
-		let testModel = function(){};
+		let testModel = function () {
+		};
 		testModel.prototype = inherits(BaseModel, testModel);
 
-		let	options = {
+		let options = {
 				model: testModel,
 				testProp: 'success',
 				testFunc: () => {
@@ -68,7 +69,7 @@ describe('Collections::ProductCollection', () => {
 				},
 				testObj: {
 					prop1: new Date(),
-					func1: function (){
+					func1: function () {
 						return 'test';
 					}
 				}
@@ -136,11 +137,12 @@ describe('Collections::ProductCollection', () => {
 		});
 
 		it('Parses a non-empty response into an array of Product models.', () => {
+			let models = pc.models;
 			pc.parse(fakeResponse);
-			expect(pc.models).to.not.be.empty;
-			expect(pc.models).to.be.an.instanceof(Array);
-			expect(pc.models).to.have.length.above(0);
-			expect(pc.models[0]).to.be.an.instanceof(Product);
+			expect(models).to.not.be.empty;
+			expect(models).to.be.an.instanceof(Array);
+			expect(models).to.have.length.above(0);
+			expect(models[0]).to.be.an.instanceof(Product);
 		});
 
 		it('Throws an error if response is empty.', () => {
@@ -157,12 +159,12 @@ describe('Collections::ProductCollection', () => {
 			});
 
 			it('Implements a `serialize` method to return all model attributes as an array of JSON objects.', () => {
-				let pojo;
+				let serialized;
 				expect(pc).to.respondTo('serialize');
-				pojo = pc.serialize();
-				expect(pojo).to.be.an.instanceof(Array);
-				expect(pojo).to.have.length.above(0);
-				expect(pojo[0]).to.be.an.instanceof(Object);
+				serialized = pc.serialize();
+				expect(serialized).to.be.an.instanceof(Array);
+				expect(serialized).to.have.length.above(0);
+				expect(serialized[0]).to.be.an.instanceof(Object);
 			});
 
 		});

@@ -46,7 +46,7 @@
     "sinon": "^1.15.4"
   },
   "scripts": {
-    "lint": "eslint -c ./.eslintrc ./lib/**/*.js",
+    "lint": "eslint -c ./.eslintrc ./lib/**/*.js ./test/**/**/*.js",
     "test": "karma start --single-run",
     "coverage": "babel-node node_modules/.bin/isparta cover --report text --report html ./lib/client/main.js --dir ./reports/coverage",
     "compile": "browserify ./lib/client/main.js -t [babelify --sourceMapRelative ./lib] --outfile acme-vineyards-webflow/js/e750.js",

@@ -1,3 +1,4 @@
+/*eslint no-unused-expressions: 0*/
 import {EventBoss} from '../../../lib/client/modules/events';
 import {settings} from '../../setup';
 
@@ -47,4 +48,4 @@ export var EmitterMixinBehavior = {
 			expect(o).to.respondTo('subscribe');
 		});
 	}
-}
+};

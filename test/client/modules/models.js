@@ -1,5 +1,5 @@
+/*eslint no-unused-expressions: 0*/
 import {Product, BaseModel} from '../../../lib/client/modules/models';
-import {EventBoss, Emitter} from '../../../lib/client/modules/events';
 
 import {settings} from '../../setup';
 import {EmitterMixinBehavior} from '../behaviors/emitter';
@@ -31,14 +31,14 @@ describe('Models::Product', () => {
 	});
 
 	describe('Handles constructor arguments/options appropriately.', () => {
-		let	options = {
+		let options = {
 				testProp: 'success',
 				testFunc: () => {
 					return true;
 				},
 				testObj: {
 					prop1: new Date(),
-					func1: function (){
+					func1: function () {
 						return 'test';
 					}
 				}
