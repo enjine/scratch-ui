@@ -15,6 +15,7 @@ module.exports = function (config) {
 		frameworks: ['browserify', 'mocha', 'sinon-chai'],
 
 		client: {
+			captureConsole: true,
 			mocha: {
 				reporter: 'html', // change Karma's debug.html to the mocha web reporter
 				ui: 'bdd'
@@ -30,7 +31,7 @@ module.exports = function (config) {
 
 
 		// list of files to exclude
-		exclude: [],
+		exclude: ['./test/clients/behaviors/**/*.js'],
 
 		// preprocess matching files before serving them to the browser
 		// available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor

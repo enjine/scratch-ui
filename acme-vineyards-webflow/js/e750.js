@@ -79,6 +79,8 @@ var _models = require('./models');
 
 var _events = require('./events');
 
+var _util = require('./util');
+
 var BaseCollection = function BaseCollection() {
 	var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
@@ -94,16 +96,19 @@ Object.assign(BaseCollection.prototype, {
 	model: _models.BaseModel,
 	fetch: _models.BaseModel.prototype.fetch,
 	parse: function parse(data) {
-		//console.log('incoming model data:', data);;
+		//console.log('incoming model data:', data);
 		try {
-			for (var item in data) {
-				if (data.hasOwnProperty(item)) {
-					var m = new this.model(data[item]);
-					//console.log('new model:', m, item, 'data:', data[item]);
-					this.models.push(m);
+			if (Object.getOwnPropertyNames(data).length) {
+				for (var item in data) {
+					if (data.hasOwnProperty(item)) {
+						var m = new this.model(data[item]);
+						//console.log('new model:', m, item, 'data:', data[item]);
+						this.models.push(m);
+					}
 				}
+			} else {
+				throw new Error('Response was empty.');
 			}
-			//console.log('collection set:', this.models);
 		} catch (e) {
 			console.error(e);
 			throw e;
@@ -111,19 +116,46 @@ Object.assign(BaseCollection.prototype, {
 
 		return this;
 	},
-	toJSON: _models.BaseModel.prototype.toJSON,
-	toMeta: _models.BaseModel.prototype.toMeta
+
+	serialize: function serialize() {
+		return this.models.map(function (model) {
+			return model.serialize();
+		});
+	},
+
+	toJSON: function toJSON() {
+		return JSON.stringify(this.models.map(function (model) {
+			return model.serialize();
+		}), null, 0);
+	},
+
+	toMeta: function toMeta() {
+		return this.models.map(function (model) {
+			return model.toMeta();
+		});
+	}
 });
 
-function ProductCollection() {
+function ProductCollection(options) {
+	this.model = options && options.model ? options.model : _models.Product;
 	BaseCollection.apply(this, arguments);
-
-	this.model = _models.Product;
 }
 
-Object.assign(ProductCollection.prototype, BaseCollection.prototype);
+// what i learned about prototypal inheritance:
+// ex 1: ProductCollection.prototype = Object.create(BaseCollection.prototype);
+// this makes the constructor = BaseCollection(), and you don't need to call apply
+// ex 2: Object.assign(ProductCollection.prototype, BaseCollection.prototype);
+// with this you get ProductCollection() as the constructor and you get a copy of BaseCollection.prototype
+// ex 3: ProductCollection.prototype = inherits(BaseCollection, ProductCollection);
+// this is probably the most `correct` way to do it because:
+// let PC = new ProductCollection();
+// console.info(PC.constructor) // ProductCollection
+// console.info(PC instanceof BaseCollection); // true
+// console.info(PC instanceof ProductCollection); // true
+// ^^ everything checks out to what you'd expect.
+ProductCollection.prototype = (0, _util.inherits)(BaseCollection, ProductCollection);
 
-},{"./events":6,"./models":7,"core-js":11}],4:[function(require,module,exports){
+},{"./events":6,"./models":7,"./util":8,"core-js":11}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -145,8 +177,6 @@ var _views = require('./views');
 var _models = require('./models');
 
 var _cart = require('./cart');
-
-console.log(_cart.ui);
 
 var Resolver = {
 	'ui/header': _cart.ui.view,
@@ -362,7 +392,7 @@ var net = {
 			};
 
 			Object.assign(defaults, options);
-			console.log('ajax', options);
+			this.emit('beforeAsync', options);
 			return xhttp(options);
 		},
 		/**
@@ -372,7 +402,7 @@ var net = {
    * @returns {*}
    */
 		get: function get(options) {
-			this.emit('beforeAsync', options);
+			options.method = 'GET';
 			return this.ajax(options);
 		}
 	})
@@ -496,6 +526,7 @@ Object.defineProperty(exports, '__esModule', {
 var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
 
 exports.nEvent = nEvent;
+exports.EventBoss = EventBoss;
 exports.Emitter = Emitter;
 
 require('core-js');
@@ -850,6 +881,8 @@ var _core = require('./core');
 
 var _events = require('./events');
 
+var _util = require('./util');
+
 var attributes = {
 	_guid: null,
 	all: function all() {
@@ -881,20 +914,29 @@ Object.assign(BaseModel.prototype, {
   * @returns {*}
   */
 	fetch: function fetch(options) {
-		this.emit('beforeFetch');
-		console.log('fetch', this, arguments);
-		return _core.net.http.get(options);
+		try {
+			this.emit('beforeFetch');
+			return _core.net.http.get(options);
+		} catch (e) {
+			console.error(e);
+			throw e;
+		}
 	},
 
 	parse: function parse(data) {
-		if (Object.keys(data).length > 0) {
-			for (var prop in data) {
-				if (data.hasOwnProperty(prop)) {
-					this.values[prop] = data[prop];
+		try {
+			if (Object.keys(data).length > 0) {
+				for (var prop in data) {
+					if (data.hasOwnProperty(prop)) {
+						this.set(prop, data[prop]);
+					}
 				}
+			} else {
+				throw new Error('Data has zero length.');
 			}
-		} else {
-			console.error('data has zero length.');
+		} catch (e) {
+			console.error(e);
+			throw e;
 		}
 
 		return this;
@@ -905,12 +947,17 @@ Object.assign(BaseModel.prototype, {
 			return this.values[propName];
 		} catch (e) {
 			console.error(e);
-			throw e;
+			throw new ReferenceError('Property `' + propName + '` not found in ' + this.constructor.name);
 		}
 	},
 
 	set: function set(propName, value) {
-		this.values[propName] = value;
+		if (this.values[propName] !== undefined) {
+			this.values[propName] = value;
+		} else {
+			throw new ReferenceError('Property `' + propName + '` is not settable for ' + this.constructor.name + '. Add `' + propName + '` to the `defaults` on this model to enable it as settable.');
+		}
+
 		return this;
 	},
 
@@ -919,16 +966,7 @@ Object.assign(BaseModel.prototype, {
 	},
 
 	toJSON: function toJSON() {
-		JSON.stringify(this.values);
-	},
-
-	toMeta: function toMeta() {
-		var _this2 = this,
-		    _arguments = arguments;
-
-		this.values.map(function () {
-			console.log(_this2, _arguments);
-		});
+		return JSON.stringify(this.values.all(), null, 0);
 	}
 });
 
@@ -1001,11 +1039,10 @@ var Product = function Product(props) {
 };
 
 exports.Product = Product;
-Object.assign(Product.prototype, BaseModel.prototype);
-
+Product.prototype = (0, _util.inherits)(BaseModel, Product);
 exports['default'] = { BaseModel: BaseModel, Product: Product };
 
-},{"./core":5,"./events":6,"core-js":11}],8:[function(require,module,exports){
+},{"./core":5,"./events":6,"./util":8,"core-js":11}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1081,6 +1118,16 @@ function getConstructorName(obj) {
 	return results && results.length > 1 ? results[1] : '';
 }
 
+var inherits = function inherits(parent, child) {
+	function ProtoMaker() {
+		this.constructor = child.prototype.constructor;
+	}
+
+	ProtoMaker.prototype = parent.prototype;
+	return new ProtoMaker();
+};
+
+exports.inherits = inherits;
 exports['default'] = { getConstructorName: getConstructorName, mixin: mixin, bindDOMEvents: bindDOMEvents, isNativeEvent: isNativeEvent, isNode: isNode, isElement: isElement, htmlToDom: htmlToDom };
 
 },{}],9:[function(require,module,exports){

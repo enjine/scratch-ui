@@ -7,6 +7,6 @@ export let settings = {
 		mocha.setup('bdd');
 		chai.use(chaiAsPromised);
 	},
-	assertions: chai.expect,
+	assertions: chai,
 	mocking: require('sinon')
 };

@@ -1,23 +1,19 @@
-import {BaseCollection, ProductCollection} from '../../../lib/client/modules/collections';
 import {Product, BaseModel} from '../../../lib/client/modules/models';
 import {EventBoss, Emitter} from '../../../lib/client/modules/events';
 
-import {inherits} from '../../../lib/client/modules/util';
+import {settings} from '../../setup';
 import {EmitterMixinBehavior} from '../behaviors/emitter';
 import {AsyncDataBehavior} from '../behaviors/async-data';
-import {settings} from '../../setup';
-
 
 let expect = settings.assertions.expect;
 let mocks = settings.mocking;
 
 settings.init();
 
-
-describe('Collections::ProductCollection', () => {
-	let pc = new ProductCollection(),
+describe('Models::Product', () => {
+	let p = new Product(),
 		reqOpts = {
-			url: '/api/products/',
+			url: '/api/product/',
 			type: 'json',
 			method: 'GET',
 			headers: {
@@ -26,42 +22,16 @@ describe('Collections::ProductCollection', () => {
 		},
 		thenable = null;
 
-	beforeEach(() => {
-
+	it('Inherits from BaseModel.', () => {
+		expect(p).to.be.an.instanceof(BaseModel);
 	});
 
-	afterEach(() => {
-
-	});
-
-	before(() => {
-
-	});
-
-	after(() => {
-
-	});
-
-	it('Inherits from BaseCollection.', () => {
-		expect(pc).to.be.an.instanceof(BaseCollection);
-	});
-
-	it('Has a constructor name of `ProductCollection`.', () => {
-		expect(pc.constructor).to.deep.equal(ProductCollection);
-	});
-
-	it('Has a `model` property set to `Product`.', () => {
-		let model = pc.model;
-		expect(model).to.exist;
-		expect(model).to.deep.equal(Product);
+	it('Has a constructor name of `Product`.', () => {
+		expect(p.constructor).to.deep.equal(Product);
 	});
 
 	describe('Handles constructor arguments/options appropriately.', () => {
-		let testModel = function(){};
-		testModel.prototype = inherits(BaseModel, testModel);
-
 		let	options = {
-				model: testModel,
 				testProp: 'success',
 				testFunc: () => {
 					return true;
@@ -73,40 +43,35 @@ describe('Collections::ProductCollection', () => {
 					}
 				}
 			},
-			pcB;
+			pB;
 
 		before(() => {
-			pcB = new ProductCollection(options);
+			pB = new Product(options);
 		});
 
 		after(() => {
-			pcB = null;
-		});
-
-		it('Has a `model` propery equal to `testModel` that is a descendant of BaseModel', () => {
-			expect(pcB.model).to.deep.equal(testModel);
-			expect(new pcB.model()).to.be.an.instanceof(BaseModel);
+			pB = null;
 		});
 
 		it('Has a `testProp` property equal to `success` that is a String', () => {
-			expect(pcB.testProp).to.equal(options.testProp);
-			expect(pcB.testProp).to.be.a('string');
+			expect(pB.testProp).to.equal(options.testProp);
+			expect(pB.testProp).to.be.a('string');
 		});
 
 		it('Has a `testFunc` property equal to a closure that is a Function', () => {
-			expect(pcB.testFunc).to.equal(options.testFunc);
-			expect(pcB.testFunc).to.be.a('function');
+			expect(pB.testFunc).to.equal(options.testFunc);
+			expect(pB.testFunc).to.be.a('function');
 		});
 
 		it('Has a `testObj` property that is an Object', () => {
-			expect(pcB.testObj).to.deep.equal(options.testObj);
-			expect(pcB.testObj).to.be.an('object');
+			expect(pB.testObj).to.deep.equal(options.testObj);
+			expect(pB.testObj).to.be.an('object');
 		});
 	});
 
-	describe(EmitterMixinBehavior.describe(), EmitterMixinBehavior.test.bind(this, pc));
+	describe(EmitterMixinBehavior.describe(), EmitterMixinBehavior.test.bind(this, p));
 
-	describe(AsyncDataBehavior.describe(), AsyncDataBehavior.test.bind(this, pc, reqOpts));
+	describe(AsyncDataBehavior.describe(), AsyncDataBehavior.test.bind(this, p, reqOpts));
 
 
 	describe('Can retrieve JSON from a remote endpoint.', () => {
@@ -123,7 +88,7 @@ describe('Collections::ProductCollection', () => {
 		});
 
 		it('receives JSON back from the API.', () => {
-			thenable = pc.fetch(reqOpts);
+			thenable = p.fetch(reqOpts);
 			// This is part of the FakeXMLHttpRequest API
 			server.requests[0].respond(
 				200,
@@ -135,31 +100,31 @@ describe('Collections::ProductCollection', () => {
 
 		});
 
-		it('Parses a non-empty response into an array of Product models.', () => {
-			pc.parse(fakeResponse);
-			expect(pc.models).to.not.be.empty;
-			expect(pc.models).to.be.an.instanceof(Array);
-			expect(pc.models).to.have.length.above(0);
-			expect(pc.models[0]).to.be.an.instanceof(Product);
+		it('Parses a non-empty response and sets instance properties.', () => {
+			p.parse(fakeResponse);
+			expect(p.models).to.not.be.empty;
+			expect(p.models).to.be.an.instanceof(Array);
+			expect(p.models).to.have.length.above(0);
+			expect(p.models[0]).to.be.an.instanceof(Product);
 		});
 
 		it('Throws an error if response is empty.', () => {
-			expect(pc.parse.bind(pc, {})).to.throw(Error);
+			expect(p.parse.bind(p, {})).to.throw(Error);
 		});
 
 		describe('Has methods to return the collection data.', () => {
 			it('Implements a `toJSON` method to return the collection as a JSON string.', () => {
 				let json;
-				expect(pc).to.respondTo('toJSON');
-				json = pc.toJSON();
+				expect(p).to.respondTo('toJSON');
+				json = p.toJSON();
 				//expect(json).to.be.an.instanceof(String);  //fails
 				expect(json).to.be.a('string'); //passes
 			});
 
 			it('Implements a `serialize` method to return all model attributes as an array of JSON objects.', () => {
 				let pojo;
-				expect(pc).to.respondTo('serialize');
-				pojo = pc.serialize();
+				expect(p).to.respondTo('serialize');
+				pojo = p.serialize();
 				expect(pojo).to.be.an.instanceof(Array);
 				expect(pojo).to.have.length.above(0);
 				expect(pojo[0]).to.be.an.instanceof(Object);
@@ -168,6 +133,4 @@ describe('Collections::ProductCollection', () => {
 		});
 
 	});
-
-
 });
