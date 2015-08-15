@@ -181,6 +181,8 @@ var _models = require('./models');
 
 var _cart = require('./cart');
 
+var _util = require('./util');
+
 var Resolver = {
 	'ui/header': _cart.ui.view,
 	'ui/slider': _cart.ui.view,
@@ -193,7 +195,7 @@ var Resolver = {
 		var _this = this;
 
 		return Object.getOwnPropertyNames(this).filter(function (componentId) {
-			console.log('Get ComponentId:', Object.getPrototypeOf(view), view instanceof _views.BaseView);
+			//console.log('Get ComponentId:', Object.getPrototypeOf(view), view instanceof BaseView);
 			return Object.getPrototypeOf(view).constructor === _this[componentId];
 		})[0] || null;
 	}
@@ -205,7 +207,8 @@ function Application() {
 	_views.BaseView.apply(this, arguments);
 }
 
-Object.assign(Application.prototype, _views.BaseView.prototype, {
+(0, _util.inherits)(Application, _views.BaseView);
+Object.assign(Application.prototype, {
 	start: function start() {
 		return this;
 	},
@@ -215,29 +218,9 @@ Object.assign(Application.prototype, _views.BaseView.prototype, {
 });
 
 function Product() {
-	var _this2 = this;
-
 	var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
 	_views.BaseView.apply(this, arguments);
-
-	Object.assign(this, _views.BaseView.prototype, {
-		render: function render() {
-			try {
-				_this2.el = _core.jst.compile(_this2.template, _this2.model.serialize());
-				_this2.attachNestedComponents();
-				return _this2;
-			} catch (e) {
-				console.error(e);
-				throw e;
-			}
-		},
-
-		onComponentsLoaded: function onComponentsLoaded() {
-			console.log('Product received componentsLoaded', this, arguments);
-		}
-	});
-
 	this.el = document.createElement(options.el || this.defaults.el);
 	this.model = options.model || _models.Product;
 	this.template = options.template || _core.jst.getFromDOM('product/simple');
@@ -245,43 +228,31 @@ function Product() {
 	this.subscribeOnce('componentsLoaded', this.onComponentsLoaded);
 }
 
+(0, _util.inherits)(Product, _views.BaseView);
+Object.assign(Product.prototype, {
+	render: function render() {
+		try {
+			this.el = _core.jst.compile(this.template, this.model.serialize());
+			this.attachNestedComponents();
+			return this;
+		} catch (e) {
+			console.error(e);
+			throw e;
+		}
+	},
+
+	onComponentsLoaded: function onComponentsLoaded() {
+		console.log('Product received componentsLoaded', this, arguments);
+	}
+});
+
 function ProductList(el) {
-	var _this3 = this,
+	var _this2 = this,
 	    _arguments = arguments;
 
 	var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
 	_views.BaseView.apply(this, arguments);
-
-	Object.assign(this, _views.BaseView.prototype, {
-		render: function render() {
-			try {
-				var html = '',
-				    products = _this3.collection.models,
-				    product = undefined;
-
-				for (var i = 0; i < products.length; i++) {
-					var model = products[i];
-					product = new Product({ model: model });
-					//not crazy about this.
-					product.model.set('quantities', window.e750.FIXTURES.quantities);
-					product.render();
-					_this3.addChildView(product);
-					html += product.el.outerHTML;
-				}
-
-				_this3.el.innerHTML = html;
-			} catch (e) {
-				throw e;
-			}
-			return _this3;
-		},
-
-		onComponentsLoaded: function onComponentsLoaded() {
-			console.log('Product List received componentsLoaded', this, arguments);
-		}
-
-	});
 
 	this.el = el;
 	this.collection = new _collections.ProductCollection();
@@ -289,7 +260,7 @@ function ProductList(el) {
 	this.subscribeOnce('componentsLoaded', this.onComponentsLoaded);
 
 	this.on('otherEvent', function () {
-		console.log('ProductList closure loaded', _this3, _arguments);
+		console.log('ProductList closure loaded', _this2, _arguments);
 	});
 
 	this.on('willUpdateChildren', function () {
@@ -297,11 +268,11 @@ function ProductList(el) {
 	});
 
 	this.on('click', function (e) {
-		console.log('CLICKED', _this3, e);
+		console.log('CLICKED', _this2, e);
 	});
 
 	this.on('submit', function (e) {
-		console.log('SUBMITTED', _this3, e);
+		console.log('SUBMITTED', _this2, e);
 		e.preventDefault();
 		return false;
 	});
@@ -317,26 +288,56 @@ function ProductList(el) {
 	    fetchOpts = {};
 
 	Object.assign(fetchOpts, defaults, options);
-
+	console.log(this);
 	this.collection.fetch(fetchOpts).then(this.collection.parse.bind(this.collection), function (reason) {
-		console.error('Parsing Failed! ', _this3, _arguments, reason);
+		console.error('Parsing Failed! ', _this2, _arguments, reason);
 	}).then(function () {
-		_this3.render();
+		_this2.render();
 	}, function (reason) {
-		console.error('Render Failed! ', _this3, _arguments, reason);
+		console.error('Render Failed! ', _this2, _arguments, reason);
 	})['catch'](function (reason) {
-		console.error('Promise Rejected! ', _this3, _arguments, reason);
+		console.error('Promise Rejected! ', _this2, _arguments, reason);
 	})['finally'](function () {
-		console.log('finally', _this3, _arguments, options);
+		console.log('finally', _this2, _arguments, options);
 		//this.updateChildren();
 	});
 }
+
+(0, _util.inherits)(ProductList, _views.BaseView);
+Object.assign(ProductList.prototype, {
+	render: function render() {
+		try {
+			var html = '',
+			    products = this.collection.models,
+			    product = undefined;
+
+			for (var i = 0; i < products.length; i++) {
+				var model = products[i];
+				product = new Product({ model: model });
+				//not crazy about this.
+				product.model.set('quantities', window.e750.FIXTURES.quantities);
+				product.render();
+				this.addChildView(product);
+				html += product.el.outerHTML;
+			}
+
+			this.el.innerHTML = html;
+		} catch (e) {
+			throw e;
+		}
+		return this;
+	},
+
+	onComponentsLoaded: function onComponentsLoaded() {
+		console.log('Product List received componentsLoaded', this, arguments);
+	}
+
+});
 
 function AddToCart(el) {
 	var opts = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
 	_views.BaseView.apply(this, arguments);
-	Object.assign(this, _views.BaseView.prototype, {});
 
 	var defaults = {
 		url: '/api/products/add',
@@ -351,7 +352,10 @@ function AddToCart(el) {
 	Object.assign(options, defaults, opts);
 }
 
-},{"./cart":2,"./collections":3,"./core":5,"./models":7,"./views":9,"core-js":11}],5:[function(require,module,exports){
+(0, _util.inherits)(AddToCart, _views.BaseView);
+Object.assign(AddToCart.prototype, {});
+
+},{"./cart":2,"./collections":3,"./core":5,"./models":7,"./util":8,"./views":9,"core-js":11}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -968,7 +972,7 @@ Object.assign(BaseModel.prototype, {
 	},
 
 	set: function set(propName, value) {
-		console.log('attempting to set set `' + propName + '` = `' + value + '`', this.values[propName]);
+		//console.log('attempting to set `' + propName + '` = `' + value + '`', this.values[propName]);
 		if (propName.indexOf('custom') !== -1) {
 			var customProp = {};
 			customProp[propName] = value;
