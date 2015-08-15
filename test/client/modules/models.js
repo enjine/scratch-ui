@@ -4,11 +4,27 @@ import {Product, BaseModel} from '../../../lib/client/modules/models';
 import {settings} from '../../setup';
 import {EmitterMixinBehavior} from '../behaviors/emitter';
 import {AsyncDataBehavior} from '../behaviors/async-data';
+import {inherits} from '../../../lib/client/modules/util';
 
 let expect = settings.assertions.expect;
 let mocks = settings.mocking;
 
 settings.init();
+
+describe('Models::Base', () => {
+	let testModel = function () {
+		this.defaults = {
+			testProp: null,
+			testFunc: () => {
+			},
+			testObj: null
+		};
+
+	};
+
+	inherits(testModel, BaseModel);
+
+});
 
 describe('Models::Product', () => {
 	let p = new Product(),
@@ -31,41 +47,40 @@ describe('Models::Product', () => {
 	});
 
 	describe('Handles constructor arguments/options appropriately.', () => {
-		let options = {
-				testProp: 'success',
-				testFunc: () => {
-					return true;
-				},
-				testObj: {
-					prop1: new Date(),
-					func1: function () {
-						return 'test';
-					}
-				}
+		let values = {
+				id: 1,
+				name: 'house red',
+				soil: 'american',
+				price: '$100.00'
+			},
+			options = {
+				test: true
 			},
 			pB;
 
 		before(() => {
-			pB = new Product(options);
+			pB = new Product(values, options);
 		});
 
 		after(() => {
 			pB = null;
 		});
 
-		it('Has a `testProp` property equal to `success` that is a String', () => {
-			expect(pB.testProp).to.equal(options.testProp);
-			expect(pB.testProp).to.be.a('string');
+		it('Has a `id` property equal to `' + values.id + '` that is a Number', () => {
+			expect(pB.get('id')).to.equal(values.id);
+			expect(pB.get('id')).to.be.a('number');
 		});
 
-		it('Has a `testFunc` property equal to a closure that is a Function', () => {
-			expect(pB.testFunc).to.equal(options.testFunc);
-			expect(pB.testFunc).to.be.a('function');
+		it('Has a `name` property equal to `' + values.name + '`', () => {
+			expect(pB.get('name')).to.equal(values.name);
 		});
 
-		it('Has a `testObj` property that is an Object', () => {
-			expect(pB.testObj).to.deep.equal(options.testObj);
-			expect(pB.testObj).to.be.an('object');
+		it('Has a `soil` property that is equal to `' + values.soil + '`', () => {
+			expect(pB.get('soil')).to.deep.equal(values.soil);
+		});
+
+		it('Has an options property that is equal to `' + JSON.stringify(options) + '`', () => {
+			expect(pB.options).to.deep.equal(options);
 		});
 	});
 
@@ -76,7 +91,7 @@ describe('Models::Product', () => {
 
 	describe('Can retrieve JSON from a remote endpoint.', () => {
 		let server,
-			fakeResponse = [{id: 1, name: 'Acme House Red', price: '$100.00'}];
+			fakeResponse = {id: 1, name: 'Acme House Red', price: '$100.00'};
 
 		before(() => {
 			server = mocks.fakeServer.create();
@@ -102,33 +117,39 @@ describe('Models::Product', () => {
 
 		it('Parses a non-empty response and sets instance properties.', () => {
 			p.parse(fakeResponse);
-			expect(p.models).to.not.be.empty;
-			expect(p.models).to.be.an.instanceof(Array);
-			expect(p.models).to.have.length.above(0);
-			expect(p.models[0]).to.be.an.instanceof(Product);
+			let props = Object.keys(p.values);
+			expect(props).to.not.be.empty;
+			expect(p.values).to.be.an.instanceof(Object);
+			expect(props).to.have.length.above(0);
 		});
 
-		it('Throws an error if response is empty.', () => {
-			expect(p.parse.bind(p, {})).to.throw(Error);
+		it('If response is empty, returns an instance of Product.', () => {
+			expect(p.parse({})).to.be.an.instanceof(Product);
 		});
 
-		describe('Has methods to return the collection data.', () => {
-			it('Implements a `toJSON` method to return the collection as a JSON string.', () => {
-				let json;
-				expect(p).to.respondTo('toJSON');
-				json = p.toJSON();
-				//expect(json).to.be.an.instanceof(String);  //fails
-				expect(json).to.be.a('string'); //passes
+		describe('Has methods to return the model data.', () => {
+			let pojo = null;
+			describe('Implements a `serialize` method to return all model attributes as a JSON object.', () => {
+				it('Responds to `serialize', () => {
+					expect(p).to.respondTo('serialize');
+				});
+
+				it('Returns an instance of `Object` with an `id` property that is a `Number`', () => {
+					pojo = p.serialize();
+					expect(pojo).to.be.an.instanceof(Object);
+					expect(Object.getOwnPropertyNames(pojo)).to.have.length.above(0);
+					expect(pojo.id).to.be.a('number');
+				});
+
+				it('Implements a `toJSON` method to return the model as a JSON string.', () => {
+					let json;
+					expect(p).to.respondTo('toJSON');
+					json = p.toJSON();
+					//expect(json).to.be.an.instanceof(String);  //fails
+					expect(json).to.be.a('string'); //passes
+				});
 			});
 
-			it('Implements a `serialize` method to return all model attributes as an array of JSON objects.', () => {
-				let pojo;
-				expect(p).to.respondTo('serialize');
-				pojo = p.serialize();
-				expect(pojo).to.be.an.instanceof(Array);
-				expect(pojo).to.have.length.above(0);
-				expect(pojo[0]).to.be.an.instanceof(Object);
-			});
 
 		});
 

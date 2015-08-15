@@ -96,10 +96,11 @@ Object.assign(BaseCollection.prototype, {
 	model: _models.BaseModel,
 	fetch: _models.BaseModel.prototype.fetch,
 	parse: function parse(data) {
-		//console.log('incoming model data:', data);
+		console.log('incoming model data:', data, Object.getOwnPropertyNames(data), data.length);
 		try {
-			if (Object.getOwnPropertyNames(data).length) {
-				for (var item in data) {
+			if (data.length) {
+				var item = undefined;
+				for (item in data) {
 					if (data.hasOwnProperty(item)) {
 						var m = new this.model(data[item]);
 						//console.log('new model:', m, item, 'data:', data[item]);
@@ -111,7 +112,7 @@ Object.assign(BaseCollection.prototype, {
 			}
 		} catch (e) {
 			console.error(e);
-			throw e;
+			//throw e;
 		}
 
 		return this;
@@ -148,14 +149,14 @@ function ProductCollection(options) {
 // ex 2: Object.assign(ProductCollection.prototype, BaseCollection.prototype);
 // with this you get ProductCollection() as the constructor and you get a copy of BaseCollection.prototype,
 // but instanceof BaseCollection will be false
-// ex 3: ProductCollection.prototype = inherits(BaseCollection, ProductCollection);
+// ex 3: ProductCollection.prototype = inherits(ProductCollection, BaseCollection);
 // this is probably the most `correct` way to do it because:
 // let PC = new ProductCollection();
 // console.info(PC.constructor) // ProductCollection
 // console.info(PC instanceof BaseCollection); // true
 // console.info(PC instanceof ProductCollection); // true
 // ^^ everything checks out to be what you'd expect.
-ProductCollection.prototype = (0, _util.inherits)(BaseCollection, ProductCollection);
+(0, _util.inherits)(ProductCollection, BaseCollection);
 
 },{"./events":6,"./models":7,"./util":8,"core-js":11}],4:[function(require,module,exports){
 'use strict';
@@ -886,12 +887,13 @@ var _events = require('./events');
 var _util = require('./util');
 
 var attributes = {
+	id: null,
 	_guid: null,
 	all: function all() {
 		var _this = this;
 
 		var values = {};
-		Object.getOwnPropertyNames(this).map(function (p) {
+		Object.keys(this).map(function (p) {
 			values[p] = _this[p];
 		});
 
@@ -900,15 +902,27 @@ var attributes = {
 };
 
 function BaseModel() {
-	var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	var props = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
 	this.options = options;
 	this.values = Object.create(attributes);
+	Object.assign(this.values, this.defaults || {});
+
+	if (props) {
+		this.parse(props);
+	}
 }
 
 (0, _events.Emitter)(BaseModel);
 
 Object.assign(BaseModel.prototype, {
+	setId: function setId(val) {
+		var id = Number(val);
+		if (!isNaN(id)) {
+			this.values.id = id;
+		}
+	},
 
 	/**
   * returns an A+ promise
@@ -921,11 +935,12 @@ Object.assign(BaseModel.prototype, {
 			return _core.net.http.get(options);
 		} catch (e) {
 			console.error(e);
-			throw e;
+			//throw e;
 		}
 	},
 
 	parse: function parse(data) {
+		//console.log('parsing model', data, Object.keys(data).length);
 		try {
 			if (Object.keys(data).length > 0) {
 				for (var prop in data) {
@@ -938,7 +953,7 @@ Object.assign(BaseModel.prototype, {
 			}
 		} catch (e) {
 			console.error(e);
-			throw e;
+			//throw e;
 		}
 
 		return this;
@@ -948,14 +963,22 @@ Object.assign(BaseModel.prototype, {
 		try {
 			return this.values[propName];
 		} catch (e) {
-			console.error(e);
 			throw new ReferenceError('Property `' + propName + '` not found in ' + this.constructor.name);
 		}
 	},
 
 	set: function set(propName, value) {
-		if (this.values[propName] !== undefined) {
-			this.values[propName] = value;
+		console.log('attempting to set set `' + propName + '` = `' + value + '`', this.values[propName]);
+		if (propName.indexOf('custom') !== -1) {
+			var customProp = {};
+			customProp[propName] = value;
+			Object.assign(this.values, customProp);
+		} else if (this.values[propName] !== undefined) {
+			if (propName.toLowerCase() === 'id') {
+				this.setId(value);
+			} else {
+				this.values[propName] = value;
+			}
 		} else {
 			throw new ReferenceError('Property `' + propName + '` is not settable for ' + this.constructor.name + '. Add `' + propName + '` to the `defaults` on this model to enable it as settable.');
 		}
@@ -972,10 +995,11 @@ Object.assign(BaseModel.prototype, {
 	}
 });
 
-var Product = function Product(props) {
+var Product = function Product() {
+	var props = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-	var defaults = {
-		id: '',
+	this.defaults = {
 		name: '',
 		sku: '',
 		price: '',
@@ -1029,19 +1053,30 @@ var Product = function Product(props) {
 				sort: ''
 			}
 		},
-		quantity: ''
+		quantity: '',
+		quantities: '',
+		cost: '',
+		image_alt_3: '',
+		no_comparison: '',
+		shipping_offer_min: '',
+		label: '',
+		review: '',
+		tasting_notes_pdf: '',
+		product_category: '',
+		reviewer: '',
+		tax_exempt: '',
+		score: ''
+
 	};
 
 	BaseModel.apply(this, arguments);
-	Object.assign(this.values, defaults);
-
-	if (props) {
-		this.parse(props);
-	}
 };
 
 exports.Product = Product;
-Product.prototype = (0, _util.inherits)(BaseModel, Product);
+(0, _util.inherits)(Product, BaseModel);
+Object.assign(Product.prototype, {
+	foo: function foo() {}
+});
 exports['default'] = { BaseModel: BaseModel, Product: Product };
 
 },{"./core":5,"./events":6,"./util":8,"core-js":11}],8:[function(require,module,exports){
@@ -1057,6 +1092,7 @@ exports.isElement = isElement;
 exports.isNativeEvent = isNativeEvent;
 exports.htmlToDom = htmlToDom;
 exports.getConstructorName = getConstructorName;
+exports.inherits = inherits;
 
 function mixin(destObject) {
 	var props = Object.keys(this.prototype);
@@ -1120,16 +1156,15 @@ function getConstructorName(obj) {
 	return results && results.length > 1 ? results[1] : '';
 }
 
-var inherits = function inherits(parent, child) {
-	function ProtoMaker() {
-		this.constructor = child.prototype.constructor;
-	}
+function inherits(child, parent) {
+	var childProto = child.prototype;
+	function F() {}
+	F.prototype = parent.prototype;
+	child.prototype = new F();
+	Object.assign(child.prototype, childProto);
+	child.prototype.constructor = child;
+}
 
-	ProtoMaker.prototype = parent.prototype;
-	return new ProtoMaker();
-};
-
-exports.inherits = inherits;
 exports['default'] = { getConstructorName: getConstructorName, mixin: mixin, bindDOMEvents: bindDOMEvents, isNativeEvent: isNativeEvent, isNode: isNode, isElement: isElement, htmlToDom: htmlToDom };
 
 },{}],9:[function(require,module,exports){

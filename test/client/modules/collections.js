@@ -58,8 +58,14 @@ describe('Collections::ProductCollection', () => {
 
 	describe('Handles constructor arguments/options appropriately.', () => {
 		let testModel = function () {
+			this.defaults = {
+				testProp: null,
+				testFunc: () => {},
+				testObj: null
+			};
+
 		};
-		testModel.prototype = inherits(BaseModel, testModel);
+		inherits(testModel, BaseModel);
 
 		let options = {
 				model: testModel,
@@ -145,8 +151,8 @@ describe('Collections::ProductCollection', () => {
 			expect(models[0]).to.be.an.instanceof(Product);
 		});
 
-		it('Throws an error if response is empty.', () => {
-			expect(pc.parse.bind(pc, {})).to.throw(Error);
+		it('If response is empty, it returns a blank instance of a ProductCollection.', () => {
+			expect(pc.parse([])).to.be.an.instanceof(ProductCollection);
 		});
 
 		describe('Has methods to return the collection data.', () => {

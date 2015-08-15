@@ -38,7 +38,7 @@ module.exports = function (config) {
 		// available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
 		preprocessors: {
 			// create the ES5 equivalents of these ES6 modules, and run coverage.
-			'./lib/**/*.js': ['browserify', 'babel', 'coverage'],
+			'./lib/**/*.js': ['browserify', 'coverage'],
 			// create the ES5 versions of the tests written in ES6 (these are included in the test runner page)
 			'./test/**/*.js': ['browserify']
 		},
@@ -62,7 +62,9 @@ module.exports = function (config) {
 		coverageReporter: {
 			dir: './reports/coverage',
 			reporters: [
-				{type: 'html', subdir: 'html'}
+				//{type: 'html', subdir: 'html'},
+				//{type: 'lcov', subdir: 'lcov'}
+				{type: 'text', subdir: '.'}
 			]
 		},
 
@@ -77,7 +79,7 @@ module.exports = function (config) {
 
 		// level of logging
 		// possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-		logLevel: config.LOG_INFO,
+		logLevel: config.LOG_DEBUG,
 
 
 		// enable / disable watching file and executing tests whenever any file changes
