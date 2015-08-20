@@ -1,11 +1,11 @@
 {
-  "name": "e750-Webflow",
+  "name": "e750-Micro",
   "version": "0.0.0",
-  "description": "750Commerce",
+  "description": "750Commerce Micro-framework",
   "main": "lib/cli/main.js",
   "dependencies": {
     "babel": "^5.5.5",
-    "core-js": "^0.9.8",
+    "core-js": "^1.0.1",
     "rsvp": "^3.0.18",
     "templeton": "^2.1.1",
     "xhttp": "^0.0.6",
@@ -33,6 +33,7 @@
     "karma-chrome-launcher": "^0.2.0",
     "karma-coverage": "douglasduteil/karma-coverage#next",
     "karma-firefox-launcher": "^0.1.6",
+    "karma-junit-reporter": "^0.3.3",
     "karma-mocha": "^0.2.0",
     "karma-mocha-reporter": "^1.0.4",
     "karma-phantomjs-launcher": "^0.2.0",
@@ -48,14 +49,14 @@
   "scripts": {
     "lint": "eslint -c ./.eslintrc ./lib/**/*.js ./test/**/**/*.js",
     "test": "karma start --single-run",
-    "coverage": "babel-node node_modules/.bin/isparta cover --report text --report html --dir ./reports/coverage _mocha -- --reporter dot",
-    "istanbul": "istanbul cover _mocha --dir ./reports/coverage -- --require babel/register ",
+    "precompile" : "npm run lint",
     "compile": "browserify ./lib/client/main.js -t [babelify --sourceMapRelative ./lib] --outfile acme-vineyards-webflow/js/e750.js",
+    "prebuild" : "npm run lint",
     "build": "browserify -d ./lib/client/main.js -t [babelify --sourceMapRelative ./lib] -p [minifyify --map /js/e750.js.map --output ./acme-vineyards-webflow/js/e750.js.map] --outfile acme-vineyards-webflow/js/e750.min.js",
     "start": "babel-node ./lib/server/main.js",
-    "metrics:compile_source": "./node_modules/.bin/babel --optional runtime lib/ --out-dir ./build/metrics/lib",
-    "metrics": "npm run metrics:compile_source && ./node_modules/.bin/plato -r  -l .eslintrc -d ./reports/metrics ./build/metrics/lib"
+    "premetrics": "babel --optional runtime lib/ --out-dir ./build/metrics/lib",
+    "metrics": "plato -r  -e .eslintrc -t 'e750 MicroFramework' -d ./reports/metrics ./build/metrics/lib"
   },
   "author": "Alessandro Di Candia",
-  "license": "ISCs"
+  "license": "BSD"
 }

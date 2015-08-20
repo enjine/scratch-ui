@@ -37,18 +37,18 @@ module.exports = function (config) {
 		// preprocess matching files before serving them to the browser
 		// available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
 		preprocessors: {
-			// create the ES5 equivalents of these ES6 modules, and run coverage.
-			'./lib/**/*.js': ['browserify', 'coverage'],
+			// create the ES5 equivalents of these ES6 modules.
+			'./lib/**/*.js': ['browserify'],
 			// create the ES5 versions of the tests written in ES6 (these are included in the test runner page)
 			'./test/**/*.js': ['browserify']
 		},
 
 		browserify: {
 			debug: true,
+			bundleDelay: 1000,
 			transform: [
 				'babelify',
 				istanbul({
-					instrumenter: isparta,
 					ignore: ['./node_modules/**', './test/**']
 				})
 			]
@@ -57,12 +57,24 @@ module.exports = function (config) {
 		// test results reporter to use
 		// possible values: 'dots', 'progress'
 		// available reporters: https://npmjs.org/browse/keyword/karma-reporter
-		reporters: ['mocha', 'coverage'],
+		reporters: ['coverage', 'junit', 'mocha'],
+
+		mochaReporter: {
+			output: 'full' //full, autowatch, minimal
+		},
+
+		// unit tests JUNIT reporter for Bamboo
+		junitReporter: {
+			outputDir: './reports',
+			outputFile: 'test-results.xml',
+			suite: ''
+		},
 
 		coverageReporter: {
+			instrumenter: {'./lib/**/*.js': isparta},
 			dir: './reports/coverage',
 			reporters: [
-				//{type: 'html', subdir: 'html'},
+				{type: 'html', subdir: 'html'},
 				//{type: 'lcov', subdir: 'lcov'}
 				{type: 'text', subdir: '.'}
 			]
