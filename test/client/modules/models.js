@@ -11,18 +11,76 @@ let mocks = settings.mocking;
 
 settings.init();
 
-describe('Models::Base', () => {
-	let testModel = function () {
-		this.defaults = {
-			testProp: null,
-			testFunc: () => {
-			},
-			testObj: null
+describe('Models::Generic', () => {
+	let m,
+		testModel = function () {
+			this.defaults = {
+				testProp: 45,
+				testFunc: () => {
+					return 'computed';
+				},
+				testObj: null
+			};
+
+			BaseModel.apply(this, arguments);
 		};
 
-	};
-
 	inherits(testModel, BaseModel);
+
+	beforeEach(() => {
+		m = new testModel({
+			testObj: {
+				r: () => {
+				}
+			}
+		}, {test: true});
+	});
+
+	afterEach(() => {
+		m = null;
+	});
+
+	it('Is an instance of testModel and inherit from BaseModel', () => {
+		expect(m).to.be.an.instanceof(testModel);
+		expect(m).to.be.an.instanceof(BaseModel);
+	});
+
+	describe('Handles arbitrary constructor arguments appropriately', () => {
+		it('Supports options arguments', () => {
+			expect(m.options).to.exist;
+			expect(m.options.test).to.be.true;
+		});
+
+		it('Supports default values', () => {
+			expect(m.get('testProp')).to.equal(45);
+		});
+
+		it('Supports computed properties', () => {
+			expect(m.get('testFunc')).to.equal('computed');
+		});
+
+		it('Supports objects as properties', () => {
+			let o = m.get('testObj');
+			expect(o).to.exist;
+			expect(o.r).to.be.a('function');
+		});
+
+		it('Throws an error if attempting to set a non-declared property', () => {
+			expect(m.set.bind(m, 'nonDeclaredProperty', 'nonDeclaredProperty')).to.throw(ReferenceError);
+		});
+
+		it('Supports setting arbitrary `custom` prefixed properties', () => {
+			expect(m.set.bind(m, 'customProperty', 'testCustomProperty')).to.not.throw(ReferenceError);
+			expect(m.get('customProperty')).to.equal('testCustomProperty');
+		});
+
+		it('Handles the special `id` attribute appropriately, enforcing it as a `Number`', () => {
+			expect(m.set.bind(m, 'id', 123)).not.to.throw(TypeError);
+			expect(m.set.bind(m, 'id', '123')).not.to.throw(TypeError);
+			expect(m.set.bind(m, 'id', 'ABC')).to.throw(TypeError);
+			expect(m.get('id')).to.be.a('number');
+		});
+	});
 
 });
 
@@ -44,6 +102,11 @@ describe('Models::Product', () => {
 
 	it('Has a constructor name of `Product`.', () => {
 		expect(p.constructor).to.deep.equal(Product);
+	});
+
+	it('Has accessor methods', () => {
+		expect(p).to.respondTo('get');
+		expect(p).to.respondTo('set');
 	});
 
 	describe('Handles constructor arguments/options appropriately.', () => {

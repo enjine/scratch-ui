@@ -6,7 +6,7 @@ let expect = settings.assertions.expect;
 
 export var EmitterMixinBehavior = {
 	describe: function () {
-		return 'Implements the Emitter interface.';
+		return 'Implements the Emitter mixin.';
 	},
 	test: function (o) {
 		let mediator;

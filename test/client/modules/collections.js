@@ -164,6 +164,14 @@ describe('Collections::ProductCollection', () => {
 				expect(json).to.be.a('string'); //passes
 			});
 
+			it('Implements a `toMeta` method to return the collection as a JSON string.', () => {
+				let json;
+				expect(pc).to.respondTo('toJSON');
+				json = pc.toJSON();
+				//expect(json).to.be.an.instanceof(String);  //fails
+				expect(json).to.be.a('string'); //passes
+			});
+
 			it('Implements a `serialize` method to return all model attributes as an array of JSON objects.', () => {
 				let serialized;
 				expect(pc).to.respondTo('serialize');
