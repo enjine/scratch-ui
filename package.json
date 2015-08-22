@@ -56,7 +56,7 @@
     "postbuild": "npm run metrics",
     "start": "babel-node ./lib/server/main.js",
     "premetrics": "babel --optional runtime lib/ --out-dir ./build/metrics/lib",
-    "metrics": "plato -r  -e ./.eslintrc -t 'e750 MicroFramework' -d ./reports/metrics ./build/metrics/lib"
+    "metrics": "plato -r  -l ./.eslintrc -t 'e750 MicroFramework' -d ./reports/metrics ./build/metrics/lib"
   },
   "author": "Alessandro Di Candia",
   "license": "BSD"
