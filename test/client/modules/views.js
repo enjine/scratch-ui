@@ -11,16 +11,15 @@ let mocks = settings.mocking;
 settings.init();
 
 describe('Views::Generic', () => {
-	let testView = function (el, options) {
-
-		},
-		v;
+	let testView = function () {
+			BaseView.apply(this, arguments);
+		};
 
 	inherits(testView, BaseView);
 
-	before(()=> {
-		v = new testView(document.createElement('figure'), {swerve: true});
-	});
+	let v = new testView(document.createElement('figure'), {swerve: true});
+
+	before(()=> {});
 
 	it('Is a descendant of BaseView', () => {
 		expect(v).to.be.an.instanceof(BaseView);
@@ -28,8 +27,12 @@ describe('Views::Generic', () => {
 	});
 
 	xit('Handles constructor arguments appropriately', () => {
+		console.log(v, v.el);
+		expect(v.swerve).to.exist;
+		expect(v.el).to.exist;
+
 	});
 
-	xdescribe(EmitterMixinBehavior.describe(), EmitterMixinBehavior.test.bind(this, v));
+	describe(EmitterMixinBehavior.describe(), EmitterMixinBehavior.test.bind(this, v));
 
 });
