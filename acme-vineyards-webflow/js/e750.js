@@ -96,7 +96,7 @@ Object.assign(BaseCollection.prototype, {
 	model: _models.BaseModel,
 	fetch: _models.BaseModel.prototype.fetch,
 	parse: function parse(data) {
-		console.log('incoming model data:', data, Object.getOwnPropertyNames(data), data.length);
+		//console.log('incoming model data:', data, Object.getOwnPropertyNames(data), data.length);
 		try {
 			if (data.length) {
 				var item = undefined;
@@ -128,12 +128,6 @@ Object.assign(BaseCollection.prototype, {
 		return JSON.stringify(this.models.map(function (model) {
 			return model.serialize();
 		}), null, 0);
-	},
-
-	toMeta: function toMeta() {
-		return this.models.map(function (model) {
-			return model.toMeta();
-		});
 	}
 });
 
@@ -142,20 +136,6 @@ function ProductCollection(options) {
 	this.model = options && options.model ? options.model : _models.Product;
 }
 
-// what i learned about prototypal inheritance:
-// ex 1: ProductCollection.prototype = Object.create(BaseCollection.prototype);
-// this makes the constructor = BaseCollection(), which means you don't need to call apply in ProductCollection,
-// but instanceof ProductCollection will be false
-// ex 2: Object.assign(ProductCollection.prototype, BaseCollection.prototype);
-// with this you get ProductCollection() as the constructor and you get a copy of BaseCollection.prototype,
-// but instanceof BaseCollection will be false
-// ex 3: inherits(ProductCollection, BaseCollection);
-// this is probably the most `correct` way to do it because:
-// let PC = new ProductCollection();
-// console.info(PC.constructor) // ProductCollection
-// console.info(PC instanceof BaseCollection); // true
-// console.info(PC instanceof ProductCollection); // true
-// ^^ everything checks out to be what you'd expect.
 (0, _util.inherits)(ProductCollection, BaseCollection);
 
 },{"./events":6,"./models":7,"./util":8,"core-js":11}],4:[function(require,module,exports){
@@ -922,6 +902,8 @@ Object.assign(BaseModel.prototype, {
 		var id = Number(val);
 		if (!isNaN(id)) {
 			this.values.id = id;
+		} else {
+			throw new TypeError('ID attribute value must be a number.');
 		}
 	},
 
@@ -962,7 +944,8 @@ Object.assign(BaseModel.prototype, {
 
 	get: function get(propName) {
 		try {
-			return this.values[propName];
+			var prop = this.values[propName];
+			return typeof prop === 'function' ? prop() : prop;
 		} catch (e) {
 			throw new ReferenceError('Property `' + propName + '` not found in ' + this.constructor.name);
 		}
@@ -1209,11 +1192,12 @@ Object.assign(BaseView.prototype, {
 	},
 
 	addChildView: function addChildView(view) {
-		var componentId = _components.Resolver.getComponentId(view);
-		if (!this.childViews[componentId]) {
-			this.childViews[componentId] = [];
+		var componentId = _components.Resolver.getComponentId(view),
+		    childViews = this.childViews;
+		if (!childViews[componentId]) {
+			childViews[componentId] = [];
 		}
-		this.childViews[componentId].push(view);
+		childViews[componentId].push(view);
 		return this;
 	},
 

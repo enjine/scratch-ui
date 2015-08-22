@@ -51,11 +51,11 @@
     "test": "karma start --single-run",
     "precompile" : "npm run lint",
     "compile": "browserify ./lib/client/main.js -t [babelify --sourceMapRelative ./lib] --outfile acme-vineyards-webflow/js/e750.js",
-    "prebuild" : "npm run lint",
+    "prebuild" : "npm run lint && npm test",
     "build": "browserify -d ./lib/client/main.js -t [babelify --sourceMapRelative ./lib] -p [minifyify --map /js/e750.js.map --output ./acme-vineyards-webflow/js/e750.js.map] --outfile acme-vineyards-webflow/js/e750.min.js",
     "start": "babel-node ./lib/server/main.js",
     "premetrics": "babel --optional runtime lib/ --out-dir ./build/metrics/lib",
-    "metrics": "plato -r  -e .eslintrc -t 'e750 MicroFramework' -d ./reports/metrics ./build/metrics/lib"
+    "metrics": "plato -r  -e ./.eslintrc -t 'e750 MicroFramework' -d ./reports/metrics ./build/metrics/lib"
   },
   "author": "Alessandro Di Candia",
   "license": "BSD"

@@ -11,7 +11,7 @@ let mocks = settings.mocking;
 settings.init();
 
 describe('Views::Generic', () => {
-	let testView = function(el, options){
+	let testView = function (el, options) {
 
 		},
 		v;
@@ -27,6 +27,9 @@ describe('Views::Generic', () => {
 		expect(v).to.be.an.instanceof(testView);
 	});
 
-	xit('Handles constructor arguments appropriately', () => {});
+	xit('Handles constructor arguments appropriately', () => {
+	});
+
+	xdescribe(EmitterMixinBehavior.describe(), EmitterMixinBehavior.test.bind(this, v));
 
 });
