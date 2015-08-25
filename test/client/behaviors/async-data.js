@@ -62,7 +62,7 @@ export var AsyncDataBehavior = {
 				});
 
 				thenable = o.fetch(reqOpts).then(() => {
-					eventSpy.should.have.been.calledTwice();
+					eventSpy.should.have.been.calledTwice;
 					o.off('beforeFetch', eventSpy);
 					o.off('beforeAsync', eventSpy);
 				});

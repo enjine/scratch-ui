@@ -57,7 +57,7 @@ module.exports = function (config) {
 		// test results reporter to use
 		// possible values: 'dots', 'progress'
 		// available reporters: https://npmjs.org/browse/keyword/karma-reporter
-		reporters: ['coverage', 'junit', 'mocha'],
+		reporters: ['coverage', 'junit', 'mocha', 'notify'],
 
 		mochaReporter: {
 			output: 'full' //full, autowatch, minimal
@@ -78,6 +78,11 @@ module.exports = function (config) {
 				//{type: 'lcov', subdir: 'lcov'}
 				{type: 'text', subdir: '.'}
 			]
+		},
+
+		notifyReporter: {
+			reportEachFailure: true, // Default: false, Will notify on every failed sepc
+			reportSuccess: false // Default: true, Will notify when a suite was successful
 		},
 
 
