@@ -75,6 +75,30 @@ var EventsAPI = {
 		return subscription;
 	},
 
+	/**
+  * Triggers DOM Events
+  * @param eventName
+  * @param element
+  * @param data
+  * @returns {*|boolean}
+  */
+	trigger: function trigger(eventName, element, data) {
+		var E = undefined;
+		if (!isNative(eventName) && CustomEvent in window) {
+			E = CustomEvent(eventName, data);
+			return element.dispatchEvent(E);
+		}
+		E = new Event(eventName);
+		return element.dispatchEvent(E);
+	},
+
+	/**
+  * Emits custom Events
+  * @param eventName
+  * @param data
+  * @param args
+  * @returns {*}
+  */
 	emit: function emit(eventName, data) {
 		var E = undefined,
 		    el = this.el,
@@ -83,9 +107,14 @@ var EventsAPI = {
 		    native = isNative(eventName),
 		    subscribers = this.mediator.subscribers;
 
-		console.log(el, elIsEl, native, subscribers);
+		//TODO: fix implementation to use trigger for DOM and emit for custom
+		if (native && elIsEl) {
+			E = new Event(eventName);
+			return el.dispatchEvent(E);
+		}
 
 		if (subscribers.has(eventName)) {
+			//console.log('PUBSUB');
 			var payload = new nEvent(eventName, data, this);
 
 			for (var _len = arguments.length, args = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
@@ -93,18 +122,6 @@ var EventsAPI = {
 			}
 
 			return this.mediator.dispatch(eventName, payload, args);
-		}
-
-		if (native && elIsEl) {
-			//<<-- fix so this is ALWAYS a DOM element,
-			// for native events, this.emit('click', this.el)
-			// and for custom events, this.emit('custom', {data: true}, [1,2], 'three', function(){});
-
-			E = new Event(eventName);
-			return el.dispatchEvent(E);
-		} else if (elIsEl && CustomEvent in window) {
-			E = CustomEvent(eventName, data);
-			return el.dispatchEvent(E);
 		}
 
 		return false;
@@ -1347,12 +1364,13 @@ var LookupTable = Util.LookupTable;
 function View(el) {
 	var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
+	var reservedElements = ['HTML', 'HEAD', 'BODY'];
 	this.options = {};
 
 	Object.assign(this.options, options);
 
 	var opts = this.options;
-	this.el = (0, _utilDOMUtils.isElement)(el) ? el : document.createElement(el || this.defaults.el);
+	this.el = (0, _utilDOMUtils.isElement)(el) ? el : reservedElements.indexOf(el.toUpperCase()) ? document.getElementsByTagName(el)[0] : document.createElement(el || this.defaults.el);
 	this.model = opts.model || null;
 	this.collection = opts.collection || null;
 	this.template = opts.template || null;
@@ -1422,7 +1440,7 @@ Object.assign(View.prototype, Events, {
 
 		var components = selector ? this.el.querySelectorAll(selector) : this.el.children;
 
-		//console.log('registering child components for: ', this, components);
+		console.log('registering child components for: ', this, components, selector, this.el.querySelectorAll(selector), this.el.children);
 
 		if (components.length) {
 			this.emit('willUpdateChildren');
@@ -1478,31 +1496,13 @@ var _comE750Components = require('./com.e750/components');
 
 //import {ElementPrototypeRemove, NodeListPrototypeRemove} from './com.e750/util/shims';
 
-var e750 = function e750() {
+var e750 = function e750(rootEl, options) {
+	console.log('new instance', this, arguments);
+	_comE750Components.Application.apply(this, arguments);
 	//ElementPrototypeRemove.shim();
 	//NodeListPrototypeRemove.shim();
 
-	this.el = document.getElementsByTagName('body')[0];
-
-	Object.assign(this, {
-		fixtures: {},
-		bootstrap: function bootstrap(options) {
-			if (options.fixtures) {
-				this.fixtures = options.fixtures;
-			}
-		},
-		start: function start() {
-			var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-
-			this.bootstrap(options);
-			//console.log('app init():', this, arguments);
-			//console.log('cookies:', document.cookie);
-			console.log('E750.js started....');
-			this.attachNestedComponents();
-			//TODO: implement this
-			//this.attachPartials();
-		}
-	});
+	this.bootstrap(options);
 
 	this.onComponentsLoaded = function () {
 		console.log('App received onComponentsLoaded', this, arguments);
@@ -1513,12 +1513,29 @@ var e750 = function e750() {
 	this.once('willUpdateChildren', function () {
 		console.log('App yip yip', this, arguments);
 	});
+
+	this.start = function () {
+		//console.log('app init():', this, arguments);
+		//console.log('cookies:', document.cookie);
+		console.log('E750.js started....', this, arguments);
+		this.attachNestedComponents();
+		//TODO: implement this
+		//this.attachPartials();
+	};
 };
 
-e750.prototype = new _comE750Components.Application();
+e750.prototype = Object.assign(Object.create(_comE750Components.Application.prototype), {
+	bootstrap: function bootstrap() {
+		var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-var app = new e750();
-document.addEventListener('DOMContentLoaded', app.start({ fixtures: window.e750.FIXTURES }));
+		if (data.fixtures) {
+			this.fixtures = data.fixtures;
+		}
+	}
+});
+
+var app = new e750('body', { fixtures: window.e750.FIXTURES });
+document.addEventListener('DOMContentLoaded', app.start.bind(app));
 
 },{"./com.e750/components":5,"core-js":18}],17:[function(require,module,exports){
 // shim for using process in browser
