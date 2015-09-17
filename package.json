@@ -5,15 +5,15 @@
   "main": "lib/cli/main.js",
   "dependencies": {
     "babel": "^5.5.5",
-    "core-js": "^1.0.1",
-    "rsvp": "^3.0.18",
-    "templeton": "^2.1.1",
-    "xhttp": "^0.0.6",
-    "cookie-parser": "^1.3.5",
     "body-parser": "^1.12.4",
+    "cookie-parser": "^1.3.5",
+    "core-js": "^1.0.1",
     "express": "^4.12.4",
     "pem": "^1.7.2",
-    "request-promise": "^0.4.2"
+    "request-promise": "^0.4.2",
+    "rsvp": "^3.0.18",
+    "templeton": "^2.1.1",
+    "xhttp": "^0.0.6"
   },
   "devDependencies": {
     "babel-eslint": "^3.1.26",
@@ -52,6 +52,7 @@
     "test": "karma start --single-run",
     "precompile": "npm run lint",
     "compile": "browserify ./lib/client/main.js -t [babelify --sourceMapRelative ./lib] --outfile acme-vineyards-webflow/js/e750.js",
+    "compile2": "browserify ./lib/client/main2.js -t [babelify --sourceMapRelative ./lib] --outfile acme-vineyards-webflow/js/f750.js",
     "prebuild": "npm run lint && npm test",
     "build": "browserify -d ./lib/client/main.js -t [babelify --sourceMapRelative ./lib] -p [minifyify --map /js/e750.js.map --output ./acme-vineyards-webflow/js/e750.js.map] --outfile acme-vineyards-webflow/js/e750.min.js",
     "postbuild": "npm run metrics",

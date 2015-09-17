@@ -53,7 +53,7 @@ export var AsyncDataBehavior = {
 				requests = [];
 			});
 
-			it('should emit `beforeFetch` and `beforeAsync` events.', function () {
+			it('should emit `beforeFetch` and `beforeAsync` event.', function () {
 				let eventSpy = mocks.spy();
 
 				before(() => {

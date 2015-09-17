@@ -14,7 +14,7 @@ window.Webflow = Webflow;
 var define = Webflow.define;
 
 /**
- * Webflow: Front-end modules
+ * Webflow: Front-end com.e750
  */
 define('ix'       , require('./webflow-ix'));
 define('touch'    , require('./webflow-touch'));
@@ -159,7 +159,7 @@ module.exports = function($, _) {
     data.outside = outside(data);
     data.complete = complete(data);
 
-    // Remove old events
+    // Remove old event
     $el.off(namespace);
     data.toggle.off(namespace);
 
@@ -170,7 +170,7 @@ module.exports = function($, _) {
     data.nav = $el.closest('.w-nav');
     data.nav.on(closeEvent, handler(data));
 
-    // Add events based on mode
+    // Add event based on mode
     if (designer) {
       $el.on('setting' + namespace, handler(data));
     } else {
@@ -220,7 +220,7 @@ module.exports = function($, _) {
     ix.intro(0, data.el[0]);
     Webflow.redraw.up();
 
-    // Listen for tap outside events
+    // Listen for tap outside event
     if (!designer) $doc.on('tap' + namespace, data.outside);
 
     // Clear previous delay
@@ -233,7 +233,7 @@ module.exports = function($, _) {
     var config = data.config;
     ix.outro(0, data.el[0]);
 
-    // Stop listening for tap outside events
+    // Stop listening for tap outside event
     $doc.off('tap' + namespace, data.outside);
 
     // Clear previous delay
@@ -318,7 +318,7 @@ module.exports = function($, _) {
     // Init forms
     init();
 
-    // Wire document events once
+    // Wire document event once
     if (!listening) addListeners();
   };
 
@@ -711,7 +711,7 @@ module.exports = function($, _) {
     els.each(teardown);
     els.each(build);
 
-    // Listen for scroll events if any anchors exist
+    // Listen for scroll event if any anchors exist
     if (anchors.length) {
       Webflow.scroll.on(scroll);
       setTimeout(scroll, 1);
@@ -721,7 +721,7 @@ module.exports = function($, _) {
     if (loads.length) Webflow.load(runLoads);
     if (readys.length) setTimeout(runReadys, 1);
 
-    // Trigger queued events, must happen after init
+    // Trigger queued event, must happen after init
     initEvents();
   }
 
@@ -1029,7 +1029,7 @@ module.exports = function($, _) {
     return found ? result : null;
   }
 
-  // Events used by other webflow modules
+  // Events used by other webflow com.e750
   var events = {
     reset: function(i, el) {
       el.__wf_intro = null;
@@ -1046,7 +1046,7 @@ module.exports = function($, _) {
     }
   };
 
-  // Trigger events in queue + point to sync methods
+  // Trigger event in queue + point to sync methods
   function initEvents() {
     var count = eventQueue.length;
     for (var i = 0; i < count; i++) {
@@ -1057,7 +1057,7 @@ module.exports = function($, _) {
     $.extend(api.events, events);
   }
 
-  // Replace events with async methods prior to init
+  // Replace event with async methods prior to init
   function asyncEvents() {
     _.each(events, function(func, name) {
       api.events[name] = function(i, el) {
@@ -1118,7 +1118,7 @@ Webflow.require = function(name) {
 };
 
 function bindModule(module) {
-  // If running in Webflow app, subscribe to design/preview events
+  // If running in Webflow app, subscribe to design/preview event
   if (Webflow.env()) {
     isFunction(module.design) && $win.on('__wf_design', module.design);
     isFunction(module.preview) && $win.on('__wf_preview', module.preview);
@@ -1135,7 +1135,7 @@ function bindModule(module) {
 }
 
 function unbindModule(module) {
-  // Unsubscribe module from window events
+  // Unsubscribe module from window event
   isFunction(module.design) && $win.off('__wf_design', module.design);
   isFunction(module.preview) && $win.off('__wf_preview', module.preview);
   isFunction(module.destroy) && $win.off('__wf_destroy', module.destroy);
@@ -1188,7 +1188,7 @@ Webflow.env.safari = /safari/.test(userAgent) && !chrome && !ios;
 
 // Maintain current touch target to prevent late clicks on touch devices
 var touchTarget;
-// Listen for both events to support touch/mouse hybrid devices
+// Listen for both event to support touch/mouse hybrid devices
 touch && $doc.on('touchstart mousedown', function(evt) {
   touchTarget = evt.target;
 });
@@ -1211,7 +1211,7 @@ Webflow.resize = eventProxy($win, resizeEvents);
 Webflow.scroll = eventProxy($win, scrollEvents);
 Webflow.redraw = eventProxy();
 
-// Create a proxy instance for throttled events
+// Create a proxy instance for throttled event
 function eventProxy(target, types) {
 
   // Set up throttled method (using custom frame-based _.throttle)
@@ -1221,7 +1221,7 @@ function eventProxy(target, types) {
     _.each(handlers, function(h) { h(evt); });
   });
 
-  // Bind events to target
+  // Bind event to target
   if (target && types) target.on(types, proxy.up);
 
   /**
@@ -1253,7 +1253,7 @@ function eventProxy(target, types) {
   return proxy;
 }
 
-// Provide optional IX events to components
+// Provide optional IX event to components
 Webflow.ixEvents = function() {
   var ix = Webflow.require('ix');
   return (ix && ix.events) || {
@@ -1314,11 +1314,11 @@ function bindLoad() {
   $win.on('load', deferLoad.resolve);
 }
 
-// Webflow.destroy - Trigger a destroy event for all modules
+// Webflow.destroy - Trigger a destroy event for all com.e750
 Webflow.destroy = function() {
   $win.triggerHandler('__wf_destroy');
 
-  // Unbind and clear modules
+  // Unbind and clear com.e750
   _.each(modules, unbindModule);
   modules = {};
 
@@ -1399,7 +1399,7 @@ function createLightbox(window, document, $, undefined) {
     }
 
     tram(
-      // Focus the lightbox to receive keyboard events.
+      // Focus the lightbox to receive keyboard event.
       removeClass($refs.lightbox, 'hide').focus()
     )
       .add('opacity .3s')
@@ -1442,7 +1442,7 @@ function createLightbox(window, document, $, undefined) {
     $refs.lightbox = dom('backdrop hide')
       .append($refs.container);
 
-      // We are delegating events for performance reasons and also
+      // We are delegating event for performance reasons and also
       // to not have to reattach handlers when images change.
       $refs.strip.on('tap', selector('item'), itemTapHandler);
       $refs.content
@@ -1461,7 +1461,7 @@ function createLightbox(window, document, $, undefined) {
         .on('focusin', focusThis);
 
     // The `tabindex` attribute is needed to enable non-input elements
-    // to receive keyboard events.
+    // to receive keyboard event.
     $('body').append($refs.lightbox.prop('tabIndex', 0));
 
     return lightbox;
@@ -1598,7 +1598,7 @@ function createLightbox(window, document, $, undefined) {
 
   function createHandler(action) {
     return function (event) {
-      // We only care about events triggered directly on the bound selectors.
+      // We only care about event triggered directly on the bound selectors.
       if (this != event.target) {
         return;
       }
@@ -1909,13 +1909,13 @@ module.exports = function($, _) {
           embed: ''
         });
 
-        // Remove old events
+        // Remove old event
         data.el.off(namespace);
 
         // Set config from json script tag
         configure(data);
 
-        // Add events based on mode
+        // Add event based on mode
         if (designer) {
           data.el.on('setting' + namespace, configure.bind(null, data));
         } else {
@@ -2128,7 +2128,7 @@ module.exports = function($, _) {
   api.preview = function() {
     // Update active map nodes
     $maps = $doc.find(namespace);
-    // Listen for resize events
+    // Listen for resize event
     Webflow.resize.off(triggerRedraw);
     if ($maps.length) {
       Webflow.resize.on(triggerRedraw);
@@ -2139,7 +2139,7 @@ module.exports = function($, _) {
   api.design = function(evt) {
     // Update active map nodes
     $maps = $doc.find(namespace);
-    // Stop listening for resize events
+    // Stop listening for resize event
     Webflow.resize.off(triggerRedraw);
     // Redraw to account for page changes
     $maps.length && _.defer(triggerRedraw);
@@ -2237,7 +2237,7 @@ module.exports = function($, _) {
     var latLngObj = new google.maps.LatLng(coords[0], coords[1]);
     state.latLngObj = latLngObj;
 
-    // Disable touch events
+    // Disable touch event
     var mapDraggable = (Webflow.env.touch && data.disableTouch) ? false : true;
 
     // Map instance
@@ -2364,7 +2364,7 @@ module.exports = function($, _) {
     if (!$navbars.length) return;
     $navbars.each(build);
 
-    // Wire events
+    // Wire event
     removeListeners();
     addListeners();
   }
@@ -2394,7 +2394,7 @@ module.exports = function($, _) {
     data.container = $el.find('.w-container');
     data.outside = outside(data);
 
-    // Remove old events
+    // Remove old event
     data.el.off(namespace);
     data.button.off(namespace);
     data.menu.off(namespace);
@@ -2402,7 +2402,7 @@ module.exports = function($, _) {
     // Set config from data attributes
     configure(data);
 
-    // Add events based on mode
+    // Add event based on mode
     if (designer) {
       removeOverlay(data);
       data.el.on('setting' + namespace, handler(data));
@@ -2564,7 +2564,7 @@ module.exports = function($, _) {
     ix.intro(0, navbarEl);
     Webflow.redraw.up();
 
-    // Listen for tap outside events
+    // Listen for tap outside event
     if (!designer) $doc.on('tap' + namespace, data.outside);
 
     // No transition for immediate
@@ -2614,7 +2614,7 @@ module.exports = function($, _) {
     var animation = config.animation;
     ix.outro(0, data.el[0]);
 
-    // Stop listening for tap outside events
+    // Stop listening for tap outside event
     $doc.off('tap' + namespace, data.outside);
 
     if (immediate) {
@@ -2861,7 +2861,7 @@ module.exports = function($, _) {
     redraw = null;
     if (fallback) return;
 
-    // Wire events
+    // Wire event
     removeListeners();
     addListeners();
   }
@@ -2908,7 +2908,7 @@ module.exports = function($, _) {
       return;
     }
 
-    // Remove old events
+    // Remove old event
     data.el.off(namespace);
     data.left.off(namespace);
     data.right.off(namespace);
@@ -2917,7 +2917,7 @@ module.exports = function($, _) {
     // Set config from data attributes
     configure(data);
 
-    // Add events based on mode
+    // Add event based on mode
     if (designer) {
       data.el.on('setting' + namespace, handler(data));
       stopTimer(data);
@@ -2935,7 +2935,7 @@ module.exports = function($, _) {
       }
     }
 
-    // Listen to nav events
+    // Listen to nav event
     data.nav.on('tap' + namespace, '> div', handler(data));
 
     // Remove gaps from formatted html (for inline-blocks)
@@ -3120,7 +3120,7 @@ module.exports = function($, _) {
     var fadeRule = 'opacity ' + duration + 'ms ' + easing;
     var slideRule = 'transform ' + duration + 'ms ' + easing;
 
-    // Trigger IX events
+    // Trigger IX event
     if (!designer) {
       targets.each(ix.intro);
       others.each(ix.outro);
@@ -3355,14 +3355,14 @@ module.exports = function($, _) {
     data.content = $el.children('.w-tab-content');
     data.panes = data.content.children('.w-tab-pane');
 
-    // Remove old events
+    // Remove old event
     data.el.off(namespace);
     data.links.off(namespace);
 
     // Set config from data attributes
     configure(data);
 
-    // Wire up events when not in design mode
+    // Wire up event when not in design mode
     if (!design) {
       data.links.on('click' + namespace, linkSelect(data));
 
@@ -3481,7 +3481,7 @@ module.exports = function($, _) {
 'use strict';
 
 /**
- * Webflow: Touch events
+ * Webflow: Touch event
  */
 
 module.exports = function($, _) {
@@ -3489,7 +3489,7 @@ module.exports = function($, _) {
   var fallback = !document.addEventListener;
   var getSelection = window.getSelection;
 
-  // Fallback to click events in old IE
+  // Fallback to click event in old IE
   if (fallback) {
     $.event.special.tap = { bindType: 'click', delegateType: 'click' };
   }
@@ -3517,7 +3517,7 @@ module.exports = function($, _) {
     el.addEventListener('mouseout', cancel, false);
 
     function start(evt) {
-      // We don’t handle multi-touch events yet.
+      // We don’t handle multi-touch event yet.
       var touches = evt.touches;
       if (touches && touches.length > 1) {
         return;
@@ -3606,7 +3606,7 @@ module.exports = function($, _) {
     $(evt.target).trigger(newEvent, data);
   }
 
-  // Listen for touch events on all nodes by default.
+  // Listen for touch event on all nodes by default.
   api.instance = api.init(document);
 
   // Export module

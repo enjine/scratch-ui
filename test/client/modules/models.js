@@ -1,10 +1,9 @@
 /*eslint no-unused-expressions: 0*/
-import {Product, BaseModel} from '../../../lib/client/modules/models';
+import {Product, Model} from '../../../lib/client/com.e750/models';
 
 import {settings} from '../../setup';
 import {EmitterMixinBehavior} from '../behaviors/emitter';
 import {AsyncDataBehavior} from '../behaviors/async-data';
-import {inherits} from '../../../lib/client/modules/util';
 
 let expect = settings.assertions.expect;
 let mocks = settings.mocking;
@@ -22,10 +21,10 @@ describe('Models::Generic', () => {
 				testObj: null
 			};
 
-			BaseModel.apply(this, arguments);
+			Model.apply(this, arguments);
 		};
 
-	inherits(testModel, BaseModel);
+	Object.assign(testModel.prototype, Model.prototype);
 
 	beforeEach(() => {
 		m = new testModel({
@@ -38,11 +37,6 @@ describe('Models::Generic', () => {
 
 	afterEach(() => {
 		m = null;
-	});
-
-	it('Is an instance of testModel and inherit from BaseModel', () => {
-		expect(m).to.be.an.instanceof(testModel);
-		expect(m).to.be.an.instanceof(BaseModel);
 	});
 
 	describe('Handles arbitrary constructor arguments appropriately', () => {
@@ -95,10 +89,6 @@ describe('Models::Product', () => {
 			}
 		},
 		thenable = null;
-
-	it('Inherits from BaseModel.', () => {
-		expect(p).to.be.an.instanceof(BaseModel);
-	});
 
 	it('Has a constructor name of `Product`.', () => {
 		expect(p.constructor).to.deep.equal(Product);
@@ -205,6 +195,14 @@ describe('Models::Product', () => {
 				});
 
 				it('Implements a `toJSON` method to return the model as a JSON string.', () => {
+					let json;
+					expect(p).to.respondTo('toJSON');
+					json = p.toJSON();
+					//expect(json).to.be.an.instanceof(String);  //fails
+					expect(json).to.be.a('string'); //passes
+				});
+
+				xit('Implements a `toMeta` method to return the model as a JSON string.', () => {
 					let json;
 					expect(p).to.respondTo('toJSON');
 					json = p.toJSON();

@@ -32,12 +32,12 @@ module.exports = function (config) {
 
 
 		// list of files to exclude
-		exclude: ['./test/clients/behaviors/**/*.js'],
+		exclude: ['./test/client/behaviors/**/*.js', './lib/client/com.e750/events-old.js'],
 
 		// preprocess matching files before serving them to the browser
 		// available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
 		preprocessors: {
-			// create the ES5 equivalents of these ES6 modules.
+			// create the ES5 equivalents of these ES6 com.e750.
 			'./lib/**/*.js': ['browserify'],
 			// create the ES5 versions of the tests written in ES6 (these are included in the test runner page)
 			'./test/**/*.js': ['browserify']
@@ -57,7 +57,7 @@ module.exports = function (config) {
 		// test results reporter to use
 		// possible values: 'dots', 'progress'
 		// available reporters: https://npmjs.org/browse/keyword/karma-reporter
-		reporters: ['coverage', 'junit', 'mocha', 'notify'],
+		reporters: ['coverage', 'mocha', 'notify'], //'junit'
 
 		mochaReporter: {
 			output: 'full' //full, autowatch, minimal
@@ -65,7 +65,7 @@ module.exports = function (config) {
 
 		// unit tests JUNIT reporter for Bamboo
 		junitReporter: {
-			outputDir: './reports',
+			outputDir: './reports/junit',
 			outputFile: 'test-results.xml',
 			suite: ''
 		},

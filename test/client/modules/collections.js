@@ -1,8 +1,7 @@
 /*eslint no-unused-expressions: 0*/
-import {BaseCollection, ProductCollection} from '../../../lib/client/modules/collections';
-import {BaseModel, Product} from '../../../lib/client/modules/models';
+import {Collection, ProductCollection} from '../../../lib/client/com.e750/collections';
+import {Model, Product} from '../../../lib/client/com.e750/models';
 
-import {inherits} from '../../../lib/client/modules/util';
 import {EmitterMixinBehavior} from '../behaviors/emitter';
 import {AsyncDataBehavior} from '../behaviors/async-data';
 import {settings} from '../../setup';
@@ -13,18 +12,29 @@ let mocks = settings.mocking;
 
 settings.init();
 
+let c = new Collection(),
+	pc = new ProductCollection(),
+	reqOpts = {
+		url: '/api/products/',
+		type: 'json',
+		method: 'GET',
+		headers: {
+			'X-Auth-Token': 'xxxxxxxxx'
+		}
+	},
+	thenable = null;
+
+
+describe('Collections::Base', () => {
+	it('Has a `model` property set to `Model`.', () => {
+		let model = c.model;
+		expect(model).to.exist;
+		expect(model).to.deep.equal(Model);
+	});
+});
 
 describe('Collections::ProductCollection', () => {
-	let pc = new ProductCollection(),
-		reqOpts = {
-			url: '/api/products/',
-			type: 'json',
-			method: 'GET',
-			headers: {
-				'X-Auth-Token': 'xxxxxxxxx'
-			}
-		},
-		thenable = null;
+
 
 	beforeEach(() => {
 
@@ -42,14 +52,6 @@ describe('Collections::ProductCollection', () => {
 
 	});
 
-	it('Inherits from BaseCollection.', () => {
-		expect(pc).to.be.an.instanceof(BaseCollection);
-	});
-
-	it('Has a constructor name of `ProductCollection`.', () => {
-		expect(pc.constructor).to.deep.equal(ProductCollection);
-	});
-
 	it('Has a `model` property set to `Product`.', () => {
 		let model = pc.model;
 		expect(model).to.exist;
@@ -65,7 +67,7 @@ describe('Collections::ProductCollection', () => {
 			};
 
 		};
-		inherits(testModel, BaseModel);
+		Object.assign(testModel.prototype, Model.prototype);
 
 		let options = {
 				model: testModel,
@@ -90,9 +92,8 @@ describe('Collections::ProductCollection', () => {
 			pcB = null;
 		});
 
-		it('Has a `model` propery equal to `testModel` that is a descendant of BaseModel', () => {
+		it('Has a `model` propery equal to `testModel`', () => {
 			expect(pcB.model).to.deep.equal(testModel);
-			expect(new pcB.model()).to.be.an.instanceof(BaseModel);
 		});
 
 		it('Has a `testProp` property equal to `success` that is a String', () => {
@@ -164,15 +165,15 @@ describe('Collections::ProductCollection', () => {
 				expect(json).to.be.a('string'); //passes
 			});
 
-			it('Implements a `toMeta` method to return the collection as a JSON string.', () => {
+			it('Implements a `toMeta` method to return apply transforms and return custom data.' +
+				'before returning as a JSON string.', () => {
 				let json;
-				expect(pc).to.respondTo('toJSON');
+				expect(pc).to.respondTo('toMeta');
 				json = pc.toJSON();
-				//expect(json).to.be.an.instanceof(String);  //fails
 				expect(json).to.be.a('string'); //passes
 			});
 
-			it('Implements a `serialize` method to return all model attributes as an array of JSON objects.', () => {
+			it('Implements a `serialize` method to return all model attributes as an array of JS objects.', () => {
 				let serialized;
 				expect(pc).to.respondTo('serialize');
 				serialized = pc.serialize();
