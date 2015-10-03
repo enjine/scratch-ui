@@ -6,7 +6,7 @@ let expect = settings.assertions.expect;
 
 export var EmitterMixinBehavior = {
 	describe: function () {
-		return 'Implements the Emitter mixin.';
+		return 'Mixes the Evented behavior.';
 	},
 	test: function (o) {
 		/*let handler = mocks.spy(),
@@ -22,6 +22,10 @@ export var EmitterMixinBehavior = {
 
 		it('Implements on().', () => {
 			expect(o).to.respondTo('on');
+		});
+
+		it('Implements trigger().', () => {
+			expect(o).to.respondTo('trigger');
 		});
 
 		it('Implements once().', () => {

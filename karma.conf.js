@@ -26,7 +26,7 @@ module.exports = function (config) {
 
 		// list of files / patterns to load in the browser test runner
 		files: [
-			{pattern: './lib/**/*.js', included: false},
+			{pattern: './src/**/*.js', included: false},
 			{pattern: './test/**/*.js', included: true}
 		],
 
@@ -38,7 +38,7 @@ module.exports = function (config) {
 		// available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
 		preprocessors: {
 			// create the ES5 equivalents of these ES6 com.e750.
-			'./lib/**/*.js': ['browserify'],
+			'./src/**/*.js': ['browserify'],
 			// create the ES5 versions of the tests written in ES6 (these are included in the test runner page)
 			'./test/**/*.js': ['browserify']
 		},
