@@ -10,7 +10,7 @@ module.exports = {
 			console.log('== cookies: ', req.cookies);
 		}
 
-		let requestedFileType = (req.url.indexOf('.') !== -1) ? req.url.split('.').pop().toLowerCase() : 'html';
+		let requestedFileType = req.url.indexOf('.') !== -1 ? req.url.split('.').pop().toLowerCase() : 'html';
 		let numCookies = Object.keys(req.cookies).length;
 		console.log('incoming: ', req.method, req.url.indexOf('.'), requestedFileType, req.url, req.path);
 		if (requestedFileType === 'html' || req.url === '/') {

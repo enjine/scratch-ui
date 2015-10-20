@@ -7,7 +7,7 @@ import Evt from '../event/Registry';
 
 
 export default class Component extends View {
-	constructor (el, options){
+	constructor (el, options = {}){
 		super(options);
 		this.setInitialProps(el, options);
 	}
@@ -31,10 +31,6 @@ export default class Component extends View {
 		this.template = this.options.template || null;
 		this.childViews = Object.create(LookupTable);
 		this.setInitialState();
-	}
-
-	get id () {
-		return this.id;
 	}
 
 	destroy () {
@@ -106,8 +102,8 @@ export default class Component extends View {
 					} else {
 						throw new ReferenceError(componentId + ' not found in component resolver.', Resolver);
 					}
-					this.emit(Evt.DID_UPDATE_CHILDREN);
 				});
+				this.emit(Evt.DID_UPDATE_CHILDREN);
 			} catch (e) {
 				console.error(e);
 				throw e;
@@ -121,7 +117,6 @@ export default class Component extends View {
 	}
 }
 
-Component.id = '';
 Component.defaults = {
 	el: 'div'
 };

@@ -14,11 +14,11 @@ export default class ProductList extends Component {
 		this.once('componentsLoaded', this.onComponentsLoaded);
 
 		this.on('otherEvent', () => {
-			console.log('ProductList closure loaded', this, arguments);
+			console.log('ProductList otherEvent closure!', this, arguments);
 		});
 
-		this.on('willUpdateChildren', function () {
-			console.log('ProductList yip yip', this, 'beep:', arguments);
+		this.on('willUpdateChildren', () => {
+			console.log('ProductList willUpdateChildren', this, 'beep:', arguments);
 		});
 
 		this.on('click', (e) => {
@@ -48,17 +48,15 @@ export default class ProductList extends Component {
 			.then(this.collection.parse.bind(this.collection), (reason) => {
 				console.error('Parsing Failed! ', this, arguments, reason);
 			})
-			.then(() => {
-				this.render();
-			}, (reason) => {
+			.then(this.render.bind(this), (reason) => {
 				console.error('Render Failed! ', this, arguments, reason);
 			})
 			.catch((reason) => {
 				console.error('Promise Rejected! ', this, arguments, reason);
 			})
 			.finally(() => {
-				console.log('finally', this, arguments, options);
-				//this.updateChildren();
+				console.log('finally', this, arguments, this.options);
+				this.updateChildren();
 			});
 
 	}

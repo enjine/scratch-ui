@@ -22,7 +22,7 @@ export default class Product extends Component {
 
 	render () {
 		try {
-			console.log('render product', this.model.serialize());
+			//console.log('render product', this.model.serialize());
 			this.el = jst.compile(this.template, this.model.serialize());
 			this.attachNestedComponents();
 			return this;

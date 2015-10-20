@@ -3,7 +3,6 @@
 // Karma configuration
 // Generated on Thu Jul 23 2015 23:21:04 GMT-0400 (EDT)
 var istanbul = require('browserify-istanbul');
-var isparta = require('isparta');
 
 module.exports = function (config) {
 	config.set({
@@ -32,7 +31,7 @@ module.exports = function (config) {
 
 
 		// list of files to exclude
-		exclude: ['./test/client/behaviors/**/*.js', './lib/client/com.e750/events-old.js'],
+		exclude: ['./test/client/behaviors/**/*.js'],
 
 		// preprocess matching files before serving them to the browser
 		// available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
@@ -71,7 +70,8 @@ module.exports = function (config) {
 		},
 
 		coverageReporter: {
-			instrumenter: {'./lib/**/*.js': isparta},
+			instrumenters: { isparta : require('isparta') },
+			instrumenter: {'./src/**/*.js': 'isparta'},
 			dir: './reports/coverage',
 			reporters: [
 				{type: 'html', subdir: 'html'},

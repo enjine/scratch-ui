@@ -29,10 +29,10 @@ Object.assign(Evented.prototype, {
 	once: function (event, handler, delegate) {
 		let that = this;
 
-		function on (data) {
+		function on (data, args) {
 			//console.log('ONCE called:', subscription, handler);
 			that.off(event, on, delegate);
-			handler(data);
+			handler(data, args);
 		}
 
 		on.sId = guid();
@@ -67,15 +67,13 @@ Object.assign(Evented.prototype, {
 	 */
 	emit: function (eventName, data, ...args) {
 		let E,
-			el = this.el, //bad. el should be being passed in, then -> el.dispatchEvent; yey, not this.el, barf;
-			elIsEl = isElement(el) || isNode(el),
+			el = this.el,
+			elIsDOM = isElement(el) || isNode(el),
 			native = isNative(eventName),
 			subscribers = this.mediator.subscribers;
 
-		//TODO: fix implementation to use trigger for DOM and emit for custom
-		if (native && elIsEl) {
-			E = new Event(eventName);
-			return el.dispatchEvent(E);
+		if (native && elIsDOM) {
+			return this.trigger(eventName, el);
 		}
 
 		if (subscribers.has(eventName)) {

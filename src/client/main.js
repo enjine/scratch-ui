@@ -1,10 +1,8 @@
-import 'core-js'; // Node module
 import Application from './com.e750/lib/components/Application';
 
 class e750 extends Application {
 	constructor (rootNode, options) {
 		super(rootNode, options);
-		console.log('new instance', this, arguments);
 
 		this.bootstrap(options);
 
@@ -14,8 +12,8 @@ class e750 extends Application {
 
 		this.once('componentsLoaded', this.onComponentsLoaded.bind(this));
 
-		this.once('willUpdateChildren', function () {
-			console.log('App yip yip', this, arguments);
+		this.once('willUpdateChildren', () => {
+			console.log('App willUpdateChildren', this, arguments);
 		});
 	}
 
