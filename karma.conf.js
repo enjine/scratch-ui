@@ -74,7 +74,7 @@ module.exports = function (config) {
 			instrumenter: {'./lib/**/*.js': isparta},
 			dir: './reports/coverage',
 			reporters: [
-				{type: 'html', subdir: 'html'},
+				//{type: 'html', subdir: 'html'},
 				//{type: 'lcov', subdir: 'lcov'}
 				{type: 'text', subdir: '.'}
 			]
