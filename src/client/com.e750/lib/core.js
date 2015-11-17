@@ -7,135 +7,134 @@ var xhttp = require('xhttp/custom')(RSVP.Promise);
 
 
 export const net = {
-	http: {
-		/**
-		 * Base NET request function
-		 * returns an A+ promise
-		 * @param options
-		 * @returns {*}
-		 */
-		ajax: function (options) {
-			let defaults = {
-				method: 'GET'
-			};
+    http: {
+        /**
+         * Base NET request function
+         * returns an A+ promise
+         * @param options
+         * @returns {*}
+         */
+        ajax: function (options) {
+            let defaults = {
+                method: 'GET'
+            };
 
-			Object.assign(defaults, options);
-			this.emit(Evt.BEFORE_AJAX, options);
-			return xhttp(options);
-		},
-		/**
-		 * Alias for an ASYNC HTTP GET
-		 * returns an A+ promise
-		 * @param options
-		 * @returns {*}
-		 */
-		get: function (options) {
-			options.method = 'GET';
-			return net.http.ajax.call(this, options);
-		}
-	}
+            Object.assign(defaults, options);
+            this.emit(Evt.BEFORE_AJAX, options);
+            return xhttp(options);
+        },
+        /**
+         * Alias for an ASYNC HTTP GET
+         * returns an A+ promise
+         * @param options
+         * @returns {*}
+         */
+        get: function (options) {
+            options.method = 'GET';
+            return net.http.ajax.call(this, options);
+        }
+    }
 };
 
 export const storage = {
 
-	cookie: (name, value, options) => {
+    cookie: (name, value, options) => {
 
-		function encode (val) {
-			try {
-				return encodeURIComponent(val);
-			} catch (e) {
-				return null;
-			}
-		}
+        function encode (val) {
+            try {
+                return encodeURIComponent(val);
+            } catch (e) {
+                return null;
+            }
+        }
 
-		function decode (val) {
-			try {
-				return decodeURIComponent(val);
-			} catch (e) {
-				return null;
-			}
-		}
+        function decode (val) {
+            try {
+                return decodeURIComponent(val);
+            } catch (e) {
+                return null;
+            }
+        }
 
-		function set (key, val) {
-			let opts = arguments[2] === undefined ? {} : arguments[2];
+        function set (key, val) {
+            let opts = arguments[2] === undefined ? {} : arguments[2];
 
-			var str = '' + encode(key) + '=' + encode(val);
+            var str = '' + encode(key) + '=' + encode(val);
 
-			if (val == null) options.maxage = -1;
+            if (val == null) options.maxage = -1;
 
-			if (opts.maxage) {
-				opts.expires = new Date(+new Date() + opts.maxage);
-			}
+            if (opts.maxage) {
+                opts.expires = new Date(+new Date() + opts.maxage);
+            }
 
-			if (opts.path) str += '; path=' + opts.path;
-			if (opts.domain) str += '; domain=' + opts.domain;
-			if (opts.expires) str += '; expires=' + opts.expires.toUTCString();
-			if (opts.secure) str += '; secure';
+            if (opts.path) str += '; path=' + opts.path;
+            if (opts.domain) str += '; domain=' + opts.domain;
+            if (opts.expires) str += '; expires=' + opts.expires.toUTCString();
+            if (opts.secure) str += '; secure';
 
-			document.cookie = str;
-		}
+            document.cookie = str;
+        }
 
-		function get (key) {
-			var cookies = parse(document.cookie);
-			return !!key ? cookies[key] : cookies;
-		}
+        function get (key) {
+            var cookies = parse(document.cookie);
+            return !!key ? cookies[key] : cookies;
+        }
 
-		function parse (str) {
-			var obj = {},
-				pairs = str.split(/ *; */);
+        function parse (str) {
+            var obj = {},
+                pairs = str.split(/ *; */);
 
-			if (!pairs[0]) {
-				return obj;
-			}
-			var _iteratorNormalCompletion = true;
-			var _didIteratorError = false;
-			var _iteratorError = undefined;
-			var _iterator, _step;
+            if (!pairs[0]) {
+                return obj;
+            }
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+            var _iterator, _step;
 
-			try {
-				for (_iterator = pairs[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-					var pair = _step.value;
+            try {
+                for (_iterator = pairs[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var pair = _step.value;
 
-					pair = pair.split('=');
-					obj[decode(pair[0])] = decode(pair[1]);
-				}
-			} catch (err) {
-				_didIteratorError = true;
-				_iteratorError = err;
-			} finally {
-				try {
-					if (!_iteratorNormalCompletion && _iterator.return) {
-						_iterator.return();
-					}
-				} finally {
-					if (_didIteratorError) {
-						throw _iteratorError;
-					}
-				}
-			}
+                    pair = pair.split('=');
+                    obj[decode(pair[0])] = decode(pair[1]);
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
+                }
+            }
 
-			return obj;
-		}
+            return obj;
+        }
 
-		if (arguments.length < 2) {
-			console.log(name, value, options, document.cookie);
-			return get(name);
-		}
+        if (arguments.length < 2) {
+            return get(name);
+        }
 
-		set(name, value, options);
-	}
+        set(name, value, options);
+    }
 };
 
 export const jst = {
-	templates: {},
+    templates: {},
 
-	getFromDOM: (name) => {
-		return document.getElementById(name).innerHTML;
-	},
+    getFromDOM: (name) => {
+        return document.getElementById(name).innerHTML;
+    },
 
-	compile: (templateStr, data, overrides) => {
-		return htmlToDom(templeton.template(templateStr, data, overrides));
-	}
+    compile: (templateStr, data, overrides) => {
+        return htmlToDom(templeton.template(templateStr, data, overrides));
+    }
 
 };
 

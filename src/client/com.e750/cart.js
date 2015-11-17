@@ -5,8 +5,8 @@ import Component from './lib/components/Component';
 
 
 export const ui = {
-	component: Component,
-	productList: ProductList,
-	addToCart: AddToCart,
-	baseProduct: Product
+    component: Component,
+    productList: ProductList,
+    addToCart: AddToCart,
+    baseProduct: Product
 };
