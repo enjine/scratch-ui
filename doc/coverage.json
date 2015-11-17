@@ -1,0 +1,221 @@
+{
+  "coverage": "12.94%",
+  "expectCount": 85,
+  "actualCount": 11,
+  "files": {
+    "src/client/com.e750/lib/components/AddToCart.js": {
+      "expectCount": 2,
+      "actualCount": 0,
+      "undocumentLines": [
+        3,
+        4
+      ]
+    },
+    "src/client/com.e750/lib/components/Application.js": {
+      "expectCount": 3,
+      "actualCount": 0,
+      "undocumentLines": [
+        7,
+        13,
+        8
+      ]
+    },
+    "src/client/com.e750/lib/classes/collections/Collection.js": {
+      "expectCount": 8,
+      "actualCount": 1,
+      "undocumentLines": [
+        19,
+        20,
+        30,
+        25,
+        50,
+        56,
+        62
+      ]
+    },
+    "src/client/com.e750/lib/components/Component.js": {
+      "expectCount": 16,
+      "actualCount": 0,
+      "undocumentLines": [
+        9,
+        79,
+        89,
+        52,
+        50,
+        12,
+        56,
+        19,
+        17,
+        29,
+        35,
+        49,
+        47,
+        51,
+        65,
+        93
+      ]
+    },
+    "src/client/com.e750/lib/event/Dispatcher.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        4
+      ]
+    },
+    "src/client/com.e750/lib/util/shims.js": {
+      "expectCount": 2,
+      "actualCount": 0,
+      "undocumentLines": [
+        1,
+        13
+      ]
+    },
+    "src/client/com.e750/lib/behaviors/Evented.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        8
+      ]
+    },
+    "src/client/com.e750/lib/behaviors/Initializable.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        1
+      ]
+    },
+    "src/client/com.e750/lib/util/LookupTable.js": {
+      "expectCount": 1,
+      "actualCount": 1,
+      "undocumentLines": []
+    },
+    "src/client/com.e750/lib/classes/models/Model.js": {
+      "expectCount": 10,
+      "actualCount": 1,
+      "undocumentLines": [
+        36,
+        37,
+        87,
+        67,
+        107,
+        97,
+        43,
+        111,
+        115
+      ]
+    },
+    "src/client/com.e750/lib/classes/models/Product.js": {
+      "expectCount": 3,
+      "actualCount": 0,
+      "undocumentLines": [
+        3,
+        5,
+        4
+      ]
+    },
+    "src/client/com.e750/lib/components/Product.js": {
+      "expectCount": 7,
+      "actualCount": 0,
+      "undocumentLines": [
+        7,
+        30,
+        20,
+        26,
+        18,
+        9,
+        22
+      ]
+    },
+    "src/client/com.e750/lib/classes/collections/Product.js": {
+      "expectCount": 3,
+      "actualCount": 0,
+      "undocumentLines": [
+        4,
+        7,
+        5
+      ]
+    },
+    "src/client/com.e750/lib/components/ProductList.js": {
+      "expectCount": 6,
+      "actualCount": 0,
+      "undocumentLines": [
+        5,
+        53,
+        7,
+        36,
+        76,
+        6
+      ]
+    },
+    "src/client/com.e750/lib/event/Registry.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        1
+      ]
+    },
+    "src/client/com.e750/lib/components/Resolver.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        3
+      ]
+    },
+    "src/client/com.e750/lib/classes/views/View.js": {
+      "expectCount": 5,
+      "actualCount": 0,
+      "undocumentLines": [
+        6,
+        7,
+        15,
+        21,
+        11
+      ]
+    },
+    "src/client/com.e750/lib/util/EventUtils.js": {
+      "expectCount": 4,
+      "actualCount": 4,
+      "undocumentLines": []
+    },
+    "src/client/com.e750/lib/util/Guid.js": {
+      "expectCount": 1,
+      "actualCount": 1,
+      "undocumentLines": []
+    },
+    "src/client/com.e750/lib/util/DOMUtils.js": {
+      "expectCount": 3,
+      "actualCount": 3,
+      "undocumentLines": []
+    },
+    "src/client/com.e750/lib/core.js": {
+      "expectCount": 3,
+      "actualCount": 0,
+      "undocumentLines": [
+        128,
+        9,
+        39
+      ]
+    },
+    "src/client/com.e750/lib/util/mixes.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        1
+      ]
+    },
+    "src/client/com.e750/lib/event/nEvent.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        1
+      ]
+    },
+    "src/client/com.e750/cart.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        7
+      ]
+    }
+  }
+}

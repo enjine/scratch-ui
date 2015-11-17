@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/server/main.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">client/com.e750</div><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-ui">ui</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">client/com.e750/lib</div><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-jst">jst</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-net">net</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-storage">storage</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">client/com.e750/lib/behaviors</div><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Evented">Evented</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Initializable">Initializable</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">client/com.e750/lib/classes/collections</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/client/com.e750/lib/classes/collections/Collection.js~Collection.html">Collection</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/client/com.e750/lib/classes/collections/Product.js~ProductCollection.html">ProductCollection</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">client/com.e750/lib/classes/models</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/client/com.e750/lib/classes/models/Model.js~Model.html">Model</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/client/com.e750/lib/classes/models/Product.js~Product.html">Product</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">client/com.e750/lib/classes/views</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/client/com.e750/lib/classes/views/View.js~View.html">View</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">client/com.e750/lib/components</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/client/com.e750/lib/components/AddToCart.js~AddToCart.html">AddToCart</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/client/com.e750/lib/components/Application.js~Application.html">Application</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/client/com.e750/lib/components/Component.js~Component.html">Component</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/client/com.e750/lib/components/Product.js~Product.html">Product</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/client/com.e750/lib/components/ProductList.js~ProductList.html">ProductList</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Resolver">Resolver</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">client/com.e750/lib/event</div><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Dispatcher">Dispatcher</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-nEvent">nEvent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Registry">Registry</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">client/com.e750/lib/util</div><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-htmlToDom">htmlToDom</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isElement">isElement</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isNode">isNode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-addHandler">addHandler</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-isNativeEvent">isNativeEvent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-manageNativeEvents">manageNativeEvents</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-removeHandler">removeHandler</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-guid">guid</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-mixes">mixes</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ElementPrototypeRemove">ElementPrototypeRemove</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-NodeListPrototypeRemove">NodeListPrototypeRemove</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-LookupTable">LookupTable</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/server/main.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">var express = require(&apos;express&apos;);
+var path = require(&apos;path&apos;);
+var https = require(&apos;https&apos;);
+var pem = require(&apos;pem&apos;);
+var bodyParser = require(&apos;body-parser&apos;);
+var cookieParser = require(&apos;cookie-parser&apos;);
+var rp = require(&apos;request-promise&apos;);
+var errors = require(&apos;request-promise/errors&apos;);
+
+
+// e750 com.e750
+var routeFilters = require(&apos;./filters&apos;);
+
+
+var app;
+var port = process.env.PORT || 8080;        // set our port
+var sslPort = 4430;        // set our secure port
+var staticPath = path.resolve(__dirname, &apos;../../acme-vineyards-webflow&apos;); // static files
+
+//support https
+pem.createCertificate({days: 1, selfSigned: true}, function (err, keys) {
+	app = express({key: keys.serviceKey, cert: keys.certificate});
+	https.createServer({key: keys.serviceKey, cert: keys.certificate}, app).listen(sslPort);
+
+// parse application/x-www-form-urlencoded
+	app.use(bodyParser.urlencoded({
+		extended: false
+	}));
+// parse application/json
+	app.use(bodyParser.json());
+	app.use(cookieParser());
+
+// ROUTERS
+
+	let apiRouter = express.Router();
+	let appRouter = express.Router();
+
+// ROUTE FILTERS/MIDDLEWARE -------------------------------
+	/**
+	 * global route prefilter, runs on every request
+	 *
+	 * Checks for APIKEY, if not present, fetches from key server
+	 * and sets cookie.
+	 *
+	 */
+	app.use(&apos;/&apos;, routeFilters.cookie);
+
+// END ROUTE FILTERS/MIDDLEWARE -------------------------------
+
+
+// API ROUTES -------------------------------
+
+	/**
+	 * all routes relative to router mount point
+	 *    =&gt; http://localhost:8080/{mount_point} (/api)
+	 */
+	apiRouter.route(&apos;/products&apos;)
+		.get((req, res) =&gt; {
+			function render (result) {
+				res.setHeader(&apos;Content-Type&apos;, &apos;application/json&apos;);
+				//res.writeHead(200)
+				res.send(result);
+				res.end();
+			}
+
+			let host = &apos;api.securecheckout.com&apos;,
+				url = &apos;/v1/cart/products/&apos;,
+				options = {
+					hostname: host,
+					uri: &apos;https://&apos; + host + url,
+					method: &apos;GET&apos;,
+					headers: {
+						&apos;X-Auth-Token&apos;: req.cookies.apikey
+					},
+					resolveWithFullResponse: true
+				};
+
+
+			console.log(&apos;:: requesting products&apos;, req.cookies, options);
+			rp(options).then((r) =&gt; {
+				if (r.statusCode === 200 &amp;&amp; r.body) {
+					// success
+					//console.log(&quot;GOT: &quot;, r.statusCode, r.body);
+					let data = JSON.parse(r.body),
+						converted = [];
+					Object.keys(data).map(function (k) {
+						let o = data[k];
+						// you could set/compute any additional props here
+						//o.tagged = true;
+						converted.push(o);
+					});
+					render(JSON.stringify(converted));
+				} else {
+					//fail
+					render(r.body);
+				}
+			}).catch(errors.RequestError, (reason) =&gt; {
+				console.log(&apos;FAILED: RequestError -&gt; &apos;);
+				render(reason.body);
+			}).catch(errors.StatusCodeError, (reason) =&gt; {
+				console.log(&apos;FAILED: StatusCodeError -&gt; &apos;);
+				render(reason.body);
+			});
+		});
+
+	apiRouter.route(&apos;/token&apos;)
+		.get((req, res) =&gt; {
+			console.log(&apos;processing GET&apos;);
+			res.end();
+		})
+		.post((req, res) =&gt; {
+			console.log(&apos;processing POST&apos;);
+			res.end();
+		})
+		.put((req, res) =&gt; {
+			console.log(&apos;processing PUT&apos;);
+			res.end();
+		});
+
+// API index route
+	apiRouter.route(&apos;/&apos;)
+		.get((req, res) =&gt; {
+			console.log(&apos;this is the api:&apos;, req.route);
+			res.json({message: &apos;e750 REST API ready.&apos;});
+			res.end();
+		});
+
+// END API ROUTES -------------------------------
+
+
+// APP ROUTES -------------------------------
+	appRouter.route(&apos;/ham&apos;)
+		.get((req, res) =&gt; {
+			res.setHeader(&apos;Content-Type&apos;, &apos;text/html&apos;);
+			res.send(&apos;&lt;h1&gt;Ham you say? Sure. Why not?&lt;/h1&gt;&apos;);
+			res.end();
+		});
+
+// ENDAPP ROUTES -------------------------------
+
+// mount the API router at /api
+	app.use(&apos;/api&apos;, apiRouter);
+
+// mount a regular router at /
+	app.use(&apos;/&apos;, appRouter);
+
+// static routes always last
+	app.use(express.static(staticPath));
+
+
+// plain &apos;ol http
+	app.listen(port);
+
+	console.log(&apos;HTTP(S) servers on ports: &apos; + port + &apos; / &apos; + sslPort);
+	console.log(&apos;Static files root: &apos; + staticPath);
+
+	console.log(&apos;registered API routes:&apos;);
+	apiRouter.stack.forEach((r) =&gt; {
+		if (r.route &amp;&amp; r.route.path) {
+			console.log(r.route.path);
+		}
+	});
+
+	console.log(&apos;registered APP routes:&apos;);
+	appRouter.stack.forEach((r) =&gt; {
+		if (r.route &amp;&amp; r.route.path) {
+			console.log(r.route.path);
+		}
+	});
+});
+
+
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.4.3)</span></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>
