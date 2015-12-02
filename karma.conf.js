@@ -49,7 +49,8 @@ module.exports = function (config) {
 			transform: [
 				'babelify',
 				istanbul({
-					ignore: ['./node_modules/**', './test/**']
+					ignore: ['./node_modules/**', './test/**'],
+					instrumenterConfig: {embedSource: true}
 				})
 			]
 		},
@@ -74,7 +75,7 @@ module.exports = function (config) {
 			instrumenter: {'./lib/**/*.js': isparta},
 			dir: './reports/coverage',
 			reporters: [
-				//{type: 'html', subdir: 'html'},
+				{type: 'html', subdir: 'html'},
 				//{type: 'lcov', subdir: 'lcov'}
 				{type: 'text', subdir: '.'}
 			]
