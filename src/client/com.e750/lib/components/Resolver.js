@@ -4,8 +4,8 @@ export default function Resolver () {
 }
 
 Resolver.prototype.registry = {
-    'ui/header': ui.component,
-    'ui/slider': ui.component,
+    'ui/header': ui.header,
+    'ui/slider': ui.carousel,
     'ui/intro': ui.component,
     'cart/add': ui.addToCart,
     'cart/product-list': ui.productList,

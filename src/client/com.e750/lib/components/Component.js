@@ -26,6 +26,10 @@ export default class Component extends View {
         }
     }
 
+    getComponentId(){
+        return '['+this.componentIdentifier.slice(1,-1)+'='+this.id+']';
+    }
+
     getBootstrap () {
         if (window.e750.bootstrap) {
             return window.e750.bootstrap[this.constructor.name] || [];

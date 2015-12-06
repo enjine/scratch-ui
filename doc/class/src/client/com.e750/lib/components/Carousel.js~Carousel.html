@@ -2,8 +2,8 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <base data-ice="baseUrl" href="../../../../../">
-  <title data-ice="title">src/client/com.e750/lib/core.js | API Document</title>
+  <base data-ice="baseUrl" href="../../../../../../">
+  <title data-ice="title">Carousel | API Document</title>
   <link type="text/css" rel="stylesheet" href="css/style.css">
   <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
   <script src="script/prettify/prettify.js"></script>
@@ -70,150 +70,430 @@
 </div>
 </nav>
 
-<div class="content" data-ice="content"><h1 data-ice="title">src/client/com.e750/lib/core.js</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import templeton from &apos;templeton&apos;;
-import Evented from &apos;./behaviors/Evented&apos;;
-import {htmlToDom} from &apos;./util/DOMUtils&apos;;
-import RSVP from &apos;rsvp&apos;;
-import Evt from &apos;./event/Registry&apos;;
-var xhttp = require(&apos;xhttp/custom&apos;)(RSVP.Promise);
+<div class="content" data-ice="content"><div class="header-notice">
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import Carousel from &apos;<span><a href="file/src/client/com.e750/lib/components/Carousel.js.html#lineNumber6">e750-Micro/src/client/com.e750/lib/components/Carousel.js</a></span>&apos;</code></pre></div>
+  <span data-ice="access">public</span>
+  <span data-ice="kind">class</span>
+  
+  
+  
+  <span data-ice="source">| <span><a href="file/src/client/com.e750/lib/components/Carousel.js.html#lineNumber6">source</a></span></span>
+</div>
+
+<div class="self-detail detail">
+  <h1 data-ice="name">Carousel</h1>
+
+  
+
+  
+  
+  <div class="flat-list" data-ice="extendsChain"><h4>Extends:</h4><div><span>src/client/com.e750/lib/components/Component~Component</span> &#x2192; Carousel</div></div>
+  
+  
+  
+  
+  
+  
+
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+</div>
 
 
-export const net = {
-    http: {
-        /**
-         * Base NET request function
-         * returns an A+ promise
-         * @param options
-         * @returns {*}
-         */
-        ajax: function (options) {
-            let defaults = {
-                method: &apos;GET&apos;
-            };
 
-            Object.assign(defaults, options);
-            this.emit(Evt.BEFORE_AJAX, options);
-            return xhttp(options);
-        },
-        /**
-         * Alias for an ASYNC HTTP GET
-         * returns an A+ promise
-         * @param options
-         * @returns {*}
-         */
-        get: function (options) {
-            options.method = &apos;GET&apos;;
-            return net.http.ajax.call(this, options);
-        }
-    }
-};
 
-export const storage = {
+<div data-ice="memberSummary"><h2>Member Summary</h2><table class="summary" data-ice="summary">
+  <thead><tr><td data-ice="title" colspan="3">Public Members</td></tr></thead>
+  <tbody>
+  
+  <tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+           <span data-ice="name"><span><a href="class/src/client/com.e750/lib/components/Carousel.js~Carousel.html#instance-member-model">model</a></span></span><span data-ice="signature">: <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+           <span data-ice="name"><span><a href="class/src/client/com.e750/lib/components/Carousel.js~Carousel.html#instance-member-template">template</a></span></span><span data-ice="signature">: <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+</tbody>
+</table>
+</div>
+<div data-ice="methodSummary"><h2>Method Summary</h2><table class="summary" data-ice="summary">
+  <thead><tr><td data-ice="title" colspan="3">Public Methods</td></tr></thead>
+  <tbody>
+  
+  <tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+           <span data-ice="name"><span><a href="class/src/client/com.e750/lib/components/Carousel.js~Carousel.html#instance-method-render">render</a></span></span><span data-ice="signature">(): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+           <span data-ice="name"><span><a href="class/src/client/com.e750/lib/components/Carousel.js~Carousel.html#instance-method-setInitialProps">setInitialProps</a></span></span><span data-ice="signature">(el: <span>*</span>, options: <span>*</span>)</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+           <span data-ice="name"><span><a href="class/src/client/com.e750/lib/components/Carousel.js~Carousel.html#instance-method-setInitialState">setInitialState</a></span></span><span data-ice="signature">()</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+</tbody>
+</table>
+</div>
 
-    cookie: (name, value, options) =&gt; {
 
-        function encode (val) {
-            try {
-                return encodeURIComponent(val);
-            } catch (e) {
-                return null;
-            }
-        }
 
-        function decode (val) {
-            try {
-                return decodeURIComponent(val);
-            } catch (e) {
-                return null;
-            }
-        }
 
-        function set (key, val) {
-            let opts = arguments[2] === undefined ? {} : arguments[2];
 
-            var str = &apos;&apos; + encode(key) + &apos;=&apos; + encode(val);
 
-            if (val == null) options.maxage = -1;
+<div data-ice="memberDetails"><h2 data-ice="title">Public Members</h2>
 
-            if (opts.maxage) {
-                opts.expires = new Date(+new Date() + opts.maxage);
-            }
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-member-model">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    <span data-ice="name">model</span><span data-ice="signature">: <span>*</span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/client/com.e750/lib/components/Carousel.js.html#lineNumber20">source</a></span></span>
+    </span>
+  </h3>
 
-            if (opts.path) str += &apos;; path=&apos; + opts.path;
-            if (opts.domain) str += &apos;; domain=&apos; + opts.domain;
-            if (opts.expires) str += &apos;; expires=&apos; + opts.expires.toUTCString();
-            if (opts.secure) str += &apos;; secure&apos;;
+  
+  
+  
+  
 
-            document.cookie = str;
-        }
+  
 
-        function get (key) {
-            var cookies = parse(document.cookie);
-            return !!key ? cookies[key] : cookies;
-        }
+  <div data-ice="properties">
+</div>
 
-        function parse (str) {
-            var obj = {},
-                pairs = str.split(/ *; */);
+  
 
-            if (!pairs[0]) {
-                return obj;
-            }
-            var _iteratorNormalCompletion = true;
-            var _didIteratorError = false;
-            var _iteratorError = undefined;
-            var _iterator, _step;
+  
 
-            try {
-                for (_iterator = pairs[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-                    var pair = _step.value;
+  
 
-                    pair = pair.split(&apos;=&apos;);
-                    obj[decode(pair[0])] = decode(pair[1]);
-                }
-            } catch (err) {
-                _didIteratorError = true;
-                _iteratorError = err;
-            } finally {
-                try {
-                    if (!_iteratorNormalCompletion &amp;&amp; _iterator.return) {
-                        _iterator.return();
-                    }
-                } finally {
-                    if (_didIteratorError) {
-                        throw _iteratorError;
-                    }
-                }
-            }
+  
 
-            return obj;
-        }
+  
 
-        if (arguments.length &lt; 2) {
-            return get(name);
-        }
+  
 
-        set(name, value, options);
-    }
-};
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-member-template">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    <span data-ice="name">template</span><span data-ice="signature">: <span>*</span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/client/com.e750/lib/components/Carousel.js.html#lineNumber22">source</a></span></span>
+    </span>
+  </h3>
 
-export const jst = {
-    templates: {},
+  
+  
+  
+  
 
-    getFromDOM: (name) =&gt; {
-        return document.getElementById(name).innerHTML;
-    },
+  
 
-    compile: (templateStr, data, overrides) =&gt; {
-        return htmlToDom(templeton.template(templateStr, data, overrides));
-    }
+  <div data-ice="properties">
+</div>
 
-};
+  
 
-export default {net, storage, jst};
-</code></pre>
+  
 
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+</div>
+<div data-ice="methodDetails"><h2 data-ice="title">Public Methods</h2>
+
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-method-render">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    <span data-ice="name">render</span><span data-ice="signature">(): <span>*</span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/client/com.e750/lib/components/Carousel.js.html#lineNumber26">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
+
+  
+
+  <div data-ice="properties">
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tr>
+        <td class="return-type" data-ice="returnType"><span>*</span></td>
+        
+      </tr>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-method-setInitialProps">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    <span data-ice="name">setInitialProps</span><span data-ice="signature">(el: <span>*</span>, options: <span>*</span>)</span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/client/com.e750/lib/components/Carousel.js.html#lineNumber18">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" data-depth="0">el</td>
+      <td data-ice="type"><span>*</span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" data-depth="0">options</td>
+      <td data-ice="type"><span>*</span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-method-setInitialState">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    <span data-ice="name">setInitialState</span><span data-ice="signature">()</span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/client/com.e750/lib/components/Carousel.js.html#lineNumber9">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
+
+  
+
+  <div data-ice="properties">
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+</div>
 </div>
 
 <footer class="footer">

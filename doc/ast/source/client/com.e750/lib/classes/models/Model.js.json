@@ -1,14 +1,14 @@
 {
   "type": "Program",
   "start": 0,
-  "end": 2827,
+  "end": 2844,
   "loc": {
     "start": {
       "line": 1,
       "column": 0
     },
     "end": {
-      "line": 120,
+      "line": 122,
       "column": 0
     }
   },
@@ -6641,6 +6641,72 @@
         "leadingComments": [],
         "trailingComments": []
       }
+    },
+    {
+      "type": "ExportNamedDeclaration",
+      "start": 2828,
+      "end": 2843,
+      "loc": {
+        "start": {
+          "line": 121,
+          "column": 0
+        },
+        "end": {
+          "line": 121,
+          "column": 15
+        }
+      },
+      "declaration": null,
+      "specifiers": [
+        {
+          "type": "ExportSpecifier",
+          "start": 2836,
+          "end": 2841,
+          "loc": {
+            "start": {
+              "line": 121,
+              "column": 8
+            },
+            "end": {
+              "line": 121,
+              "column": 13
+            }
+          },
+          "local": {
+            "type": "Identifier",
+            "start": 2836,
+            "end": 2841,
+            "loc": {
+              "start": {
+                "line": 121,
+                "column": 8
+              },
+              "end": {
+                "line": 121,
+                "column": 13
+              }
+            },
+            "name": "Model"
+          },
+          "exported": {
+            "type": "Identifier",
+            "start": 2836,
+            "end": 2841,
+            "loc": {
+              "start": {
+                "line": 121,
+                "column": 8
+              },
+              "end": {
+                "line": 121,
+                "column": 13
+              }
+            },
+            "name": "Model"
+          }
+        }
+      ],
+      "source": null
     }
   ]
 }

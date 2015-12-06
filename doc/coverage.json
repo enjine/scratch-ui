@@ -1,6 +1,6 @@
 {
-  "coverage": "12.94%",
-  "expectCount": 85,
+  "coverage": "11.34%",
+  "expectCount": 97,
   "actualCount": 11,
   "files": {
     "src/client/com.e750/lib/components/AddToCart.js": {
@@ -18,6 +18,18 @@
         7,
         13,
         8
+      ]
+    },
+    "src/client/com.e750/lib/components/Carousel.js": {
+      "expectCount": 6,
+      "actualCount": 0,
+      "undocumentLines": [
+        6,
+        20,
+        26,
+        18,
+        9,
+        22
       ]
     },
     "src/client/com.e750/lib/classes/collections/Collection.js": {
@@ -77,6 +89,18 @@
         8
       ]
     },
+    "src/client/com.e750/lib/components/Header.js": {
+      "expectCount": 6,
+      "actualCount": 0,
+      "undocumentLines": [
+        6,
+        20,
+        26,
+        18,
+        9,
+        22
+      ]
+    },
     "src/client/com.e750/lib/behaviors/Initializable.js": {
       "expectCount": 1,
       "actualCount": 0,
@@ -104,6 +128,19 @@
         115
       ]
     },
+    "src/client/com.e750/lib/components/Product.js": {
+      "expectCount": 7,
+      "actualCount": 0,
+      "undocumentLines": [
+        6,
+        29,
+        19,
+        25,
+        17,
+        8,
+        21
+      ]
+    },
     "src/client/com.e750/lib/classes/models/Product.js": {
       "expectCount": 3,
       "actualCount": 0,
@@ -111,19 +148,6 @@
         3,
         5,
         4
-      ]
-    },
-    "src/client/com.e750/lib/components/Product.js": {
-      "expectCount": 7,
-      "actualCount": 0,
-      "undocumentLines": [
-        7,
-        30,
-        20,
-        26,
-        18,
-        9,
-        22
       ]
     },
     "src/client/com.e750/lib/classes/collections/Product.js": {
@@ -214,7 +238,7 @@
       "expectCount": 1,
       "actualCount": 0,
       "undocumentLines": [
-        7
+        9
       ]
     }
   }

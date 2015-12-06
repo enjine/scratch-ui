@@ -12,6 +12,12 @@ window.esdocSearchIndex = [
     "class"
   ],
   [
+    "e750-micro/src/client/com.e750/lib/components/carousel.js~carousel",
+    "class/src/client/com.e750/lib/components/Carousel.js~Carousel.html",
+    "<span>Carousel</span> <span class=\"search-result-import-path\">e750-Micro/src/client/com.e750/lib/components/Carousel.js</span>",
+    "class"
+  ],
+  [
     "e750-micro/src/client/com.e750/lib/classes/collections/collection.js~collection",
     "class/src/client/com.e750/lib/classes/collections/Collection.js~Collection.html",
     "<span>Collection</span> <span class=\"search-result-import-path\">e750-Micro/src/client/com.e750/lib/classes/collections/Collection.js</span>",
@@ -40,6 +46,12 @@ window.esdocSearchIndex = [
     "function/index.html#static-function-Evented",
     "<span>Evented</span> <span class=\"search-result-import-path\">e750-Micro/src/client/com.e750/lib/behaviors/Evented.js</span>",
     "function"
+  ],
+  [
+    "e750-micro/src/client/com.e750/lib/components/header.js~header",
+    "class/src/client/com.e750/lib/components/Header.js~Header.html",
+    "<span>Header</span> <span class=\"search-result-import-path\">e750-Micro/src/client/com.e750/lib/components/Header.js</span>",
+    "class"
   ],
   [
     "e750-micro/src/client/com.e750/lib/behaviors/initializable.js~initializable",
@@ -750,6 +762,42 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "src/client/com.e750/lib/components/carousel.js",
+    "file/src/client/com.e750/lib/components/Carousel.js.html",
+    "src/client/com.e750/lib/components/Carousel.js",
+    "file"
+  ],
+  [
+    "src/client/com.e750/lib/components/carousel.js~carousel#model",
+    "class/src/client/com.e750/lib/components/Carousel.js~Carousel.html#instance-member-model",
+    "src/client/com.e750/lib/components/Carousel.js~Carousel#model",
+    "member"
+  ],
+  [
+    "src/client/com.e750/lib/components/carousel.js~carousel#render",
+    "class/src/client/com.e750/lib/components/Carousel.js~Carousel.html#instance-method-render",
+    "src/client/com.e750/lib/components/Carousel.js~Carousel#render",
+    "method"
+  ],
+  [
+    "src/client/com.e750/lib/components/carousel.js~carousel#setinitialprops",
+    "class/src/client/com.e750/lib/components/Carousel.js~Carousel.html#instance-method-setInitialProps",
+    "src/client/com.e750/lib/components/Carousel.js~Carousel#setInitialProps",
+    "method"
+  ],
+  [
+    "src/client/com.e750/lib/components/carousel.js~carousel#setinitialstate",
+    "class/src/client/com.e750/lib/components/Carousel.js~Carousel.html#instance-method-setInitialState",
+    "src/client/com.e750/lib/components/Carousel.js~Carousel#setInitialState",
+    "method"
+  ],
+  [
+    "src/client/com.e750/lib/components/carousel.js~carousel#template",
+    "class/src/client/com.e750/lib/components/Carousel.js~Carousel.html#instance-member-template",
+    "src/client/com.e750/lib/components/Carousel.js~Carousel#template",
+    "member"
+  ],
+  [
     "src/client/com.e750/lib/components/component.js",
     "file/src/client/com.e750/lib/components/Component.js.html",
     "src/client/com.e750/lib/components/Component.js",
@@ -844,6 +892,42 @@ window.esdocSearchIndex = [
     "class/src/client/com.e750/lib/components/Component.js~Component.html#instance-method-updateChildren",
     "src/client/com.e750/lib/components/Component.js~Component#updateChildren",
     "method"
+  ],
+  [
+    "src/client/com.e750/lib/components/header.js",
+    "file/src/client/com.e750/lib/components/Header.js.html",
+    "src/client/com.e750/lib/components/Header.js",
+    "file"
+  ],
+  [
+    "src/client/com.e750/lib/components/header.js~header#model",
+    "class/src/client/com.e750/lib/components/Header.js~Header.html#instance-member-model",
+    "src/client/com.e750/lib/components/Header.js~Header#model",
+    "member"
+  ],
+  [
+    "src/client/com.e750/lib/components/header.js~header#render",
+    "class/src/client/com.e750/lib/components/Header.js~Header.html#instance-method-render",
+    "src/client/com.e750/lib/components/Header.js~Header#render",
+    "method"
+  ],
+  [
+    "src/client/com.e750/lib/components/header.js~header#setinitialprops",
+    "class/src/client/com.e750/lib/components/Header.js~Header.html#instance-method-setInitialProps",
+    "src/client/com.e750/lib/components/Header.js~Header#setInitialProps",
+    "method"
+  ],
+  [
+    "src/client/com.e750/lib/components/header.js~header#setinitialstate",
+    "class/src/client/com.e750/lib/components/Header.js~Header.html#instance-method-setInitialState",
+    "src/client/com.e750/lib/components/Header.js~Header#setInitialState",
+    "method"
+  ],
+  [
+    "src/client/com.e750/lib/components/header.js~header#template",
+    "class/src/client/com.e750/lib/components/Header.js~Header.html#instance-member-template",
+    "src/client/com.e750/lib/components/Header.js~Header#template",
+    "member"
   ],
   [
     "src/client/com.e750/lib/components/product.js",
