@@ -74,8 +74,26 @@
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import Component from &apos;./Component&apos;;
 
 export default class AddToCart extends Component {
-    onSubmit () {
+    initProps (el, options) {
+        super.initProps(el, options);
+    }
 
+    initState () {
+        this.bindDOMEvents();
+    }
+
+    bindDOMEvents () {
+        this.on(&apos;submit&apos;, this.onSubmit.bind(this));
+
+        this.on(&apos;click&apos;, (e) =&gt; {
+            console.log(&apos;CLICKED&apos;, this, e);
+        });
+    }
+
+    onSubmit (e) {
+        console.log(&apos;SUBMITTED&apos;, this, e);
+        e.preventDefault();
+        return false;
     }
 }
 </code></pre>

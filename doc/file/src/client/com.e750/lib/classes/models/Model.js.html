@@ -92,7 +92,7 @@ let attributes = {
 };
 
 let overrides = {
-    setInitialProps: function (props) {
+    initProps: function (props) {
         this.values = Object.create(attributes);
 
         Object.assign(this.values, this.defaults || {});
@@ -108,9 +108,9 @@ let overrides = {
 export default
 class Model {
     constructor (props, options) {
-        Initializable.setInitialProps.call(this, options);
-        this.setInitialProps(props);
-        this.setInitialState();
+        Initializable.initProps.call(this, options);
+        this.initProps(props);
+        this.initState();
     }
 
     setId (val) {

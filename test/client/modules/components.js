@@ -22,7 +22,7 @@ let instanceTestComponentAClick,
 	instances = [];
 
 class testComponent extends Component {
-	setInitialState () {
+	initState () {
 		this.on('click', instanceTestComponentAClick);
 		this.once('onceTest', instanceTestComponentAOnceBroadcast);
 		this.once('mouseup', instanceTestComponentAOnceMouseup);

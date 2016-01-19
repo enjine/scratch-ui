@@ -6,7 +6,7 @@ import mixes from '../../util/mixes';
 import Evt from '../../event/Registry';
 
 let overrides = {
-    setInitialProps: function (models = [], options = {}) {
+    initProps: function (models = [], options = {}) {
         this.options = {};
         Object.assign(this.options, options);
         this.model = (options.model) ? options.model : Model;
@@ -18,8 +18,8 @@ let overrides = {
 @mixes(Evented, Initializable, overrides)
 export default class Collection {
     constructor (models = [], options = {}) {
-        this.setInitialProps(models, options);
-        this.setInitialState();
+        this.initProps(models, options);
+        this.initState();
     }
 
     parse (data) {
@@ -41,7 +41,7 @@ export default class Collection {
             }
         } catch (e) {
             console.error(e);
-            //throw e;
+            throw e;
         }
 
         return this;
@@ -71,13 +71,18 @@ export default class Collection {
      * @returns {*}
      */
     fetch (options) {
-        try {
-            this.emit(Evt.BEFORE_FETCH);
-            return net.http.get.call(this, options);
-        } catch (e) {
-            console.error(e);
-            //throw e;
-        }
+        this.emit(Evt.BEFORE_FETCH);
+        console.log('fetch:', options);
+        return net.http.get.call(this, options);
+    }
+
+    get (options) {
+        return this.fetch(options).then(this.parse.bind(this), this.onParseFailed.bind(this), 'collection.fetch');
+    }
+
+    onParseFailed () {
+        console.error('Parsing Failed.', this, arguments);
+        return false;
     }
 }
 

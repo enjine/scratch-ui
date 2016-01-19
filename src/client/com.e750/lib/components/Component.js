@@ -4,6 +4,7 @@ import Collection from '../classes/collections/Collection';
 import {isElement} from '../util/DOMUtils';
 import LookupTable from '../util/LookupTable';
 import Evt from '../event/Registry';
+import utils from '../util/defaults';
 
 
 export default class Component extends View {
@@ -11,7 +12,16 @@ export default class Component extends View {
 
     constructor (el, options = {}) {
         super(options);
-        this.setInitialProps(el, options);
+        this.initProps(el, options);
+    }
+
+    initProps (el, options) {
+        this.ensureElement(el);
+        this.model = new Model(this.options.model);
+        this.collection = new Collection(this.options.collection);
+        this.template = this.options.template || null;
+        this.childViews = Object.create(LookupTable);
+        this.initState();
     }
 
     ensureElement (el) {
@@ -26,8 +36,8 @@ export default class Component extends View {
         }
     }
 
-    getComponentId(){
-        return '['+this.componentIdentifier.slice(1,-1)+'='+this.id+']';
+    getComponentId () {
+        return '[' + this.componentIdentifier.slice(1, -1) + '=' + this.id + ']';
     }
 
     getBootstrap () {
@@ -36,7 +46,7 @@ export default class Component extends View {
         }
     }
 
-    isRendered () {
+    isMounted () {
         let components = this.componentIdentifier ? this.el.querySelectorAll(this.componentIdentifier) : this.el.children;
         if (components.length) {
             let list = [];
@@ -46,15 +56,6 @@ export default class Component extends View {
             return !!list.indexOf(false);
         }
         return false;
-    }
-
-    setInitialProps (el, options) {
-        this.ensureElement(el);
-        this.model = new Model(this.options.model);
-        this.collection = new Collection(this.options.collection);
-        this.template = this.options.template || null;
-        this.childViews = Object.create(LookupTable);
-        this.setInitialState();
     }
 
     destroy () {
@@ -80,6 +81,28 @@ export default class Component extends View {
         }
     }
 
+    showProgress () {
+        this.el.classList.add('loading');
+        this.emit(Evt.PROGRESS_START);
+        this.progressId = window.setInterval(() => {
+            let progress = this.el.querySelector('progress');
+            if(progress){
+                let value = parseInt(progress.getAttribute('value'), 10);
+                progress.setAttribute('value', value + utils.anyIntBetween(1, 10));
+            }else{
+                window.clearInterval(this.progressId);
+            }
+
+        }, 200);
+        return this;
+    }
+
+    done () {
+        window.clearInterval(this.progressId);
+        this.el.classList.remove('loading');
+        return this;
+    }
+
     addChildView (view) {
         let componentId = Component.Resolver.getComponentId(view),
             childViews = this.childViews;
@@ -88,6 +111,10 @@ export default class Component extends View {
         }
         childViews[componentId].push(view);
         return this;
+    }
+
+    bindDOMEvents () {
+
     }
 
     attachNestedComponents () {
@@ -120,9 +147,10 @@ export default class Component extends View {
                         this.childViews[componentId] = [];
                     }
                     if (Resolver.has(componentId)) {
-                        let C = Resolver.get(componentId);
-                        this.childViews[componentId].push(new C(componentEl, componentEl.dataset.options));
-                        //console.info('registered component: ', componentId, C);
+                        let C = Resolver.get(componentId),
+                            c = new C(componentEl, componentEl.dataset.options);
+                        this.childViews[componentId].push(c);
+                        //console.info('registered component: ', componentId, componentEl, C);
                     } else {
                         throw new ReferenceError(componentId + ' not found in component resolver.', Resolver);
                     }

@@ -576,10 +576,22 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "src/client/com.e750/lib/classes/collections/collection.js~collection#get",
+    "class/src/client/com.e750/lib/classes/collections/Collection.js~Collection.html#instance-method-get",
+    "src/client/com.e750/lib/classes/collections/Collection.js~Collection#get",
+    "method"
+  ],
+  [
     "src/client/com.e750/lib/classes/collections/collection.js~collection#models",
     "class/src/client/com.e750/lib/classes/collections/Collection.js~Collection.html#instance-member-models",
     "src/client/com.e750/lib/classes/collections/Collection.js~Collection#models",
     "member"
+  ],
+  [
+    "src/client/com.e750/lib/classes/collections/collection.js~collection#onparsefailed",
+    "class/src/client/com.e750/lib/classes/collections/Collection.js~Collection.html#instance-method-onParseFailed",
+    "src/client/com.e750/lib/classes/collections/Collection.js~Collection#onParseFailed",
+    "method"
   ],
   [
     "src/client/com.e750/lib/classes/collections/collection.js~collection#parse",
@@ -612,16 +624,16 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
+    "src/client/com.e750/lib/classes/collections/product.js~productcollection#initprops",
+    "class/src/client/com.e750/lib/classes/collections/Product.js~ProductCollection.html#instance-method-initProps",
+    "src/client/com.e750/lib/classes/collections/Product.js~ProductCollection#initProps",
+    "method"
+  ],
+  [
     "src/client/com.e750/lib/classes/collections/product.js~productcollection#model",
     "class/src/client/com.e750/lib/classes/collections/Product.js~ProductCollection.html#instance-member-model",
     "src/client/com.e750/lib/classes/collections/Product.js~ProductCollection#model",
     "member"
-  ],
-  [
-    "src/client/com.e750/lib/classes/collections/product.js~productcollection#setinitialprops",
-    "class/src/client/com.e750/lib/classes/collections/Product.js~ProductCollection.html#instance-method-setInitialProps",
-    "src/client/com.e750/lib/classes/collections/Product.js~ProductCollection#setInitialProps",
-    "method"
   ],
   [
     "src/client/com.e750/lib/classes/models/model.js",
@@ -696,9 +708,9 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
-    "src/client/com.e750/lib/classes/models/product.js~product#setinitialprops",
-    "class/src/client/com.e750/lib/classes/models/Product.js~Product.html#instance-method-setInitialProps",
-    "src/client/com.e750/lib/classes/models/Product.js~Product#setInitialProps",
+    "src/client/com.e750/lib/classes/models/product.js~product#initprops",
+    "class/src/client/com.e750/lib/classes/models/Product.js~Product.html#instance-method-initProps",
+    "src/client/com.e750/lib/classes/models/Product.js~Product#initProps",
     "method"
   ],
   [
@@ -706,6 +718,12 @@ window.esdocSearchIndex = [
     "file/src/client/com.e750/lib/classes/views/View.js.html",
     "src/client/com.e750/lib/classes/views/View.js",
     "file"
+  ],
+  [
+    "src/client/com.e750/lib/classes/views/view.js~view#bindsubscriptions",
+    "class/src/client/com.e750/lib/classes/views/View.js~View.html#instance-method-bindSubscriptions",
+    "src/client/com.e750/lib/classes/views/View.js~View#bindSubscriptions",
+    "method"
   ],
   [
     "src/client/com.e750/lib/classes/views/view.js~view#constructor",
@@ -738,6 +756,24 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
+    "src/client/com.e750/lib/components/addtocart.js~addtocart#binddomevents",
+    "class/src/client/com.e750/lib/components/AddToCart.js~AddToCart.html#instance-method-bindDOMEvents",
+    "src/client/com.e750/lib/components/AddToCart.js~AddToCart#bindDOMEvents",
+    "method"
+  ],
+  [
+    "src/client/com.e750/lib/components/addtocart.js~addtocart#initprops",
+    "class/src/client/com.e750/lib/components/AddToCart.js~AddToCart.html#instance-method-initProps",
+    "src/client/com.e750/lib/components/AddToCart.js~AddToCart#initProps",
+    "method"
+  ],
+  [
+    "src/client/com.e750/lib/components/addtocart.js~addtocart#initstate",
+    "class/src/client/com.e750/lib/components/AddToCart.js~AddToCart.html#instance-method-initState",
+    "src/client/com.e750/lib/components/AddToCart.js~AddToCart#initState",
+    "method"
+  ],
+  [
     "src/client/com.e750/lib/components/addtocart.js~addtocart#onsubmit",
     "class/src/client/com.e750/lib/components/AddToCart.js~AddToCart.html#instance-method-onSubmit",
     "src/client/com.e750/lib/components/AddToCart.js~AddToCart#onSubmit",
@@ -768,6 +804,18 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
+    "src/client/com.e750/lib/components/carousel.js~carousel#initprops",
+    "class/src/client/com.e750/lib/components/Carousel.js~Carousel.html#instance-method-initProps",
+    "src/client/com.e750/lib/components/Carousel.js~Carousel#initProps",
+    "method"
+  ],
+  [
+    "src/client/com.e750/lib/components/carousel.js~carousel#initstate",
+    "class/src/client/com.e750/lib/components/Carousel.js~Carousel.html#instance-method-initState",
+    "src/client/com.e750/lib/components/Carousel.js~Carousel#initState",
+    "method"
+  ],
+  [
     "src/client/com.e750/lib/components/carousel.js~carousel#model",
     "class/src/client/com.e750/lib/components/Carousel.js~Carousel.html#instance-member-model",
     "src/client/com.e750/lib/components/Carousel.js~Carousel#model",
@@ -777,18 +825,6 @@ window.esdocSearchIndex = [
     "src/client/com.e750/lib/components/carousel.js~carousel#render",
     "class/src/client/com.e750/lib/components/Carousel.js~Carousel.html#instance-method-render",
     "src/client/com.e750/lib/components/Carousel.js~Carousel#render",
-    "method"
-  ],
-  [
-    "src/client/com.e750/lib/components/carousel.js~carousel#setinitialprops",
-    "class/src/client/com.e750/lib/components/Carousel.js~Carousel.html#instance-method-setInitialProps",
-    "src/client/com.e750/lib/components/Carousel.js~Carousel#setInitialProps",
-    "method"
-  ],
-  [
-    "src/client/com.e750/lib/components/carousel.js~carousel#setinitialstate",
-    "class/src/client/com.e750/lib/components/Carousel.js~Carousel.html#instance-method-setInitialState",
-    "src/client/com.e750/lib/components/Carousel.js~Carousel#setInitialState",
     "method"
   ],
   [
@@ -816,6 +852,12 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "src/client/com.e750/lib/components/component.js~component#binddomevents",
+    "class/src/client/com.e750/lib/components/Component.js~Component.html#instance-method-bindDOMEvents",
+    "src/client/com.e750/lib/components/Component.js~Component#bindDOMEvents",
+    "method"
+  ],
+  [
     "src/client/com.e750/lib/components/component.js~component#childviews",
     "class/src/client/com.e750/lib/components/Component.js~Component.html#instance-member-childViews",
     "src/client/com.e750/lib/components/Component.js~Component#childViews",
@@ -840,6 +882,12 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "src/client/com.e750/lib/components/component.js~component#done",
+    "class/src/client/com.e750/lib/components/Component.js~Component.html#instance-method-done",
+    "src/client/com.e750/lib/components/Component.js~Component#done",
+    "method"
+  ],
+  [
     "src/client/com.e750/lib/components/component.js~component#el",
     "class/src/client/com.e750/lib/components/Component.js~Component.html#instance-member-el",
     "src/client/com.e750/lib/components/Component.js~Component#el",
@@ -858,9 +906,21 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "src/client/com.e750/lib/components/component.js~component#isrendered",
-    "class/src/client/com.e750/lib/components/Component.js~Component.html#instance-method-isRendered",
-    "src/client/com.e750/lib/components/Component.js~Component#isRendered",
+    "src/client/com.e750/lib/components/component.js~component#getcomponentid",
+    "class/src/client/com.e750/lib/components/Component.js~Component.html#instance-method-getComponentId",
+    "src/client/com.e750/lib/components/Component.js~Component#getComponentId",
+    "method"
+  ],
+  [
+    "src/client/com.e750/lib/components/component.js~component#initprops",
+    "class/src/client/com.e750/lib/components/Component.js~Component.html#instance-method-initProps",
+    "src/client/com.e750/lib/components/Component.js~Component#initProps",
+    "method"
+  ],
+  [
+    "src/client/com.e750/lib/components/component.js~component#ismounted",
+    "class/src/client/com.e750/lib/components/Component.js~Component.html#instance-method-isMounted",
+    "src/client/com.e750/lib/components/Component.js~Component#isMounted",
     "method"
   ],
   [
@@ -870,9 +930,15 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
-    "src/client/com.e750/lib/components/component.js~component#setinitialprops",
-    "class/src/client/com.e750/lib/components/Component.js~Component.html#instance-method-setInitialProps",
-    "src/client/com.e750/lib/components/Component.js~Component#setInitialProps",
+    "src/client/com.e750/lib/components/component.js~component#progressid",
+    "class/src/client/com.e750/lib/components/Component.js~Component.html#instance-member-progressId",
+    "src/client/com.e750/lib/components/Component.js~Component#progressId",
+    "member"
+  ],
+  [
+    "src/client/com.e750/lib/components/component.js~component#showprogress",
+    "class/src/client/com.e750/lib/components/Component.js~Component.html#instance-method-showProgress",
+    "src/client/com.e750/lib/components/Component.js~Component#showProgress",
     "method"
   ],
   [
@@ -900,6 +966,18 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
+    "src/client/com.e750/lib/components/header.js~header#initprops",
+    "class/src/client/com.e750/lib/components/Header.js~Header.html#instance-method-initProps",
+    "src/client/com.e750/lib/components/Header.js~Header#initProps",
+    "method"
+  ],
+  [
+    "src/client/com.e750/lib/components/header.js~header#initstate",
+    "class/src/client/com.e750/lib/components/Header.js~Header.html#instance-method-initState",
+    "src/client/com.e750/lib/components/Header.js~Header#initState",
+    "method"
+  ],
+  [
     "src/client/com.e750/lib/components/header.js~header#model",
     "class/src/client/com.e750/lib/components/Header.js~Header.html#instance-member-model",
     "src/client/com.e750/lib/components/Header.js~Header#model",
@@ -909,18 +987,6 @@ window.esdocSearchIndex = [
     "src/client/com.e750/lib/components/header.js~header#render",
     "class/src/client/com.e750/lib/components/Header.js~Header.html#instance-method-render",
     "src/client/com.e750/lib/components/Header.js~Header#render",
-    "method"
-  ],
-  [
-    "src/client/com.e750/lib/components/header.js~header#setinitialprops",
-    "class/src/client/com.e750/lib/components/Header.js~Header.html#instance-method-setInitialProps",
-    "src/client/com.e750/lib/components/Header.js~Header#setInitialProps",
-    "method"
-  ],
-  [
-    "src/client/com.e750/lib/components/header.js~header#setinitialstate",
-    "class/src/client/com.e750/lib/components/Header.js~Header.html#instance-method-setInitialState",
-    "src/client/com.e750/lib/components/Header.js~Header#setInitialState",
     "method"
   ],
   [
@@ -942,6 +1008,12 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
+    "src/client/com.e750/lib/components/product.js~product#initprops",
+    "class/src/client/com.e750/lib/components/Product.js~Product.html#instance-method-initProps",
+    "src/client/com.e750/lib/components/Product.js~Product#initProps",
+    "method"
+  ],
+  [
     "src/client/com.e750/lib/components/product.js~product#model",
     "class/src/client/com.e750/lib/components/Product.js~Product.html#instance-member-model",
     "src/client/com.e750/lib/components/Product.js~Product#model",
@@ -951,18 +1023,6 @@ window.esdocSearchIndex = [
     "src/client/com.e750/lib/components/product.js~product#render",
     "class/src/client/com.e750/lib/components/Product.js~Product.html#instance-method-render",
     "src/client/com.e750/lib/components/Product.js~Product#render",
-    "method"
-  ],
-  [
-    "src/client/com.e750/lib/components/product.js~product#setinitialprops",
-    "class/src/client/com.e750/lib/components/Product.js~Product.html#instance-method-setInitialProps",
-    "src/client/com.e750/lib/components/Product.js~Product#setInitialProps",
-    "method"
-  ],
-  [
-    "src/client/com.e750/lib/components/product.js~product#setinitialstate",
-    "class/src/client/com.e750/lib/components/Product.js~Product.html#instance-method-setInitialState",
-    "src/client/com.e750/lib/components/Product.js~Product#setInitialState",
     "method"
   ],
   [
@@ -978,9 +1038,9 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
-    "src/client/com.e750/lib/components/productlist.js~productlist#attacheventlisteners",
-    "class/src/client/com.e750/lib/components/ProductList.js~ProductList.html#instance-method-attachEventListeners",
-    "src/client/com.e750/lib/components/ProductList.js~ProductList#attachEventListeners",
+    "src/client/com.e750/lib/components/productlist.js~productlist#binddomevents",
+    "class/src/client/com.e750/lib/components/ProductList.js~ProductList.html#instance-method-bindDOMEvents",
+    "src/client/com.e750/lib/components/ProductList.js~ProductList#bindDOMEvents",
     "method"
   ],
   [
@@ -988,6 +1048,12 @@ window.esdocSearchIndex = [
     "class/src/client/com.e750/lib/components/ProductList.js~ProductList.html#instance-member-collection",
     "src/client/com.e750/lib/components/ProductList.js~ProductList#collection",
     "member"
+  ],
+  [
+    "src/client/com.e750/lib/components/productlist.js~productlist#initstate",
+    "class/src/client/com.e750/lib/components/ProductList.js~ProductList.html#instance-method-initState",
+    "src/client/com.e750/lib/components/ProductList.js~ProductList#initState",
+    "method"
   ],
   [
     "src/client/com.e750/lib/components/productlist.js~productlist#loaddata",
@@ -999,12 +1065,6 @@ window.esdocSearchIndex = [
     "src/client/com.e750/lib/components/productlist.js~productlist#render",
     "class/src/client/com.e750/lib/components/ProductList.js~ProductList.html#instance-method-render",
     "src/client/com.e750/lib/components/ProductList.js~ProductList#render",
-    "method"
-  ],
-  [
-    "src/client/com.e750/lib/components/productlist.js~productlist#setinitialstate",
-    "class/src/client/com.e750/lib/components/ProductList.js~ProductList.html#instance-method-setInitialState",
-    "src/client/com.e750/lib/components/ProductList.js~ProductList#setInitialState",
     "method"
   ],
   [

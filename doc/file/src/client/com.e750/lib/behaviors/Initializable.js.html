@@ -72,11 +72,11 @@
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/client/com.e750/lib/behaviors/Initializable.js</h1>
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">const Initializable = {
-    setInitialState: function () {
+    initState: function () {
         return this;
     },
 
-    setInitialProps: function (props) {
+    initProps: function (props) {
         this.options = {};
         Object.assign(this.options, props);
     }

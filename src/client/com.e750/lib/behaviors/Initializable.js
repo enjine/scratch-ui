@@ -1,9 +1,9 @@
 const Initializable = {
-    setInitialState: function () {
+    initState: function () {
         return this;
     },
 
-    setInitialProps: function (props) {
+    initProps: function (props) {
         this.options = {};
         Object.assign(this.options, props);
     }

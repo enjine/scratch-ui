@@ -57,12 +57,13 @@
     "compile": "browserify ./src/client/main.js -t [babelify --sourceMapRelative ./src] --outfile dist/e750.js",
     "prebuild": "npm run lint && npm test && esdoc -c ./esdoc.json",
     "build": "browserify -d ./src/client/main.js -t [babelify --sourceMapRelative ./src] -p [minifyify --map /js/e750.js.map --output dist/e750.js.map] --outfile dist/e750.min.js",
-    "postbuild": "npm run metrics",
+    "postbuild": "npm run copy && npm run metrics",
     "start": "babel-node ./src/server/main.js",
+    "copy": "cp dist/*.js ~/Sync/Clients/750Group/e750.laravel/e750/core/resources/assets/js && cp dist/e750.js.map ~/Sync/Clients/750Group/e750.laravel/e750/core/resources/assets/js",
     "premetrics": "babel --optional runtime src/ --out-dir ./build/metrics/src",
     "metrics:compile_source": "./node_modules/.bin/babel --optional runtime ./src/ --out-dir ./build/metrics/src",
     "metrics": "npm run metrics:compile_source && ./node_modules/.bin/plato -r -t 'e750.js MicroFramework' -l .jshintrc -d ./reports/metrics ./build/metrics/src"
   },
   "author": "Alessandro Di Candia",
-  "license": "MIT"
+  "license": "BSD"
 }

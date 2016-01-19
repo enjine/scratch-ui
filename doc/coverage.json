@@ -1,14 +1,17 @@
 {
-  "coverage": "11.34%",
-  "expectCount": 97,
+  "coverage": "10.28%",
+  "expectCount": 107,
   "actualCount": 11,
   "files": {
     "src/client/com.e750/lib/components/AddToCart.js": {
-      "expectCount": 2,
+      "expectCount": 5,
       "actualCount": 0,
       "undocumentLines": [
         3,
-        4
+        12,
+        4,
+        8,
+        20
       ]
     },
     "src/client/com.e750/lib/components/Application.js": {
@@ -24,21 +27,23 @@
       "expectCount": 6,
       "actualCount": 0,
       "undocumentLines": [
-        6,
-        20,
-        26,
-        18,
+        5,
+        13,
         9,
-        22
+        15,
+        21,
+        17
       ]
     },
     "src/client/com.e750/lib/classes/collections/Collection.js": {
-      "expectCount": 8,
+      "expectCount": 10,
       "actualCount": 1,
       "undocumentLines": [
         19,
         20,
+        79,
         30,
+        83,
         25,
         50,
         56,
@@ -46,25 +51,30 @@
       ]
     },
     "src/client/com.e750/lib/components/Component.js": {
-      "expectCount": 16,
+      "expectCount": 21,
       "actualCount": 0,
       "undocumentLines": [
-        9,
-        79,
-        89,
-        52,
-        50,
-        12,
-        56,
-        19,
-        17,
+        10,
+        106,
+        120,
+        116,
+        23,
+        21,
+        13,
+        61,
+        100,
         29,
-        35,
+        27,
+        43,
+        39,
+        18,
         49,
-        47,
-        51,
-        65,
-        93
+        20,
+        87,
+        84,
+        22,
+        70,
+        124
       ]
     },
     "src/client/com.e750/lib/event/Dispatcher.js": {
@@ -93,12 +103,12 @@
       "expectCount": 6,
       "actualCount": 0,
       "undocumentLines": [
-        6,
-        20,
-        26,
-        18,
+        5,
+        13,
         9,
-        22
+        15,
+        21,
+        17
       ]
     },
     "src/client/com.e750/lib/behaviors/Initializable.js": {
@@ -129,16 +139,15 @@
       ]
     },
     "src/client/com.e750/lib/components/Product.js": {
-      "expectCount": 7,
+      "expectCount": 6,
       "actualCount": 0,
       "undocumentLines": [
         6,
-        29,
         19,
-        25,
-        17,
-        8,
-        21
+        7,
+        9,
+        15,
+        11
       ]
     },
     "src/client/com.e750/lib/classes/models/Product.js": {
@@ -155,8 +164,8 @@
       "actualCount": 0,
       "undocumentLines": [
         4,
-        7,
-        5
+        5,
+        7
       ]
     },
     "src/client/com.e750/lib/components/ProductList.js": {
@@ -164,11 +173,11 @@
       "actualCount": 0,
       "undocumentLines": [
         5,
-        53,
+        44,
         7,
-        36,
-        76,
-        6
+        6,
+        29,
+        50
       ]
     },
     "src/client/com.e750/lib/event/Registry.js": {
@@ -186,13 +195,14 @@
       ]
     },
     "src/client/com.e750/lib/classes/views/View.js": {
-      "expectCount": 5,
+      "expectCount": 6,
       "actualCount": 0,
       "undocumentLines": [
         6,
-        7,
         15,
-        21,
+        7,
+        19,
+        25,
         11
       ]
     },

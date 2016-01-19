@@ -1,9 +1,9 @@
 import Model from './Model';
 
 export default class Product extends Model {
-    setInitialProps () {
+    initProps () {
         this.defaults = {};
-        Model.prototype.setInitialProps.apply(this, arguments);
+        Model.prototype.initProps.apply(this, arguments);
     }
 }
 

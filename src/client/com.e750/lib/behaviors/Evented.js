@@ -12,7 +12,6 @@ Object.assign(Evented.prototype, {
     on: function (event, handler, delegate) {
         let d = delegate || this.el || this;
         if (isNative(event)) {
-            //console.log('adding native event', this, d, event, handler)
             return addHandler(d, event, handler);
         }
 
@@ -67,8 +66,7 @@ Object.assign(Evented.prototype, {
      * @returns {*}
      */
     emit: function (eventName, data, ...args) {
-        let E,
-            el = this.el,
+        let el = this.el,
             elIsDOM = isElement(el) || isNode(el),
             native = isNative(eventName),
             subscribers = this.mediator.subscribers;

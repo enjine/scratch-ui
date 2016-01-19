@@ -77,38 +77,38 @@
  * Cross-Browser event listener.
  *
  * @param addOrRemove {String}
- * @param object {DOM Element or Node}
+ * @param obj {DOM Element or Node}
  * @param eventNames {String: list of events to listen for}
  * @param handler {Function}
  * @param useCapture {Boolean}
  */
-export function manageNativeEvents (addOrRemove, object, eventNames, handler, useCapture = false) {
-	var i = 0,
-		events = eventNames.split(&apos; &apos;),
-		prefix = object.addEventListener ? &apos;&apos; : &apos;on&apos;;
+export function manageNativeEvents (addOrRemove, obj, eventNames, handler, useCapture = false) {
+    var i = 0,
+        events = eventNames.split(&apos; &apos;),
+        prefix = obj.addEventListener ? &apos;&apos; : &apos;on&apos;;
 
-	try {
-		return events.map(() =&gt; {
-			let e = prefix + events[i],
-				listenerId,
-				addlistenerMethods = [&apos;addEventListener&apos;, &apos;attachEvent&apos;],
-				ret;
+    try {
+        return events.map(() =&gt; {
+            let e = prefix + events[i],
+                listenerId,
+                addlistenerMethods = [&apos;addEventListener&apos;, &apos;attachEvent&apos;],
+                ret;
 
-			if (addlistenerMethods.indexOf(addOrRemove) !== -1) {
-				listenerId = guid();
-				handler.sId = listenerId;
-			} else {
-				//console.log(&apos;Removing DOM event:&apos;, e, handler);
-				delete handler.sId;
-			}
-			object[addOrRemove](e, handler, useCapture);
-			ret = {evt: e, id: listenerId, fn: handler};
-			return ret;
-		});
-	} catch (e) {
-		console.error(&apos;Error attaching event listener&apos;, e, addOrRemove, object, eventNames, handler);
-		return false;
-	}
+            if (addlistenerMethods.indexOf(addOrRemove) !== -1) {
+                listenerId = guid();
+                handler.sId = listenerId;
+            } else {
+                //console.log(&apos;Removing DOM event:&apos;, e, handler);
+                delete handler.sId;
+            }
+            obj[addOrRemove](e, handler, useCapture);
+            ret = {evt: e, id: listenerId, fn: handler};
+            return ret;
+        });
+    } catch (e) {
+        console.error(&apos;Error attaching event listener&apos;, e, addOrRemove, obj, eventNames, handler);
+        return false;
+    }
 
 }
 
@@ -118,29 +118,29 @@ export function manageNativeEvents (addOrRemove, object, eventNames, handler, us
  * @returns {boolean}
  */
 export function isNativeEvent (eventname) {
-	return typeof document.body[&apos;on&apos; + eventname] !== &apos;undefined&apos;;
+    return typeof document.body[&apos;on&apos; + eventname] !== &apos;undefined&apos;;
 }
 
 /**
  * Cross-browser addEventListener()
- * @param object
+ * @param target
  * @param eventNames
  * @param handler
  */
-export function addHandler (object, eventNames, handler) {
-	let bindType = object.addEventListener ? &apos;addEventListener&apos; : &apos;attachEvent&apos;;
-	return manageNativeEvents(bindType, object, eventNames, handler);
+export function addHandler (target, eventNames, handler) {
+    let bindType = target.addEventListener ? &apos;addEventListener&apos; : &apos;attachEvent&apos;;
+    return manageNativeEvents(bindType, target, eventNames, handler);
 }
 
 /**
  * Cross-browser removeEventListener()
- * @param object
+ * @param target
  * @param eventNames
  * @param handler
  */
-export function removeHandler (object, eventNames, handler) {
-	let bindType = object.removeEventListener ? &apos;removeEventListener&apos; : &apos;detachEvent&apos;;
-	return manageNativeEvents(bindType, object, eventNames, handler);
+export function removeHandler (target, eventNames, handler) {
+    let bindType = target.removeEventListener ? &apos;removeEventListener&apos; : &apos;detachEvent&apos;;
+    return manageNativeEvents(bindType, target, eventNames, handler);
 }
 
 export default {isNativeEvent, addHandler, removeHandler};

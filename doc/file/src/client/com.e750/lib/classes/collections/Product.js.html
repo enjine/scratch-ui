@@ -75,8 +75,8 @@
 import Product from &apos;../../classes/models/Product&apos;;
 
 export default class ProductCollection extends Collection {
-    setInitialProps (models = [], options = {}) {
-        super.setInitialProps(models, options);
+    initProps (models = [], options = {}) {
+        super.initProps(models, options);
         this.model = (options.model) ? options.model : Product;
     }
 }

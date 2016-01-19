@@ -77,6 +77,7 @@ import Collection from &apos;../classes/collections/Collection&apos;;
 import {isElement} from &apos;../util/DOMUtils&apos;;
 import LookupTable from &apos;../util/LookupTable&apos;;
 import Evt from &apos;../event/Registry&apos;;
+import utils from &apos;../util/defaults&apos;;
 
 
 export default class Component extends View {
@@ -84,7 +85,16 @@ export default class Component extends View {
 
     constructor (el, options = {}) {
         super(options);
-        this.setInitialProps(el, options);
+        this.initProps(el, options);
+    }
+
+    initProps (el, options) {
+        this.ensureElement(el);
+        this.model = new Model(this.options.model);
+        this.collection = new Collection(this.options.collection);
+        this.template = this.options.template || null;
+        this.childViews = Object.create(LookupTable);
+        this.initState();
     }
 
     ensureElement (el) {
@@ -99,13 +109,17 @@ export default class Component extends View {
         }
     }
 
+    getComponentId () {
+        return &apos;[&apos; + this.componentIdentifier.slice(1, -1) + &apos;=&apos; + this.id + &apos;]&apos;;
+    }
+
     getBootstrap () {
         if (window.e750.bootstrap) {
             return window.e750.bootstrap[this.constructor.name] || [];
         }
     }
 
-    isRendered () {
+    isMounted () {
         let components = this.componentIdentifier ? this.el.querySelectorAll(this.componentIdentifier) : this.el.children;
         if (components.length) {
             let list = [];
@@ -115,15 +129,6 @@ export default class Component extends View {
             return !!list.indexOf(false);
         }
         return false;
-    }
-
-    setInitialProps (el, options) {
-        this.ensureElement(el);
-        this.model = new Model(this.options.model);
-        this.collection = new Collection(this.options.collection);
-        this.template = this.options.template || null;
-        this.childViews = Object.create(LookupTable);
-        this.setInitialState();
     }
 
     destroy () {
@@ -149,6 +154,28 @@ export default class Component extends View {
         }
     }
 
+    showProgress () {
+        this.el.classList.add(&apos;loading&apos;);
+        this.emit(Evt.PROGRESS_START);
+        this.progressId = window.setInterval(() =&gt; {
+            let progress = this.el.querySelector(&apos;progress&apos;);
+            if(progress){
+                let value = parseInt(progress.getAttribute(&apos;value&apos;), 10);
+                progress.setAttribute(&apos;value&apos;, value + utils.anyIntBetween(1, 10));
+            }else{
+                window.clearInterval(this.progressId);
+            }
+
+        }, 200);
+        return this;
+    }
+
+    done () {
+        window.clearInterval(this.progressId);
+        this.el.classList.remove(&apos;loading&apos;);
+        return this;
+    }
+
     addChildView (view) {
         let componentId = Component.Resolver.getComponentId(view),
             childViews = this.childViews;
@@ -157,6 +184,10 @@ export default class Component extends View {
         }
         childViews[componentId].push(view);
         return this;
+    }
+
+    bindDOMEvents () {
+
     }
 
     attachNestedComponents () {
@@ -189,9 +220,10 @@ export default class Component extends View {
                         this.childViews[componentId] = [];
                     }
                     if (Resolver.has(componentId)) {
-                        let C = Resolver.get(componentId);
-                        this.childViews[componentId].push(new C(componentEl, componentEl.dataset.options));
-                        //console.info(&apos;registered component: &apos;, componentId, C);
+                        let C = Resolver.get(componentId),
+                            c = new C(componentEl, componentEl.dataset.options);
+                        this.childViews[componentId].push(c);
+                        //console.info(&apos;registered component: &apos;, componentId, componentEl, C);
                     } else {
                         throw new ReferenceError(componentId + &apos; not found in component resolver.&apos;, Resolver);
                     }

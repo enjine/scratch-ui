@@ -3,15 +3,8 @@ import Product from './Product';
 import ProductCollection from '../classes/collections/Product';
 
 export default class ProductList extends Component {
-    setInitialState () {
+    initState () {
         this.collection = new ProductCollection(this.getBootstrap());
-
-        //TODO: take this out.
-        this.onComponentsLoaded = function () {
-            console.log('Product List received componentsLoaded', this, arguments);
-        };
-
-        this.attachEventListeners();
 
         //console.log('PRODUCT LIST:', this.collection.models, window.e750.bootstrap.productList);
         if (!this.collection.models.length) {
@@ -28,16 +21,14 @@ export default class ProductList extends Component {
             Object.assign(fetchOpts, defaults, this.options);
             this.loadData(fetchOpts);
         } else {
-            this.render().updateChildren();
+            this.render();
         }
 
     }
 
     loadData (fetchOpts) {
-        this.collection.fetch(fetchOpts)
-            .then(this.collection.parse.bind(this.collection), (reason) => {
-                console.error('Parsing Failed! ', this, arguments, reason);
-            })
+        this.showProgress();
+        this.collection.get(fetchOpts)
             .then(this.render.bind(this), (reason) => {
                 console.error('Render Failed! ', this, arguments, reason);
             })
@@ -46,35 +37,18 @@ export default class ProductList extends Component {
             })
             .finally(() => {
                 console.log('finally', this, arguments, this.options);
-                this.updateChildren();
+                this.done();
             });
     }
 
-    attachEventListeners () {
-
-        this.once('componentsLoaded', this.onComponentsLoaded);
-
-        this.on('otherEvent', () => {
-            console.log('ProductList otherEvent closure!', this, arguments);
-        });
-
-        this.on('willUpdateChildren', () => {
-            console.log('ProductList willUpdateChildren', this, 'beep:', arguments);
-        });
-
-        this.on('click', (e) => {
-            console.log('CLICKED', this, e);
-        });
-
-        this.on('submit', (e) => {
-            console.log('SUBMITTED', this, e);
-            e.preventDefault();
-            return false;
-        });
+    bindDOMEvents () {
+        this.on('dblclick', () => {
+            console.log('double clicked!');
+        })
     }
 
     render () {
-        if (!this.isRendered()) {
+        if (!this.isMounted()) {
             try {
                 let html = '',
                     products = this.collection.models,
@@ -89,6 +63,8 @@ export default class ProductList extends Component {
                 }
 
                 this.el.innerHTML = html;
+                this.bindDOMEvents();
+                this.attachNestedComponents();
             } catch (e) {
                 throw e;
             }

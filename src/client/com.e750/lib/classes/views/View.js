@@ -5,11 +5,15 @@ import mixes from '../../util/mixes';
 @mixes(Evented, Initializable)
 export default class View {
     constructor (options) {
-        Initializable.setInitialProps.call(this, options);
+        Initializable.initProps.call(this, options);
     }
 
     render () {
         return this;
+    }
+
+    bindSubscriptions () {
+
     }
 
     destroy () {
@@ -19,11 +23,13 @@ export default class View {
     }
 
     detachEvents () {
-        return this.subscriptions.map((subscription) => {
-            //console.log('detaching event', this, subscription);
-            let evt = subscription.evt,
-                fn = subscription.fn;
-            return this.off(evt, fn);
-        });
+        if(this.subscriptions) {
+            return this.subscriptions.map((subscription) => {
+                //console.log('detaching event', this, subscription);
+                let evt = subscription.evt,
+                    fn = subscription.fn;
+                return this.off(evt, fn);
+            });
+        }
     }
 }

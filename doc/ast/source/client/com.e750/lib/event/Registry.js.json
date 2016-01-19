@@ -1,14 +1,14 @@
 {
   "type": "Program",
   "start": 0,
-  "end": 332,
+  "end": 404,
   "loc": {
     "start": {
       "line": 1,
       "column": 0
     },
     "end": {
-      "line": 12,
+      "line": 14,
       "column": 0
     }
   },
@@ -17,14 +17,14 @@
     {
       "type": "Identifier",
       "start": 0,
-      "end": 280,
+      "end": 352,
       "loc": {
         "start": {
           "line": 1,
           "column": 0
         },
         "end": {
-          "line": 9,
+          "line": 11,
           "column": 2
         }
       },
@@ -32,14 +32,14 @@
         {
           "type": "VariableDeclarator",
           "start": 6,
-          "end": 279,
+          "end": 351,
           "loc": {
             "start": {
               "line": 1,
               "column": 6
             },
             "end": {
-              "line": 9,
+              "line": 11,
               "column": 1
             }
           },
@@ -62,14 +62,14 @@
           "init": {
             "type": "ObjectExpression",
             "start": 17,
-            "end": 279,
+            "end": 351,
             "loc": {
               "start": {
                 "line": 1,
                 "column": 17
               },
               "end": {
-                "line": 9,
+                "line": 11,
                 "column": 1
               }
             },
@@ -444,6 +444,112 @@
                   "raw": "'didUpdateChildren'"
                 },
                 "kind": "init"
+              },
+              {
+                "type": "Property",
+                "start": 283,
+                "end": 315,
+                "loc": {
+                  "start": {
+                    "line": 9,
+                    "column": 4
+                  },
+                  "end": {
+                    "line": 9,
+                    "column": 36
+                  }
+                },
+                "method": false,
+                "shorthand": false,
+                "computed": false,
+                "key": {
+                  "type": "Identifier",
+                  "start": 283,
+                  "end": 297,
+                  "loc": {
+                    "start": {
+                      "line": 9,
+                      "column": 4
+                    },
+                    "end": {
+                      "line": 9,
+                      "column": 18
+                    }
+                  },
+                  "name": "PROGRESS_START"
+                },
+                "value": {
+                  "type": "Literal",
+                  "start": 299,
+                  "end": 315,
+                  "loc": {
+                    "start": {
+                      "line": 9,
+                      "column": 20
+                    },
+                    "end": {
+                      "line": 9,
+                      "column": 36
+                    }
+                  },
+                  "value": "progress:start",
+                  "rawValue": "progress:start",
+                  "raw": "'progress:start'"
+                },
+                "kind": "init"
+              },
+              {
+                "type": "Property",
+                "start": 321,
+                "end": 349,
+                "loc": {
+                  "start": {
+                    "line": 10,
+                    "column": 4
+                  },
+                  "end": {
+                    "line": 10,
+                    "column": 32
+                  }
+                },
+                "method": false,
+                "shorthand": false,
+                "computed": false,
+                "key": {
+                  "type": "Identifier",
+                  "start": 321,
+                  "end": 333,
+                  "loc": {
+                    "start": {
+                      "line": 10,
+                      "column": 4
+                    },
+                    "end": {
+                      "line": 10,
+                      "column": 16
+                    }
+                  },
+                  "name": "PROGRESS_END"
+                },
+                "value": {
+                  "type": "Literal",
+                  "start": 335,
+                  "end": 349,
+                  "loc": {
+                    "start": {
+                      "line": 10,
+                      "column": 18
+                    },
+                    "end": {
+                      "line": 10,
+                      "column": 32
+                    }
+                  },
+                  "value": "progress:end",
+                  "rawValue": "progress:end",
+                  "raw": "'progress:end'"
+                },
+                "kind": "init"
               }
             ]
           }
@@ -456,29 +562,29 @@
     },
     {
       "type": "Identifier",
-      "start": 281,
-      "end": 305,
+      "start": 353,
+      "end": 377,
       "loc": {
         "start": {
-          "line": 10,
+          "line": 12,
           "column": 0
         },
         "end": {
-          "line": 10,
+          "line": 12,
           "column": 24
         }
       },
       "declaration": {
         "type": "Identifier",
-        "start": 296,
-        "end": 304,
+        "start": 368,
+        "end": 376,
         "loc": {
           "start": {
-            "line": 10,
+            "line": 12,
             "column": 15
           },
           "end": {
-            "line": 10,
+            "line": 12,
             "column": 23
           }
         },
@@ -490,15 +596,15 @@
     },
     {
       "type": "ExportNamedDeclaration",
-      "start": 306,
-      "end": 331,
+      "start": 378,
+      "end": 403,
       "loc": {
         "start": {
-          "line": 11,
+          "line": 13,
           "column": 0
         },
         "end": {
-          "line": 11,
+          "line": 13,
           "column": 25
         }
       },
@@ -506,29 +612,29 @@
       "specifiers": [
         {
           "type": "ExportSpecifier",
-          "start": 314,
-          "end": 329,
+          "start": 386,
+          "end": 401,
           "loc": {
             "start": {
-              "line": 11,
+              "line": 13,
               "column": 8
             },
             "end": {
-              "line": 11,
+              "line": 13,
               "column": 23
             }
           },
           "local": {
             "type": "Identifier",
-            "start": 314,
-            "end": 322,
+            "start": 386,
+            "end": 394,
             "loc": {
               "start": {
-                "line": 11,
+                "line": 13,
                 "column": 8
               },
               "end": {
-                "line": 11,
+                "line": 13,
                 "column": 16
               }
             },
@@ -536,15 +642,15 @@
           },
           "exported": {
             "type": "Identifier",
-            "start": 326,
-            "end": 329,
+            "start": 398,
+            "end": 401,
             "loc": {
               "start": {
-                "line": 11,
+                "line": 13,
                 "column": 20
               },
               "end": {
-                "line": 11,
+                "line": 13,
                 "column": 23
               }
             },
@@ -556,29 +662,29 @@
     },
     {
       "type": "ExportDefaultDeclaration",
-      "start": 281,
-      "end": 305,
+      "start": 353,
+      "end": 377,
       "loc": {
         "start": {
-          "line": 10,
+          "line": 12,
           "column": 0
         },
         "end": {
-          "line": 10,
+          "line": 12,
           "column": 24
         }
       },
       "declaration": {
         "type": "VariableDeclaration",
         "start": 0,
-        "end": 280,
+        "end": 352,
         "loc": {
           "start": {
             "line": 1,
             "column": 0
           },
           "end": {
-            "line": 9,
+            "line": 11,
             "column": 2
           }
         },
@@ -586,14 +692,14 @@
           {
             "type": "VariableDeclarator",
             "start": 6,
-            "end": 279,
+            "end": 351,
             "loc": {
               "start": {
                 "line": 1,
                 "column": 6
               },
               "end": {
-                "line": 9,
+                "line": 11,
                 "column": 1
               }
             },
@@ -616,14 +722,14 @@
             "init": {
               "type": "ObjectExpression",
               "start": 17,
-              "end": 279,
+              "end": 351,
               "loc": {
                 "start": {
                   "line": 1,
                   "column": 17
                 },
                 "end": {
-                  "line": 9,
+                  "line": 11,
                   "column": 1
                 }
               },
@@ -996,6 +1102,112 @@
                     "value": "didUpdateChildren",
                     "rawValue": "didUpdateChildren",
                     "raw": "'didUpdateChildren'"
+                  },
+                  "kind": "init"
+                },
+                {
+                  "type": "Property",
+                  "start": 283,
+                  "end": 315,
+                  "loc": {
+                    "start": {
+                      "line": 9,
+                      "column": 4
+                    },
+                    "end": {
+                      "line": 9,
+                      "column": 36
+                    }
+                  },
+                  "method": false,
+                  "shorthand": false,
+                  "computed": false,
+                  "key": {
+                    "type": "Identifier",
+                    "start": 283,
+                    "end": 297,
+                    "loc": {
+                      "start": {
+                        "line": 9,
+                        "column": 4
+                      },
+                      "end": {
+                        "line": 9,
+                        "column": 18
+                      }
+                    },
+                    "name": "PROGRESS_START"
+                  },
+                  "value": {
+                    "type": "Literal",
+                    "start": 299,
+                    "end": 315,
+                    "loc": {
+                      "start": {
+                        "line": 9,
+                        "column": 20
+                      },
+                      "end": {
+                        "line": 9,
+                        "column": 36
+                      }
+                    },
+                    "value": "progress:start",
+                    "rawValue": "progress:start",
+                    "raw": "'progress:start'"
+                  },
+                  "kind": "init"
+                },
+                {
+                  "type": "Property",
+                  "start": 321,
+                  "end": 349,
+                  "loc": {
+                    "start": {
+                      "line": 10,
+                      "column": 4
+                    },
+                    "end": {
+                      "line": 10,
+                      "column": 32
+                    }
+                  },
+                  "method": false,
+                  "shorthand": false,
+                  "computed": false,
+                  "key": {
+                    "type": "Identifier",
+                    "start": 321,
+                    "end": 333,
+                    "loc": {
+                      "start": {
+                        "line": 10,
+                        "column": 4
+                      },
+                      "end": {
+                        "line": 10,
+                        "column": 16
+                      }
+                    },
+                    "name": "PROGRESS_END"
+                  },
+                  "value": {
+                    "type": "Literal",
+                    "start": 335,
+                    "end": 349,
+                    "loc": {
+                      "start": {
+                        "line": 10,
+                        "column": 18
+                      },
+                      "end": {
+                        "line": 10,
+                        "column": 32
+                      }
+                    },
+                    "value": "progress:end",
+                    "rawValue": "progress:end",
+                    "raw": "'progress:end'"
                   },
                   "kind": "init"
                 }

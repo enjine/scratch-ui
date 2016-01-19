@@ -2535,7 +2535,6 @@ Object.assign(Evented.prototype, {
     on: function on(event, handler, delegate) {
         var d = delegate || this.el || this;
         if ((0, _utilEventUtils.isNativeEvent)(event)) {
-            //console.log('adding native event', this, d, event, handler)
             return (0, _utilEventUtils.addHandler)(d, event, handler);
         }
 
@@ -2590,8 +2589,7 @@ Object.assign(Evented.prototype, {
      * @returns {*}
      */
     emit: function emit(eventName, data) {
-        var E = undefined,
-            el = this.el,
+        var el = this.el,
             elIsDOM = (0, _utilDOMUtils.isElement)(el) || (0, _utilDOMUtils.isNode)(el),
             native = (0, _utilEventUtils.isNativeEvent)(eventName),
             subscribers = this.mediator.subscribers;
@@ -2664,11 +2662,11 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 var Initializable = {
-    setInitialState: function setInitialState() {
+    initState: function initState() {
         return this;
     },
 
-    setInitialProps: function setInitialProps(props) {
+    initProps: function initProps(props) {
         this.options = {};
         Object.assign(this.options, props);
     }
@@ -2713,7 +2711,7 @@ var _eventRegistry = require('../../event/Registry');
 var _eventRegistry2 = _interopRequireDefault(_eventRegistry);
 
 var overrides = {
-    setInitialProps: function setInitialProps() {
+    initProps: function initProps() {
         var models = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
         var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
@@ -2732,8 +2730,8 @@ var Collection = (function () {
 
         _classCallCheck(this, _Collection);
 
-        this.setInitialProps(models, options);
-        this.setInitialState();
+        this.initProps(models, options);
+        this.initState();
     }
 
     _createClass(Collection, [{
@@ -2757,7 +2755,7 @@ var Collection = (function () {
                 }
             } catch (e) {
                 console.error(e);
-                //throw e;
+                throw e;
             }
 
             return this;
@@ -2792,13 +2790,20 @@ var Collection = (function () {
     }, {
         key: 'fetch',
         value: function fetch(options) {
-            try {
-                this.emit(_eventRegistry2['default'].BEFORE_FETCH);
-                return _core.net.http.get.call(this, options);
-            } catch (e) {
-                console.error(e);
-                //throw e;
-            }
+            this.emit(_eventRegistry2['default'].BEFORE_FETCH);
+            console.log('fetch:', options);
+            return _core.net.http.get.call(this, options);
+        }
+    }, {
+        key: 'get',
+        value: function get(options) {
+            return this.fetch(options).then(this.parse.bind(this), this.onParseFailed.bind(this), 'collection.fetch');
+        }
+    }, {
+        key: 'onParseFailed',
+        value: function onParseFailed() {
+            console.error('Parsing Failed.', this, arguments);
+            return false;
         }
     }]);
 
@@ -2812,7 +2817,7 @@ exports['default'] = Collection;
 Collection.model = _classesModelsModel2['default'];
 module.exports = exports['default'];
 
-},{"../../behaviors/Evented":10,"../../behaviors/Initializable":11,"../../classes/models/Model":14,"../../core":25,"../../event/Registry":27,"../../util/mixes":33}],13:[function(require,module,exports){
+},{"../../behaviors/Evented":10,"../../behaviors/Initializable":11,"../../classes/models/Model":14,"../../core":25,"../../event/Registry":27,"../../util/mixes":34}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2847,12 +2852,12 @@ var ProductCollection = (function (_Collection) {
     }
 
     _createClass(ProductCollection, [{
-        key: 'setInitialProps',
-        value: function setInitialProps() {
+        key: 'initProps',
+        value: function initProps() {
             var models = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
             var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-            _get(Object.getPrototypeOf(ProductCollection.prototype), 'setInitialProps', this).call(this, models, options);
+            _get(Object.getPrototypeOf(ProductCollection.prototype), 'initProps', this).call(this, models, options);
             this.model = options.model ? options.model : _classesModelsProduct2['default'];
         }
     }]);
@@ -2914,7 +2919,7 @@ var attributes = {
 };
 
 var overrides = {
-    setInitialProps: function setInitialProps(props) {
+    initProps: function initProps(props) {
         this.values = Object.create(attributes);
 
         Object.assign(this.values, this.defaults || {});
@@ -2929,9 +2934,9 @@ var Model = (function () {
     function Model(props, options) {
         _classCallCheck(this, _Model);
 
-        _behaviorsInitializable2['default'].setInitialProps.call(this, options);
-        this.setInitialProps(props);
-        this.setInitialState();
+        _behaviorsInitializable2['default'].initProps.call(this, options);
+        this.initProps(props);
+        this.initState();
     }
 
     _createClass(Model, [{
@@ -3029,7 +3034,7 @@ var Model = (function () {
 exports['default'] = Model;
 exports.Model = Model;
 
-},{"../../behaviors/Evented":10,"../../behaviors/Initializable":11,"../../core":25,"../../event/Registry":27,"../../util/Guid.js":31,"../../util/mixes":33}],15:[function(require,module,exports){
+},{"../../behaviors/Evented":10,"../../behaviors/Initializable":11,"../../core":25,"../../event/Registry":27,"../../util/Guid.js":31,"../../util/mixes":34}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3060,10 +3065,10 @@ var Product = (function (_Model) {
     }
 
     _createClass(Product, [{
-        key: 'setInitialProps',
-        value: function setInitialProps() {
+        key: 'initProps',
+        value: function initProps() {
             this.defaults = {};
-            _Model3['default'].prototype.setInitialProps.apply(this, arguments);
+            _Model3['default'].prototype.initProps.apply(this, arguments);
         }
     }]);
 
@@ -3102,7 +3107,7 @@ var View = (function () {
     function View(options) {
         _classCallCheck(this, _View);
 
-        _behaviorsInitializable2['default'].setInitialProps.call(this, options);
+        _behaviorsInitializable2['default'].initProps.call(this, options);
     }
 
     _createClass(View, [{
@@ -3110,6 +3115,9 @@ var View = (function () {
         value: function render() {
             return this;
         }
+    }, {
+        key: 'bindSubscriptions',
+        value: function bindSubscriptions() {}
     }, {
         key: 'destroy',
         value: function destroy() {
@@ -3122,12 +3130,14 @@ var View = (function () {
         value: function detachEvents() {
             var _this = this;
 
-            return this.subscriptions.map(function (subscription) {
-                //console.log('detaching event', this, subscription);
-                var evt = subscription.evt,
-                    fn = subscription.fn;
-                return _this.off(evt, fn);
-            });
+            if (this.subscriptions) {
+                return this.subscriptions.map(function (subscription) {
+                    //console.log('detaching event', this, subscription);
+                    var evt = subscription.evt,
+                        fn = subscription.fn;
+                    return _this.off(evt, fn);
+                });
+            }
         }
     }]);
 
@@ -3139,7 +3149,7 @@ var View = (function () {
 exports['default'] = View;
 module.exports = exports['default'];
 
-},{"../../behaviors/Evented":10,"../../behaviors/Initializable":11,"../../util/mixes":33}],17:[function(require,module,exports){
+},{"../../behaviors/Evented":10,"../../behaviors/Initializable":11,"../../util/mixes":34}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3170,8 +3180,33 @@ var AddToCart = (function (_Component) {
     }
 
     _createClass(AddToCart, [{
+        key: 'initProps',
+        value: function initProps(el, options) {
+            _get(Object.getPrototypeOf(AddToCart.prototype), 'initProps', this).call(this, el, options);
+        }
+    }, {
+        key: 'initState',
+        value: function initState() {
+            this.bindDOMEvents();
+        }
+    }, {
+        key: 'bindDOMEvents',
+        value: function bindDOMEvents() {
+            var _this = this;
+
+            this.on('submit', this.onSubmit.bind(this));
+
+            this.on('click', function (e) {
+                console.log('CLICKED', _this, e);
+            });
+        }
+    }, {
         key: 'onSubmit',
-        value: function onSubmit() {}
+        value: function onSubmit(e) {
+            console.log('SUBMITTED', this, e);
+            e.preventDefault();
+            return false;
+        }
     }]);
 
     return AddToCart;
@@ -3256,8 +3291,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var _core = require('../core');
-
 var _classesModelsModel = require('../classes/models/Model');
 
 var _componentsComponent = require('../components/Component');
@@ -3273,26 +3306,19 @@ var Carousel = (function (_Component) {
         _get(Object.getPrototypeOf(Carousel.prototype), 'constructor', this).apply(this, arguments);
 
         this.model = _classesModelsModel.Model;
-        this.id = '[data-component="ui/slider"]';
+        this.id = 'ui/slider';
     }
 
     _createClass(Carousel, [{
-        key: 'setInitialState',
-        value: function setInitialState() {
-            this.onComponentsLoaded = function () {
-                console.log('Carousel received componentsLoaded', this, arguments);
-                this.emit('otherEvent');
-            };
-
-            this.once('componentsLoaded', this.onComponentsLoaded.bind(this));
-        }
+        key: 'initState',
+        value: function initState() {}
     }, {
-        key: 'setInitialProps',
-        value: function setInitialProps(el, options) {
-            _get(Object.getPrototypeOf(Carousel.prototype), 'setInitialProps', this).call(this, el, options);
+        key: 'initProps',
+        value: function initProps(el, options) {
+            _get(Object.getPrototypeOf(Carousel.prototype), 'initProps', this).call(this, el, options);
             this.model = options.model || new _classesModelsModel.Model();
             if (this.el.dataset.mounted === undefined) {
-                this.template = options.template || document.querySelector(this.id);
+                this.template = options.template || document.querySelector(this.getComponentId());
             }
         }
     }, {
@@ -3314,7 +3340,7 @@ var Carousel = (function (_Component) {
 exports['default'] = Carousel;
 module.exports = exports['default'];
 
-},{"../classes/models/Model":14,"../components/Component":20,"../core":25}],20:[function(require,module,exports){
+},{"../classes/models/Model":14,"../components/Component":20}],20:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3353,6 +3379,10 @@ var _eventRegistry = require('../event/Registry');
 
 var _eventRegistry2 = _interopRequireDefault(_eventRegistry);
 
+var _utilDefaults = require('../util/defaults');
+
+var _utilDefaults2 = _interopRequireDefault(_utilDefaults);
+
 var Component = (function (_View) {
     _inherits(Component, _View);
 
@@ -3363,10 +3393,20 @@ var Component = (function (_View) {
 
         _get(Object.getPrototypeOf(Component.prototype), 'constructor', this).call(this, options);
         this.componentIdentifier = '[data-component]';
-        this.setInitialProps(el, options);
+        this.initProps(el, options);
     }
 
     _createClass(Component, [{
+        key: 'initProps',
+        value: function initProps(el, options) {
+            this.ensureElement(el);
+            this.model = new _classesModelsModel2['default'](this.options.model);
+            this.collection = new _classesCollectionsCollection2['default'](this.options.collection);
+            this.template = this.options.template || null;
+            this.childViews = Object.create(_utilLookupTable2['default']);
+            this.initState();
+        }
+    }, {
         key: 'ensureElement',
         value: function ensureElement(el) {
             try {
@@ -3377,6 +3417,11 @@ var Component = (function (_View) {
             }
         }
     }, {
+        key: 'getComponentId',
+        value: function getComponentId() {
+            return '[' + this.componentIdentifier.slice(1, -1) + '=' + this.id + ']';
+        }
+    }, {
         key: 'getBootstrap',
         value: function getBootstrap() {
             if (window.e750.bootstrap) {
@@ -3384,8 +3429,8 @@ var Component = (function (_View) {
             }
         }
     }, {
-        key: 'isRendered',
-        value: function isRendered() {
+        key: 'isMounted',
+        value: function isMounted() {
             var components = this.componentIdentifier ? this.el.querySelectorAll(this.componentIdentifier) : this.el.children;
             if (components.length) {
                 var _ret = (function () {
@@ -3401,16 +3446,6 @@ var Component = (function (_View) {
                 if (typeof _ret === 'object') return _ret.v;
             }
             return false;
-        }
-    }, {
-        key: 'setInitialProps',
-        value: function setInitialProps(el, options) {
-            this.ensureElement(el);
-            this.model = new _classesModelsModel2['default'](this.options.model);
-            this.collection = new _classesCollectionsCollection2['default'](this.options.collection);
-            this.template = this.options.template || null;
-            this.childViews = Object.create(_utilLookupTable2['default']);
-            this.setInitialState();
         }
     }, {
         key: 'destroy',
@@ -3438,6 +3473,31 @@ var Component = (function (_View) {
             }
         }
     }, {
+        key: 'showProgress',
+        value: function showProgress() {
+            var _this = this;
+
+            this.el.classList.add('loading');
+            this.emit(_eventRegistry2['default'].PROGRESS_START);
+            this.progressId = window.setInterval(function () {
+                var progress = _this.el.querySelector('progress');
+                if (progress) {
+                    var value = parseInt(progress.getAttribute('value'), 10);
+                    progress.setAttribute('value', value + _utilDefaults2['default'].anyIntBetween(1, 10));
+                } else {
+                    window.clearInterval(_this.progressId);
+                }
+            }, 200);
+            return this;
+        }
+    }, {
+        key: 'done',
+        value: function done() {
+            window.clearInterval(this.progressId);
+            this.el.classList.remove('loading');
+            return this;
+        }
+    }, {
         key: 'addChildView',
         value: function addChildView(view) {
             var componentId = Component.Resolver.getComponentId(view),
@@ -3449,6 +3509,9 @@ var Component = (function (_View) {
             return this;
         }
     }, {
+        key: 'bindDOMEvents',
+        value: function bindDOMEvents() {}
+    }, {
         key: 'attachNestedComponents',
         value: function attachNestedComponents() {
             return this.updateChildren(this.componentIdentifier);
@@ -3456,7 +3519,7 @@ var Component = (function (_View) {
     }, {
         key: 'updateChildren',
         value: function updateChildren(selector) {
-            var _this = this;
+            var _this2 = this;
 
             var components = selector ? this.el.querySelectorAll(selector) : this.el.children,
                 Resolver = Component.Resolver;
@@ -3478,13 +3541,14 @@ var Component = (function (_View) {
                     //console.log('components: ', components, this, this.childViews);
                     [].forEach.call(components, function (componentEl) {
                         var componentId = componentEl.dataset.component;
-                        if (!_this.childViews.has(componentId)) {
-                            _this.childViews[componentId] = [];
+                        if (!_this2.childViews.has(componentId)) {
+                            _this2.childViews[componentId] = [];
                         }
                         if (Resolver.has(componentId)) {
-                            var C = Resolver.get(componentId);
-                            _this.childViews[componentId].push(new C(componentEl, componentEl.dataset.options));
-                            //console.info('registered component: ', componentId, C);
+                            var C = Resolver.get(componentId),
+                                c = new C(componentEl, componentEl.dataset.options);
+                            _this2.childViews[componentId].push(c);
+                            //console.info('registered component: ', componentId, componentEl, C);
                         } else {
                                 throw new ReferenceError(componentId + ' not found in component resolver.', Resolver);
                             }
@@ -3515,7 +3579,7 @@ Component.defaults = {
 Component.reservedElements = ['HTML', 'HEAD', 'BODY'];
 module.exports = exports['default'];
 
-},{"../classes/collections/Collection":12,"../classes/models/Model":14,"../classes/views/View":16,"../event/Registry":27,"../util/DOMUtils":29,"../util/LookupTable":32}],21:[function(require,module,exports){
+},{"../classes/collections/Collection":12,"../classes/models/Model":14,"../classes/views/View":16,"../event/Registry":27,"../util/DOMUtils":29,"../util/LookupTable":32,"../util/defaults":33}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3532,8 +3596,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var _core = require('../core');
-
 var _classesModelsModel = require('../classes/models/Model');
 
 var _componentsComponent = require('../components/Component');
@@ -3549,26 +3611,19 @@ var Header = (function (_Component) {
         _get(Object.getPrototypeOf(Header.prototype), 'constructor', this).apply(this, arguments);
 
         this.model = _classesModelsModel.Model;
-        this.id = '[data-component="ui/header"]';
+        this.id = 'ui/header';
     }
 
     _createClass(Header, [{
-        key: 'setInitialState',
-        value: function setInitialState() {
-            this.onComponentsLoaded = function () {
-                console.log('Header received componentsLoaded', this, arguments);
-                this.emit('otherEvent');
-            };
-
-            this.once('componentsLoaded', this.onComponentsLoaded.bind(this));
-        }
+        key: 'initState',
+        value: function initState() {}
     }, {
-        key: 'setInitialProps',
-        value: function setInitialProps(el, options) {
-            _get(Object.getPrototypeOf(Header.prototype), 'setInitialProps', this).call(this, el, options);
+        key: 'initProps',
+        value: function initProps(el, options) {
+            _get(Object.getPrototypeOf(Header.prototype), 'initProps', this).call(this, el, options);
             this.model = options.model || new _classesModelsModel.Model();
             if (this.el.dataset.mounted === undefined) {
-                this.template = options.template || document.querySelector(this.id);
+                this.template = options.template || document.querySelector(this.getComponentId());
             }
         }
     }, {
@@ -3590,7 +3645,7 @@ var Header = (function (_Component) {
 exports['default'] = Header;
 module.exports = exports['default'];
 
-},{"../classes/models/Model":14,"../components/Component":20,"../core":25}],22:[function(require,module,exports){
+},{"../classes/models/Model":14,"../components/Component":20}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -3625,19 +3680,9 @@ var Product = (function (_Component) {
     }
 
     _createClass(Product, [{
-        key: 'setInitialState',
-        value: function setInitialState() {
-            this.onComponentsLoaded = function () {
-                console.log('Product received componentsLoaded', this, arguments);
-                this.emit('otherEvent');
-            };
-
-            this.once('componentsLoaded', this.onComponentsLoaded.bind(this));
-        }
-    }, {
-        key: 'setInitialProps',
-        value: function setInitialProps(el, options) {
-            _get(Object.getPrototypeOf(Product.prototype), 'setInitialProps', this).call(this, el, options);
+        key: 'initProps',
+        value: function initProps(el, options) {
+            _get(Object.getPrototypeOf(Product.prototype), 'initProps', this).call(this, el, options);
             this.model = options.model || new _classesModelsProduct.ProductModel();
             if (this.el.dataset.mounted === undefined) {
                 this.template = options.template || _core.jst.getFromDOM('product/simple');
@@ -3705,16 +3750,9 @@ var ProductList = (function (_Component) {
     }
 
     _createClass(ProductList, [{
-        key: 'setInitialState',
-        value: function setInitialState() {
+        key: 'initState',
+        value: function initState() {
             this.collection = new _classesCollectionsProduct2['default'](this.getBootstrap());
-
-            //TODO: take this out.
-            this.onComponentsLoaded = function () {
-                console.log('Product List received componentsLoaded', this, arguments);
-            };
-
-            this.attachEventListeners();
 
             //console.log('PRODUCT LIST:', this.collection.models, window.e750.bootstrap.productList);
             if (!this.collection.models.length) {
@@ -3731,7 +3769,7 @@ var ProductList = (function (_Component) {
                 Object.assign(fetchOpts, defaults, this.options);
                 this.loadData(fetchOpts);
             } else {
-                this.render().updateChildren();
+                this.render();
             }
         }
     }, {
@@ -3740,47 +3778,27 @@ var ProductList = (function (_Component) {
             var _this = this,
                 _arguments2 = arguments;
 
-            this.collection.fetch(fetchOpts).then(this.collection.parse.bind(this.collection), function (reason) {
-                console.error('Parsing Failed! ', _this, _arguments2, reason);
-            }).then(this.render.bind(this), function (reason) {
+            this.showProgress();
+            this.collection.get(fetchOpts).then(this.render.bind(this), function (reason) {
                 console.error('Render Failed! ', _this, _arguments2, reason);
             })['catch'](function (reason) {
                 console.error('Promise Rejected! ', _this, _arguments2, reason);
             })['finally'](function () {
                 console.log('finally', _this, _arguments2, _this.options);
-                _this.updateChildren();
+                _this.done();
             });
         }
     }, {
-        key: 'attachEventListeners',
-        value: function attachEventListeners() {
-            var _this2 = this,
-                _arguments3 = arguments;
-
-            this.once('componentsLoaded', this.onComponentsLoaded);
-
-            this.on('otherEvent', function () {
-                console.log('ProductList otherEvent closure!', _this2, _arguments3);
-            });
-
-            this.on('willUpdateChildren', function () {
-                console.log('ProductList willUpdateChildren', _this2, 'beep:', _arguments3);
-            });
-
-            this.on('click', function (e) {
-                console.log('CLICKED', _this2, e);
-            });
-
-            this.on('submit', function (e) {
-                console.log('SUBMITTED', _this2, e);
-                e.preventDefault();
-                return false;
+        key: 'bindDOMEvents',
+        value: function bindDOMEvents() {
+            this.on('dblclick', function () {
+                console.log('double clicked!');
             });
         }
     }, {
         key: 'render',
         value: function render() {
-            if (!this.isRendered()) {
+            if (!this.isMounted()) {
                 try {
                     var html = '',
                         products = this.collection.models,
@@ -3795,6 +3813,8 @@ var ProductList = (function (_Component) {
                     }
 
                     this.el.innerHTML = html;
+                    this.bindDOMEvents();
+                    this.attachNestedComponents();
                 } catch (e) {
                     throw e;
                 }
@@ -4141,7 +4161,9 @@ var Registry = {
     COMPONENTS_LOADED: 'componentsLoaded',
     BEFORE_RENDER: 'beforeRender',
     WILL_UPDATE_CHILDREN: 'willUpdateChildren',
-    DID_UPDATE_CHILDREN: 'didUpdateChildren'
+    DID_UPDATE_CHILDREN: 'didUpdateChildren',
+    PROGRESS_START: 'progress:start',
+    PROGRESS_END: 'progress:end'
 };
 exports['default'] = Registry;
 exports.Evt = Registry;
@@ -4228,7 +4250,7 @@ exports['default'] = { isNode: isNode, isElement: isElement, htmlToDom: htmlToDo
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
-	value: true
+    value: true
 });
 exports.manageNativeEvents = manageNativeEvents;
 exports.isNativeEvent = isNativeEvent;
@@ -4245,41 +4267,41 @@ var _utilGuid2 = _interopRequireDefault(_utilGuid);
  * Cross-Browser event listener.
  *
  * @param addOrRemove {String}
- * @param object {DOM Element or Node}
+ * @param obj {DOM Element or Node}
  * @param eventNames {String: list of events to listen for}
  * @param handler {Function}
  * @param useCapture {Boolean}
  */
 
-function manageNativeEvents(addOrRemove, object, eventNames, handler) {
-	var useCapture = arguments.length <= 4 || arguments[4] === undefined ? false : arguments[4];
+function manageNativeEvents(addOrRemove, obj, eventNames, handler) {
+    var useCapture = arguments.length <= 4 || arguments[4] === undefined ? false : arguments[4];
 
-	var i = 0,
-	    events = eventNames.split(' '),
-	    prefix = object.addEventListener ? '' : 'on';
+    var i = 0,
+        events = eventNames.split(' '),
+        prefix = obj.addEventListener ? '' : 'on';
 
-	try {
-		return events.map(function () {
-			var e = prefix + events[i],
-			    listenerId = undefined,
-			    addlistenerMethods = ['addEventListener', 'attachEvent'],
-			    ret = undefined;
+    try {
+        return events.map(function () {
+            var e = prefix + events[i],
+                listenerId = undefined,
+                addlistenerMethods = ['addEventListener', 'attachEvent'],
+                ret = undefined;
 
-			if (addlistenerMethods.indexOf(addOrRemove) !== -1) {
-				listenerId = (0, _utilGuid2['default'])();
-				handler.sId = listenerId;
-			} else {
-				//console.log('Removing DOM event:', e, handler);
-				delete handler.sId;
-			}
-			object[addOrRemove](e, handler, useCapture);
-			ret = { evt: e, id: listenerId, fn: handler };
-			return ret;
-		});
-	} catch (e) {
-		console.error('Error attaching event listener', e, addOrRemove, object, eventNames, handler);
-		return false;
-	}
+            if (addlistenerMethods.indexOf(addOrRemove) !== -1) {
+                listenerId = (0, _utilGuid2['default'])();
+                handler.sId = listenerId;
+            } else {
+                //console.log('Removing DOM event:', e, handler);
+                delete handler.sId;
+            }
+            obj[addOrRemove](e, handler, useCapture);
+            ret = { evt: e, id: listenerId, fn: handler };
+            return ret;
+        });
+    } catch (e) {
+        console.error('Error attaching event listener', e, addOrRemove, obj, eventNames, handler);
+        return false;
+    }
 }
 
 /**
@@ -4289,7 +4311,7 @@ function manageNativeEvents(addOrRemove, object, eventNames, handler) {
  */
 
 function isNativeEvent(eventname) {
-	return typeof document.body['on' + eventname] !== 'undefined';
+    return typeof document.body['on' + eventname] !== 'undefined';
 }
 
 /**
@@ -4299,9 +4321,9 @@ function isNativeEvent(eventname) {
  * @param handler
  */
 
-function addHandler(object, eventNames, handler) {
-	var bindType = object.addEventListener ? 'addEventListener' : 'attachEvent';
-	return manageNativeEvents(bindType, object, eventNames, handler);
+function addHandler(target, eventNames, handler) {
+    var bindType = target.addEventListener ? 'addEventListener' : 'attachEvent';
+    return manageNativeEvents(bindType, target, eventNames, handler);
 }
 
 /**
@@ -4311,9 +4333,9 @@ function addHandler(object, eventNames, handler) {
  * @param handler
  */
 
-function removeHandler(object, eventNames, handler) {
-	var bindType = object.removeEventListener ? 'removeEventListener' : 'detachEvent';
-	return manageNativeEvents(bindType, object, eventNames, handler);
+function removeHandler(target, eventNames, handler) {
+    var bindType = target.removeEventListener ? 'removeEventListener' : 'detachEvent';
+    return manageNativeEvents(bindType, target, eventNames, handler);
 }
 
 exports['default'] = { isNativeEvent: isNativeEvent, addHandler: addHandler, removeHandler: removeHandler };
@@ -4381,6 +4403,53 @@ exports['default'] = LookupTable;
 module.exports = exports['default'];
 
 },{}],33:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+    value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _Guid = require('./Guid');
+
+var _Guid2 = _interopRequireDefault(_Guid);
+
+var _mixes = require('./mixes');
+
+var _mixes2 = _interopRequireDefault(_mixes);
+
+var Compose = function Compose() {
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+    }
+
+    return function (initial) {
+        return args.reduceRight(function (result, fn) {
+            return fn(result);
+        }, initial);
+    };
+};
+
+/**
+ *  Returns a random number between min (inclusive) and max (exclusive)
+ */
+function getRandomArbitrary(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
+/**
+ * Returns a random integer between min (inclusive) and max (inclusive)
+ * Using Math.round() will give you a non-uniform distribution!
+ */
+var anyIntBetween = function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+exports['default'] = { Compose: Compose, mixes: _mixes2['default'], guid: _Guid2['default'], anyIntBetween: anyIntBetween };
+module.exports = exports['default'];
+
+},{"./Guid":31,"./mixes":34}],34:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4404,7 +4473,7 @@ function mixes() {
 
 module.exports = exports["default"];
 
-},{}],34:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 'use strict';
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -4421,28 +4490,17 @@ var _comE750LibComponentsApplication = require('./com.e750/lib/components/Applic
 
 var _comE750LibComponentsApplication2 = _interopRequireDefault(_comE750LibComponentsApplication);
 
+var app_version = '0.0.1';
+
 var e750 = (function (_Application) {
     _inherits(e750, _Application);
 
     function e750(rootNode, options) {
-        var _this = this,
-            _arguments2 = arguments;
-
         _classCallCheck(this, e750);
 
         _get(Object.getPrototypeOf(e750.prototype), 'constructor', this).call(this, rootNode, options);
 
-        this.bootstrap(options);
-
-        this.onComponentsLoaded = function () {
-            console.log('App received onComponentsLoaded', this, arguments);
-        };
-
-        this.once('componentsLoaded', this.onComponentsLoaded.bind(this));
-
-        this.once('willUpdateChildren', function () {
-            console.log('App willUpdateChildren', _this, _arguments2);
-        });
+        this.bootstrap(options.FIXTURES || {});
     }
 
     _createClass(e750, [{
@@ -4450,7 +4508,7 @@ var e750 = (function (_Application) {
         value: function start() {
             //console.log('app init():', this, arguments);
             //console.log('cookies:', document.cookie);
-            console.log('E750.js started....', this, arguments);
+            console.info('E750.js v' + app_version);
             this.attachNestedComponents();
             //TODO: implement this
             //this.attachPartials();
@@ -4460,16 +4518,14 @@ var e750 = (function (_Application) {
         value: function bootstrap() {
             var data = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
 
-            if (data.fixtures) {
-                this.fixtures = data.fixtures;
-            }
+            this.fixtures = data;
         }
     }]);
 
     return e750;
 })(_comE750LibComponentsApplication2['default']);
 
-var app = new e750('body', { fixtures: window.e750.FIXTURES });
+var app = new e750('body', { fixtures: window.e750.FIXTURES, options: window.e750.options || {} });
 document.addEventListener('DOMContentLoaded', app.start.bind(app));
 
-},{"./com.e750/lib/components/Application":18}]},{},[34]);
+},{"./com.e750/lib/components/Application":18}]},{},[35]);

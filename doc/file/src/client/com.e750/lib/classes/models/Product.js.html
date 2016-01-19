@@ -74,9 +74,9 @@
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import Model from &apos;./Model&apos;;
 
 export default class Product extends Model {
-    setInitialProps () {
+    initProps () {
         this.defaults = {};
-        Model.prototype.setInitialProps.apply(this, arguments);
+        Model.prototype.initProps.apply(this, arguments);
     }
 }
 

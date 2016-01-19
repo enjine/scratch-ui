@@ -71,28 +71,23 @@
 </nav>
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/client/com.e750/lib/components/Carousel.js</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import {jst} from &apos;../core&apos;;
-import {Model} from &apos;../classes/models/Model&apos;;
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import {Model} from &apos;../classes/models/Model&apos;;
 import Component from &apos;../components/Component&apos;;
 
 
 export default class Carousel extends Component {
     model = Model;
+    id = &apos;ui/slider&apos;;
 
-    setInitialState () {
-        this.onComponentsLoaded = function () {
-            console.log(&apos;Carousel received componentsLoaded&apos;, this, arguments);
-            this.emit(&apos;otherEvent&apos;);
-        };
+    initState () {
 
-        this.once(&apos;componentsLoaded&apos;, this.onComponentsLoaded.bind(this));
     }
 
-    setInitialProps (el, options) {
-        super.setInitialProps(el, options);
+    initProps (el, options) {
+        super.initProps(el, options);
         this.model = options.model || new Model();
         if (this.el.dataset.mounted === undefined) {
-            this.template = options.template || jst.getFromDOM(&apos;ui/slider&apos;);
+            this.template = options.template || document.querySelector(this.getComponentId());
         }
     }
 

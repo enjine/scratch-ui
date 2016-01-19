@@ -4,18 +4,8 @@ import Component from '../components/Component';
 
 
 export default class Product extends Component {
-
-    setInitialState () {
-        this.onComponentsLoaded = function () {
-            console.log('Product received componentsLoaded', this, arguments);
-            this.emit('otherEvent');
-        };
-
-        this.once('componentsLoaded', this.onComponentsLoaded.bind(this));
-    }
-
-    setInitialProps (el, options) {
-        super.setInitialProps(el, options);
+    initProps (el, options) {
+        super.initProps(el, options);
         this.model = options.model || new ProductModel();
         if (this.el.dataset.mounted === undefined) {
             this.template = options.template || jst.getFromDOM('product/simple');
