@@ -17,11 +17,16 @@ export default class Component extends View {
 
     initProps (el, options) {
         this.ensureElement(el);
+        this.id = this.options.id || this.generateComponentId();
         this.model = new Model(this.options.model);
         this.collection = new Collection(this.options.collection);
         this.template = this.options.template || null;
         this.childViews = Object.create(LookupTable);
         this.initState();
+    }
+
+    generateComponentId () {
+        return (new Date).getTime();
     }
 
     ensureElement (el) {
@@ -30,6 +35,7 @@ export default class Component extends View {
                 (Component.reservedElements.indexOf(el.toUpperCase()) !== -1) ?
                     document.getElementsByTagName(el)[0] :
                     document.createElement(el || Component.defaults.el);
+            return true;
         } catch (e) {
             console.error(e);
             throw new Error('Component must have a DOMElement.', e);
@@ -44,6 +50,7 @@ export default class Component extends View {
         if (window.e750.bootstrap) {
             return window.e750.bootstrap[this.constructor.name] || [];
         }
+        return [];
     }
 
     isMounted () {
@@ -82,6 +89,7 @@ export default class Component extends View {
     }
 
     showProgress () {
+        //TODO: change this to use a proper 'progrees' component;
         this.el.classList.add('loading');
         this.emit(Evt.PROGRESS_START);
         this.progressId = window.setInterval(() => {

@@ -3,30 +3,53 @@
  * @type {{has: *}}
  */
 const LookupTable = {
-	has: Object.prototype.hasOwnProperty,
-	all: function () {
-		let p,
-			values = {};
-		for (p in this) {
-			if (this.has(p)) {
-				values[p] = this[p];
-			}
-		}
-		return values;
-	},
-	toArray: function () {
-		let p,
-			values = [];
-		for (p in this) {
-			if (this.has(p)) {
-				values.push({key: p, value: this[p]});
-			}
-		}
-		return values;
-	}
+    add: function (name, value) {
+        if(value === undefined)
+            return false;
+
+        if(this[name] === undefined){ // because 0, false and null are OK!
+            this[name] = value;
+            return true;
+        }else{
+            throw new ReferenceError('`' + name + '` already exists in lookup table.');
+        }
+    },
+    remove: function (name) {
+        if(this[name] !== undefined){
+            delete this[name];
+            return true;
+        }else{
+            throw new ReferenceError('`' + name + '` does not exist in lookup table.');
+        }
+
+    },
+    all: function () {
+        let p,
+            values = {};
+        for (p in this) {
+            if (this.has(p)) {
+                values[p] = this[p];
+            }
+        }
+        return values;
+    },
+    toArray: function () {
+        let p,
+            values = [];
+        for (p in this) {
+            if (this.has(p)) {
+                values.push({key: p, value: this[p]});
+            }
+        }
+        return values;
+    },
+    reset: function () {
+        for (var x in this) if (this.hasOwnProperty(x) && typeof x !== 'function') delete this[x];
+        return true;
+    }
 };
 
-Object.defineProperty(LookupTable, 'size', {value: 0, enumerable: false});
+Object.defineProperty(LookupTable, 'size', {value: function () { return Object.keys(this).length}, enumerable: false});
 Object.defineProperty(LookupTable, 'has', {value: Object.prototype.hasOwnProperty, enumerable: false});
 
 export default LookupTable;

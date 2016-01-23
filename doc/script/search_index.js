@@ -900,6 +900,12 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "src/client/com.e750/lib/components/component.js~component#generatecomponentid",
+    "class/src/client/com.e750/lib/components/Component.js~Component.html#instance-method-generateComponentId",
+    "src/client/com.e750/lib/components/Component.js~Component#generateComponentId",
+    "method"
+  ],
+  [
     "src/client/com.e750/lib/components/component.js~component#getbootstrap",
     "class/src/client/com.e750/lib/components/Component.js~Component.html#instance-method-getBootstrap",
     "src/client/com.e750/lib/components/Component.js~Component#getBootstrap",
@@ -910,6 +916,12 @@ window.esdocSearchIndex = [
     "class/src/client/com.e750/lib/components/Component.js~Component.html#instance-method-getComponentId",
     "src/client/com.e750/lib/components/Component.js~Component#getComponentId",
     "method"
+  ],
+  [
+    "src/client/com.e750/lib/components/component.js~component#id",
+    "class/src/client/com.e750/lib/components/Component.js~Component.html#instance-member-id",
+    "src/client/com.e750/lib/components/Component.js~Component#id",
+    "member"
   ],
   [
     "src/client/com.e750/lib/components/component.js~component#initprops",

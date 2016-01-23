@@ -1,6 +1,6 @@
 {
-  "coverage": "10.28%",
-  "expectCount": 107,
+  "coverage": "10.09%",
+  "expectCount": 109,
   "actualCount": 11,
   "files": {
     "src/client/com.e750/lib/components/AddToCart.js": {
@@ -51,30 +51,32 @@
       ]
     },
     "src/client/com.e750/lib/components/Component.js": {
-      "expectCount": 21,
+      "expectCount": 23,
       "actualCount": 0,
       "undocumentLines": [
         10,
-        106,
-        120,
-        116,
-        23,
-        21,
-        13,
-        61,
-        100,
-        29,
-        27,
-        43,
-        39,
-        18,
-        49,
-        20,
-        87,
-        84,
+        114,
+        128,
+        124,
+        24,
         22,
-        70,
-        124
+        13,
+        68,
+        108,
+        34,
+        32,
+        28,
+        49,
+        45,
+        20,
+        18,
+        56,
+        21,
+        95,
+        91,
+        23,
+        77,
+        132
       ]
     },
     "src/client/com.e750/lib/event/Dispatcher.js": {
