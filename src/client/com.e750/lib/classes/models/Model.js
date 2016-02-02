@@ -27,7 +27,7 @@ let overrides = {
         if (props) {
             this.parse(props);
         }
-
+        return this;
     }
 };
 

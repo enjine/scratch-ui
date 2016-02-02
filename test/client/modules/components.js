@@ -48,14 +48,14 @@ describe('Components', () => {
 
         it('Returns the component ID when set as a constructor option', () => {
             let t = new testComponent('aside', {id: 'cart/aside'}),
-                ret = t.getComponentId();
-            expect(ret).to.equal('[data-component=cart/aside]');
-            expect(ret).to.match(/\[data-component=[a-zA-Z\/0-9]+\]/);
+                ret = t.getComponentSelector();
+            expect(ret).to.equal('[data-component="cart/aside"]');
+            expect(ret).to.match(/\[data-component="[a-zA-Z\/0-9]+"\]/);
         });
 
         it('Returns a randomly generated integer as the component ID when not set as a constructor option', () => {
             let t = new testComponent('aside');
-            expect(t.getComponentId()).to.match(/\[data-component=[0-9]+\]/);
+            expect(t.getComponentSelector()).to.match(/\[data-component="[0-9]+"\]/);
         });
 
         it('Returns an array of bootstrap data, or an empty array if none available.', () => {
@@ -125,14 +125,13 @@ describe('Components', () => {
     });
 
     afterEach(() => {
-        let teardownA = viewA.destroy();
-        let teardownB = viewB.destroy();
-        console.log('teardowns:', teardownA, teardownB);
+        viewA.destroy();
+        viewB.destroy();
 
     });
 
     after(() => {
-        console.log('instances', instances);
+        //console.log('instances', instances);
         viewA = viewB = null;
     });
 
@@ -286,7 +285,7 @@ describe('Components', () => {
             });
 
             after(() => {
-                console.log('instances', instances);
+                //console.log('instances', instances);
                 viewB = null;
             });
 
@@ -320,7 +319,7 @@ describe('Components', () => {
             });
 
             after(() => {
-                console.log('instances', instances);
+                //console.log('instances', instances);
                 viewC = null;
             });
 

@@ -7,15 +7,16 @@ export default class Carousel extends Component {
     id = 'ui/slider';
 
     initState () {
-
+        return this;
     }
 
     initProps (el, options) {
         super.initProps(el, options);
         this.model = options.model || new Model();
         if (this.el.dataset.mounted === undefined) {
-            this.template = options.template || document.querySelector(this.getComponentId());
+            this.template = options.template || document.querySelector(this.getComponentSelector());
         }
+        return this;
     }
 
     render () {

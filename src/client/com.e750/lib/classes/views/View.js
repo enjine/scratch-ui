@@ -12,9 +12,7 @@ export default class View {
         return this;
     }
 
-    bindSubscriptions () {
-
-    }
+    bindSubscriptions () { return this; }
 
     destroy () {
         let ret = [];
@@ -31,5 +29,6 @@ export default class View {
                 return this.off(evt, fn);
             });
         }
+        return false;
     }
 }

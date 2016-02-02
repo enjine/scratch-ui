@@ -6,9 +6,12 @@ import LookupTable from '../util/LookupTable';
 import Evt from '../event/Registry';
 import utils from '../util/defaults';
 
+import Progressable from '../behaviors/Progressable';
+import mixes from '../util/mixes';
 
+@mixes(Progressable)
 export default class Component extends View {
-    componentIdentifier = '[data-component]';
+    componentAttr = 'data-component';
 
     constructor (el, options = {}) {
         super(options);
@@ -42,8 +45,20 @@ export default class Component extends View {
         }
     }
 
+    getComponentAttrSelector () {
+        return '[' + this.componentAttr + ']';
+    }
+
+    findComponents () {
+        return this.el.querySelectorAll(this.getComponentAttrSelector());
+    }
+
+    getComponentSelector () {
+        return '[' + this.componentAttr + '="' + this.getComponentId() + '"]';
+    }
+
     getComponentId () {
-        return '[' + this.componentIdentifier.slice(1, -1) + '=' + this.id + ']';
+        return this.id;
     }
 
     getBootstrap () {
@@ -54,7 +69,7 @@ export default class Component extends View {
     }
 
     isMounted () {
-        let components = this.componentIdentifier ? this.el.querySelectorAll(this.componentIdentifier) : this.el.children;
+        let components = this.id ? this.findComponents() : this.el.children;
         if (components.length) {
             let list = [];
             [].forEach.call(components, (component) => {
@@ -88,29 +103,6 @@ export default class Component extends View {
         }
     }
 
-    showProgress () {
-        //TODO: change this to use a proper 'progrees' component;
-        this.el.classList.add('loading');
-        this.emit(Evt.PROGRESS_START);
-        this.progressId = window.setInterval(() => {
-            let progress = this.el.querySelector('progress');
-            if(progress){
-                let value = parseInt(progress.getAttribute('value'), 10);
-                progress.setAttribute('value', value + utils.anyIntBetween(1, 10));
-            }else{
-                window.clearInterval(this.progressId);
-            }
-
-        }, 200);
-        return this;
-    }
-
-    done () {
-        window.clearInterval(this.progressId);
-        this.el.classList.remove('loading');
-        return this;
-    }
-
     addChildView (view) {
         let componentId = Component.Resolver.getComponentId(view),
             childViews = this.childViews;
@@ -121,12 +113,10 @@ export default class Component extends View {
         return this;
     }
 
-    bindDOMEvents () {
-
-    }
+    bindDOMEvents () { return this; }
 
     attachNestedComponents () {
-        return this.updateChildren(this.componentIdentifier);
+        return this.updateChildren(this.getComponentAttrSelector());
     }
 
     updateChildren (selector) {
@@ -172,7 +162,7 @@ export default class Component extends View {
             console.info('No child components to register.');
         }
 
-        this.emit(Evt.COMPONENTS_LOADED, {test: 'abcd'}, [1, 2, 3], true);
+        this.emit(Evt.COMPONENTS_LOADED);
         return this;
     }
 }

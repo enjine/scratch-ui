@@ -2,11 +2,12 @@ import Component from './Component';
 
 export default class AddToCart extends Component {
     initProps (el, options) {
-        super.initProps(el, options);
+        return super.initProps(el, options);
     }
 
     initState () {
         this.bindDOMEvents();
+        return this;
     }
 
     bindDOMEvents () {
@@ -15,6 +16,8 @@ export default class AddToCart extends Component {
         this.on('click', (e) => {
             console.log('CLICKED', this, e);
         });
+
+        return this;
     }
 
     onSubmit (e) {

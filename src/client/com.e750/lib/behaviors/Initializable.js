@@ -6,6 +6,7 @@ const Initializable = {
     initProps: function (props) {
         this.options = {};
         Object.assign(this.options, props);
+        return this;
     }
 };
 

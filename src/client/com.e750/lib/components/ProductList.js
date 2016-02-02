@@ -23,7 +23,7 @@ export default class ProductList extends Component {
         } else {
             this.render();
         }
-
+        return this;
     }
 
     loadData (fetchOpts) {
@@ -36,15 +36,17 @@ export default class ProductList extends Component {
                 console.error('Promise Rejected! ', this, arguments, reason);
             })
             .finally(() => {
-                console.log('finally', this, arguments, this.options);
+                //console.log('finally', this, arguments, this.options);
                 this.done();
             });
+        return this;
     }
 
     bindDOMEvents () {
         this.on('dblclick', () => {
             console.log('double clicked!');
-        })
+        });
+        return this;
     }
 
     render () {

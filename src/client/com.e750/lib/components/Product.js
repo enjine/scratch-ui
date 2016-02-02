@@ -10,6 +10,7 @@ export default class Product extends Component {
         if (this.el.dataset.mounted === undefined) {
             this.template = options.template || jst.getFromDOM('product/simple');
         }
+        return this;
     }
 
     render () {

@@ -72,7 +72,7 @@ export default class Collection {
      */
     fetch (options) {
         this.emit(Evt.BEFORE_FETCH);
-        console.log('fetch:', options);
+        //console.log('fetch:', options);
         return net.http.get.call(this, options);
     }
 
