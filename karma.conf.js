@@ -1,5 +1,3 @@
-'use strict';
-
 // Karma configuration
 // Generated on Thu Jul 23 2015 23:21:04 GMT-0400 (EDT)
 var istanbul = require('browserify-istanbul');

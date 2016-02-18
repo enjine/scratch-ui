@@ -1,9 +1,9 @@
 import templeton from 'templeton';
 import Evented from './behaviors/Evented';
 import {htmlToDom} from './util/DOMUtils';
-import RSVP from 'rsvp';
 import Evt from './event/Registry';
-var xhttp = require('xhttp/custom')(RSVP.Promise);
+
+require('whatwg-fetch');
 
 
 export const net = {
@@ -14,24 +14,50 @@ export const net = {
          * @param options
          * @returns {*}
          */
-        ajax: function (options) {
-            let defaults = {
-                method: 'GET'
-            };
+        exec: function (url, options) {
+            function checkStatus (response) {
+                if (response.status >= 200 && response.status < 300 || response === 0 /*local file*/) {
+                    return response;
+                } else {
+                    return Promise.reject(new Error(response.statusText));
+                }
+            }
 
-            Object.assign(defaults, options);
-            this.emit(Evt.BEFORE_AJAX, options);
-            return xhttp(options);
+            function parseResponse (response) {
+                var contentType = response.headers.get('content-type');
+                if (contentType && contentType.indexOf('application/json') !== -1) {
+                    return response.json();
+                }
+                return response.text();
+            }
+
+            this.emit(Evt.BEFORE_FETCH, options);
+            return fetch(url, options).then(checkStatus).then(parseResponse);
         },
         /**
-         * Alias for an ASYNC HTTP GET
-         * returns an A+ promise
-         * @param options
-         * @returns {*}
+         * GET, POST, PUT, DELETE methods
+         * @param String url
+         * @param Object options
+         * @returns native promises
          */
-        get: function (options) {
+        get: function (url, options) {
             options.method = 'GET';
-            return net.http.ajax.call(this, options);
+            return net.http.exec.call(this, url, options);
+        },
+
+        post: function (url, options) {
+            options.method = 'POST';
+            return net.http.exec.call(this, url, options);
+        },
+
+        put: function (url, options) {
+            options.method = 'PUT';
+            return net.http.exec.call(this, url, options);
+        },
+
+        del: function (url, options) {
+            options.method = 'DELETE';
+            return net.http.exec.call(this, url, options);
         }
     }
 };
@@ -61,7 +87,7 @@ export const storage = {
 
             var str = '' + encode(key) + '=' + encode(val);
 
-            if (val == null) options.maxage = -1;
+            if (val === null) options.maxage = -1;
 
             if (opts.maxage) {
                 opts.expires = new Date(+new Date() + opts.maxage);

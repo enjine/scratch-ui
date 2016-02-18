@@ -1,6 +1,6 @@
 const Registry = {
     APP_START: 'start',
-    BEFORE_AJAX: 'beforeAjax',
+    BEFORE_REQUEST: 'beforeAjax',
     BEFORE_FETCH: 'beforeFetch',
     COMPONENTS_LOADED: 'componentsLoaded',
     BEFORE_RENDER: 'beforeRender',

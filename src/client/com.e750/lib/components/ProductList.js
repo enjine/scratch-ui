@@ -1,48 +1,51 @@
 import Component from './Component';
 import Product from './Product';
 import ProductCollection from '../classes/collections/Product';
+import Evt from '../event/Registry';
 
 export default class ProductList extends Component {
     initState () {
-        this.collection = new ProductCollection(this.getBootstrap());
+        this.collection = new ProductCollection(this.getBootstrap(), {url: '/api/products'});
 
         //console.log('PRODUCT LIST:', this.collection.models, window.e750.bootstrap.productList);
         if (!this.collection.models.length) {
             var defaults = {
-                url: '/api/products/',
                 type: 'json',
-                method: 'GET',
                 headers: {
                     'X-Auth-Token': document.cookie.split('=')[1]
                 }
             }, fetchOpts = {};
 
-
             Object.assign(fetchOpts, defaults, this.options);
-            this.loadData(fetchOpts);
+            this.loadData(this.apiUrl, fetchOpts);
         } else {
             this.render();
         }
         return this;
     }
 
-    loadData (fetchOpts) {
-        this.showProgress();
-        this.collection.get(fetchOpts)
+    loadData (url, opts) {
+        this.collection.get(url, opts)
             .then(this.render.bind(this), (reason) => {
                 console.error('Render Failed! ', this, arguments, reason);
             })
-            .catch((reason) => {
-                console.error('Promise Rejected! ', this, arguments, reason);
-            })
-            .finally(() => {
+            .then(() => {
                 //console.log('finally', this, arguments, this.options);
                 this.done();
+            })
+            .catch((reason) => {
+                console.error('Promise Rejected! ', this, arguments, reason);
             });
         return this;
     }
 
+    bindSubscriptions () {
+        //this.subscribe(Evt.BEFORE_REQUEST, this.showProgress);
+    }
+
     bindDOMEvents () {
+        this.on('fetch', this.showProgress);
+
         this.on('dblclick', () => {
             console.log('double clicked!');
         });

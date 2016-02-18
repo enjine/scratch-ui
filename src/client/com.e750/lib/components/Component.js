@@ -4,15 +4,12 @@ import Collection from '../classes/collections/Collection';
 import {isElement} from '../util/DOMUtils';
 import LookupTable from '../util/LookupTable';
 import Evt from '../event/Registry';
-import utils from '../util/defaults';
 
 import Progressable from '../behaviors/Progressable';
 import mixes from '../util/mixes';
 
 @mixes(Progressable)
 export default class Component extends View {
-    componentAttr = 'data-component';
-
     constructor (el, options = {}) {
         super(options);
         this.initProps(el, options);
@@ -29,13 +26,13 @@ export default class Component extends View {
     }
 
     generateComponentId () {
-        return (new Date).getTime();
+        return (new Date()).getTime();
     }
 
     ensureElement (el) {
         try {
             this.el = isElement(el) ? el :
-                (Component.reservedElements.indexOf(el.toUpperCase()) !== -1) ?
+                Component.reservedElements.indexOf(el.toUpperCase()) !== -1 ?
                     document.getElementsByTagName(el)[0] :
                     document.createElement(el || Component.defaults.el);
             return true;
@@ -46,7 +43,7 @@ export default class Component extends View {
     }
 
     getComponentAttrSelector () {
-        return '[' + this.componentAttr + ']';
+        return '[' + Component.attr + ']';
     }
 
     findComponents () {
@@ -54,7 +51,7 @@ export default class Component extends View {
     }
 
     getComponentSelector () {
-        return '[' + this.componentAttr + '="' + this.getComponentId() + '"]';
+        return '[' + Component.attr + '="' + this.getComponentId() + '"]';
     }
 
     getComponentId () {
@@ -166,6 +163,8 @@ export default class Component extends View {
         return this;
     }
 }
+
+Component.attr = 'data-component';
 
 Component.defaults = {
     el: 'div'

@@ -9,7 +9,7 @@ let overrides = {
     initProps: function (models = [], options = {}) {
         this.options = {};
         Object.assign(this.options, options);
-        this.model = (options.model) ? options.model : Model;
+        this.model = options.model ? options.model : Model;
         this.models = [];
         this.parse(models);
     }
@@ -65,19 +65,39 @@ export default class Collection {
         }), options), null, 0);
     }
 
-    /**
-     * returns an A+ promise
-     * @param options
-     * @returns {*}
-     */
-    fetch (options) {
-        this.emit(Evt.BEFORE_FETCH);
-        //console.log('fetch:', options);
-        return net.http.get.call(this, options);
+    request (url, options) {
+        this.emit(Evt.BEFORE_REQUEST);
+        Object.assign(options.headers, {
+            'Accept': 'application/json'
+        });
+        return net.http.get.call(this, url, options);
     }
 
-    get (options) {
-        return this.fetch(options).then(this.parse.bind(this), this.onParseFailed.bind(this), 'collection.fetch');
+    verifyResource (url){
+        let endpoint = url || this.options.url;
+        if (!endpoint) {
+            throw new Error('No URL set for collection!');
+        }
+        return endpoint;
+    }
+
+    get (url, options) {
+        return this.request(this.verifyResource(url), options).then(this.parse.bind(this), this.onParseFailed.bind(this), 'collection.get');
+    }
+
+    post (url, options) {
+        options.method = 'POST';
+        console.log('POST:', url, options);
+    }
+
+    put (url, options) {
+        options.method = 'PUT';
+        console.log('PUT:', url, options);
+    }
+
+    del (url, options) {
+        options.method = 'DELETE';
+        console.log('DEL:', url, options);
     }
 
     onParseFailed () {

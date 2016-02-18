@@ -12,7 +12,9 @@ export default class View {
         return this;
     }
 
-    bindSubscriptions () { return this; }
+    bindSubscriptions () {
+        return this;
+    }
 
     destroy () {
         let ret = [];
@@ -21,7 +23,7 @@ export default class View {
     }
 
     detachEvents () {
-        if(this.subscriptions) {
+        if (this.subscriptions) {
             return this.subscriptions.map((subscription) => {
                 //console.log('detaching event', this, subscription);
                 let evt = subscription.evt,

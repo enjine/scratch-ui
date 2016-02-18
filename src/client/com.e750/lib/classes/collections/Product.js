@@ -4,7 +4,7 @@ import Product from '../../classes/models/Product';
 export default class ProductCollection extends Collection {
     initProps (models = [], options = {}) {
         super.initProps(models, options);
-        this.model = (options.model) ? options.model : Product;
+        this.model = options.model ? options.model : Product;
         return this;
     }
 }
