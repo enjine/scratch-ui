@@ -7,7 +7,6 @@ import {settings} from '../../setup';
 //import {EmitterMixinBehavior} from '../behaviors/emitter';
 
 let expect = settings.assertions.expect;
-let assert = settings.assertions.assert;
 let mocks = settings.mocking;
 
 settings.init();
@@ -38,12 +37,6 @@ describe('Components', () => {
         it('Can ensure it is bound to a DOM element.', () => {
             let t = new testComponent('option');
             expect(t.ensureElement('option')).to.equal(true);
-        });
-
-        it('Throws an Error if it is not bound to a DOM element', () => {
-            assert.throw(function () {
-                new testComponent(null);
-            }, Error);
         });
 
         it('Returns the component ID when set as a constructor option', () => {

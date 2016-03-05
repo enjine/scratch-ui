@@ -38,6 +38,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-storage">storage</a></span></span></li>
 <li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">client/com.e750/lib/behaviors</div><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Evented">Evented</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Initializable">Initializable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Progressable">Progressable</a></span></span></li>
 <li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">client/com.e750/lib/classes/collections</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/client/com.e750/lib/classes/collections/Collection.js~Collection.html">Collection</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/client/com.e750/lib/classes/collections/Product.js~ProductCollection.html">ProductCollection</a></span></span></li>
 <li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">client/com.e750/lib/classes/models</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/client/com.e750/lib/classes/models/Model.js~Model.html">Model</a></span></span></li>
@@ -82,7 +83,7 @@ let overrides = {
     initProps: function (models = [], options = {}) {
         this.options = {};
         Object.assign(this.options, options);
-        this.model = (options.model) ? options.model : Model;
+        this.model = options.model ? options.model : Model;
         this.models = [];
         this.parse(models);
     }
@@ -138,20 +139,45 @@ export default class Collection {
         }), options), null, 0);
     }
 
-    /**
-     * returns an A+ promise
-     * @param options
-     * @returns {*}
-     */
-    fetch (options) {
-        this.emit(Evt.BEFORE_FETCH);
-        console.log(&apos;fetch:&apos;, options);
-        return net.http.get.call(this, options);
+    request (url, options) {
+        this.emit(Evt.BEFORE_REQUEST);
+        return net.http.getJSON.call(this, url, options);
     }
 
-    get (options) {
-        return this.fetch(options).then(this.parse.bind(this), this.onParseFailed.bind(this), &apos;collection.fetch&apos;);
+    verifyResource (url){
+        let endpoint = url || this.options.url;
+        if (!endpoint) {
+            throw new Error(&apos;No URL set for collection!&apos;);
+        }
+        return endpoint;
     }
+
+    fetch (options = {}) {
+        return this.request(this.verifyResource(options.url), options).then(this.parse.bind(this), this.onParseFailed.bind(this), &apos;collection.get&apos;);
+    }
+
+    get (index){
+        return this.models[index];
+    }
+
+    save (options = {}) {
+        console.log(&apos;SAVE:&apos;, options);
+    }
+
+    /*post (options = {}) {
+        options.method = &apos;POST&apos;;
+        console.log(&apos;POST:&apos;, options);
+    }
+
+    put (options = {}) {
+        options.method = &apos;PUT&apos;;
+        console.log(&apos;PUT:&apos;, options);
+    }
+
+    del (options = {}) {
+        options.method = &apos;DELETE&apos;;
+        console.log(&apos;DEL:&apos;, options);
+    }*/
 
     onParseFailed () {
         console.error(&apos;Parsing Failed.&apos;, this, arguments);

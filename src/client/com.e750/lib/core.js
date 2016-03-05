@@ -15,6 +15,7 @@ export const net = {
          * @returns {*}
          */
         exec: function (url, options) {
+            console.info('FETCH', url, options);
             function checkStatus (response) {
                 if (response.status >= 200 && response.status < 300 || response === 0 /*local file*/) {
                     return response;
@@ -40,6 +41,30 @@ export const net = {
          * @param Object options
          * @returns native promises
          */
+
+        getJSON: function (url, options) {
+            Object.assign(options, {
+                method: 'GET',
+                headers: Object.assign(options.headers, {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                })
+            });
+            return net.http.exec.call(this, url, options);
+        },
+
+        postJSON: function (url, data, options) {
+            Object.assign(options, {
+                method: 'POST',
+                headers: Object.assign(options.headers, {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }),
+                body: JSON.stringify(data)
+            });
+            return net.http.exec.call(this, url, options);
+        },
+
         get: function (url, options) {
             options.method = 'GET';
             return net.http.exec.call(this, url, options);

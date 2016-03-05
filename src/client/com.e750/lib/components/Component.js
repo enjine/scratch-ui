@@ -30,16 +30,11 @@ export default class Component extends View {
     }
 
     ensureElement (el) {
-        try {
-            this.el = isElement(el) ? el :
-                Component.reservedElements.indexOf(el.toUpperCase()) !== -1 ?
-                    document.getElementsByTagName(el)[0] :
-                    document.createElement(el || Component.defaults.el);
-            return true;
-        } catch (e) {
-            console.error(e);
-            throw new Error('Component must have a DOMElement.', e);
-        }
+        this.el = !el ? document.createElement(Component.defaults.el) : isElement(el) ? el :
+            Component.reservedElements.indexOf(el.toUpperCase()) !== -1 ?
+                document.getElementsByTagName(el)[0] :
+                document.createElement(el);
+        return true;
     }
 
     getComponentAttrSelector () {
@@ -110,7 +105,9 @@ export default class Component extends View {
         return this;
     }
 
-    bindDOMEvents () { return this; }
+    bindDOMEvents () {
+        return this;
+    }
 
     attachNestedComponents () {
         return this.updateChildren(this.getComponentAttrSelector());

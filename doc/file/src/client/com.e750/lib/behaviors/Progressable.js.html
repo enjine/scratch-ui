@@ -2,8 +2,8 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <base data-ice="baseUrl" href="../../../../../../../">
-  <title data-ice="title">Product | API Document</title>
+  <base data-ice="baseUrl" href="../../../../../../">
+  <title data-ice="title">src/client/com.e750/lib/behaviors/Progressable.js | API Document</title>
   <link type="text/css" rel="stylesheet" href="css/style.css">
   <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
   <script src="script/prettify/prettify.js"></script>
@@ -71,213 +71,42 @@
 </div>
 </nav>
 
-<div class="content" data-ice="content"><div class="header-notice">
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import Product from &apos;<span><a href="file/src/client/com.e750/lib/classes/models/Product.js.html#lineNumber3">e750-Micro/src/client/com.e750/lib/classes/models/Product.js</a></span>&apos;</code></pre></div>
-  <span data-ice="access">public</span>
-  <span data-ice="kind">class</span>
-  
-  
-  
-  <span data-ice="source">| <span><a href="file/src/client/com.e750/lib/classes/models/Product.js.html#lineNumber3">source</a></span></span>
-</div>
+<div class="content" data-ice="content"><h1 data-ice="title">src/client/com.e750/lib/behaviors/Progressable.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import Evt from &apos;../event/Registry&apos;;
+import utils from &apos;../util/defaults&apos;;
 
-<div class="self-detail detail">
-  <h1 data-ice="name">Product</h1>
+const Progressable = {
+    showProgress: function() {
+        if(!this.el || !this.emit) return false;
 
-  
+        this.el.classList.add(&apos;loading&apos;);
+        this.emit(Evt.PROGRESS_START);
+        this.progressId = window.setInterval(() =&gt; {
+            let progress = this.el.querySelector(&apos;progress&apos;);
+            if(progress){
+                let value = parseInt(progress.getAttribute(&apos;value&apos;), 10);
+                progress.setAttribute(&apos;value&apos;, value + utils.anyIntBetween(1, 10));
+            }else{
+                window.clearInterval(this.progressId);
+                throw new Error(&apos;&lt;progress&gt; element not found in component DOM.&apos;);
+            }
 
-  
-  
-  <div class="flat-list" data-ice="extendsChain"><h4>Extends:</h4><div><span>src/client/com.e750/lib/classes/models/Model~Model</span> &#x2192; Product</div></div>
-  
-  
-  
-  
-  
-  
+        }, 200);
+        return this;
+    },
 
-  
-  
-  
+    done: function () {
+        if(!this.el || !this.progressId) return false;
 
-  
+        window.clearInterval(this.progressId);
+        this.el.classList.remove(&apos;loading&apos;);
+        return this;
+    }
+};
 
-  
+export default Progressable;
+</code></pre>
 
-  
-
-  
-</div>
-
-
-
-
-<div data-ice="memberSummary"><h2>Member Summary</h2><table class="summary" data-ice="summary">
-  <thead><tr><td data-ice="title" colspan="3">Public Members</td></tr></thead>
-  <tbody>
-  
-  <tr data-ice="target">
-    <td>
-      <span class="access" data-ice="access">public</span>
-      
-      
-      
-      <span class="override" data-ice="override"></span>
-    </td>
-    <td>
-      <div>
-        <p>
-           <span data-ice="name"><span><a href="class/src/client/com.e750/lib/classes/models/Product.js~Product.html#instance-member-defaults">defaults</a></span></span><span data-ice="signature">: <span>*</span></span>
-        </p>
-      </div>
-      <div>
-        
-        
-        
-      </div>
-    </td>
-    <td>
-      
-      
-    </td>
-  </tr>
-</tbody>
-</table>
-</div>
-<div data-ice="methodSummary"><h2>Method Summary</h2><table class="summary" data-ice="summary">
-  <thead><tr><td data-ice="title" colspan="3">Public Methods</td></tr></thead>
-  <tbody>
-  
-  <tr data-ice="target">
-    <td>
-      <span class="access" data-ice="access">public</span>
-      
-      
-      
-      <span class="override" data-ice="override"></span>
-    </td>
-    <td>
-      <div>
-        <p>
-           <span data-ice="name"><span><a href="class/src/client/com.e750/lib/classes/models/Product.js~Product.html#instance-method-initProps">initProps</a></span></span><span data-ice="signature">(): <span>*</span></span>
-        </p>
-      </div>
-      <div>
-        
-        
-        
-      </div>
-    </td>
-    <td>
-      
-      
-    </td>
-  </tr>
-</tbody>
-</table>
-</div>
-
-
-
-
-
-
-<div data-ice="memberDetails"><h2 data-ice="title">Public Members</h2>
-
-<div class="detail" data-ice="detail">
-  <h3 data-ice="anchor" id="instance-member-defaults">
-    <span class="access" data-ice="access">public</span>
-    
-    
-    
-    
-    <span data-ice="name">defaults</span><span data-ice="signature">: <span>*</span></span>
-    <span class="right-info">
-      
-      
-      <span data-ice="source"><span><a href="file/src/client/com.e750/lib/classes/models/Product.js.html#lineNumber5">source</a></span></span>
-    </span>
-  </h3>
-
-  
-  
-  
-  
-
-  
-
-  <div data-ice="properties">
-</div>
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-  
-</div>
-</div>
-<div data-ice="methodDetails"><h2 data-ice="title">Public Methods</h2>
-
-<div class="detail" data-ice="detail">
-  <h3 data-ice="anchor" id="instance-method-initProps">
-    <span class="access" data-ice="access">public</span>
-    
-    
-    
-    
-    <span data-ice="name">initProps</span><span data-ice="signature">(): <span>*</span></span>
-    <span class="right-info">
-      
-      
-      <span data-ice="source"><span><a href="file/src/client/com.e750/lib/classes/models/Product.js.html#lineNumber4">source</a></span></span>
-    </span>
-  </h3>
-
-  
-  
-  
-  
-
-  
-
-  <div data-ice="properties">
-</div>
-
-  <div class="return-params" data-ice="returnParams">
-    <h4>Return:</h4>
-    <table>
-      <tr>
-        <td class="return-type" data-ice="returnType"><span>*</span></td>
-        
-      </tr>
-    </table>
-    <div data-ice="returnProperties">
-</div>
-  </div>
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-  
-</div>
-</div>
 </div>
 
 <footer class="footer">

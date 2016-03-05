@@ -17,15 +17,15 @@ export default class ProductList extends Component {
             }, fetchOpts = {};
 
             Object.assign(fetchOpts, defaults, this.options);
-            this.loadData(this.apiUrl, fetchOpts);
+            this.loadData(fetchOpts);
         } else {
             this.render();
         }
         return this;
     }
 
-    loadData (url, opts) {
-        this.collection.get(url, opts)
+    loadData (opts) {
+        this.collection.fetch(opts)
             .then(this.render.bind(this), (reason) => {
                 console.error('Render Failed! ', this, arguments, reason);
             })

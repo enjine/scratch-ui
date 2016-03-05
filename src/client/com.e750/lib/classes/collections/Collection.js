@@ -67,10 +67,7 @@ export default class Collection {
 
     request (url, options) {
         this.emit(Evt.BEFORE_REQUEST);
-        Object.assign(options.headers, {
-            'Accept': 'application/json'
-        });
-        return net.http.get.call(this, url, options);
+        return net.http.getJSON.call(this, url, options);
     }
 
     verifyResource (url){
@@ -81,24 +78,32 @@ export default class Collection {
         return endpoint;
     }
 
-    get (url, options) {
-        return this.request(this.verifyResource(url), options).then(this.parse.bind(this), this.onParseFailed.bind(this), 'collection.get');
+    fetch (options = {}) {
+        return this.request(this.verifyResource(options.url), options).then(this.parse.bind(this), this.onParseFailed.bind(this), 'collection.get');
     }
 
-    post (url, options) {
+    get (index){
+        return this.models[index];
+    }
+
+    save (options = {}) {
+        console.log('SAVE:', options);
+    }
+
+    /*post (options = {}) {
         options.method = 'POST';
-        console.log('POST:', url, options);
+        console.log('POST:', options);
     }
 
-    put (url, options) {
+    put (options = {}) {
         options.method = 'PUT';
-        console.log('PUT:', url, options);
+        console.log('PUT:', options);
     }
 
-    del (url, options) {
+    del (options = {}) {
         options.method = 'DELETE';
-        console.log('DEL:', url, options);
-    }
+        console.log('DEL:', options);
+    }*/
 
     onParseFailed () {
         console.error('Parsing Failed.', this, arguments);

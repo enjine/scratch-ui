@@ -1,14 +1,14 @@
 {
   "type": "Program",
   "start": 0,
-  "end": 224,
+  "end": 245,
   "loc": {
     "start": {
       "line": 1,
       "column": 0
     },
     "end": {
-      "line": 12,
+      "line": 13,
       "column": 0
     }
   },
@@ -84,28 +84,28 @@
     {
       "type": "ExportDefaultDeclaration",
       "start": 30,
-      "end": 187,
+      "end": 208,
       "loc": {
         "start": {
           "line": 3,
           "column": 0
         },
         "end": {
-          "line": 8,
+          "line": 9,
           "column": 1
         }
       },
       "declaration": {
         "type": "ClassDeclaration",
         "start": 45,
-        "end": 187,
+        "end": 208,
         "loc": {
           "start": {
             "line": 3,
             "column": 15
           },
           "end": {
-            "line": 8,
+            "line": 9,
             "column": 1
           }
         },
@@ -144,14 +144,14 @@
         "body": {
           "type": "ClassBody",
           "start": 73,
-          "end": 187,
+          "end": 208,
           "loc": {
             "start": {
               "line": 3,
               "column": 43
             },
             "end": {
-              "line": 8,
+              "line": 9,
               "column": 1
             }
           },
@@ -159,14 +159,14 @@
             {
               "type": "MethodDefinition",
               "start": 79,
-              "end": 185,
+              "end": 206,
               "loc": {
                 "start": {
                   "line": 4,
                   "column": 4
                 },
                 "end": {
-                  "line": 7,
+                  "line": 8,
                   "column": 5
                 }
               },
@@ -192,14 +192,14 @@
               "value": {
                 "type": "FunctionExpression",
                 "start": 89,
-                "end": 185,
+                "end": 206,
                 "loc": {
                   "start": {
                     "line": 4,
                     "column": 14
                   },
                   "end": {
-                    "line": 7,
+                    "line": 8,
                     "column": 5
                   }
                 },
@@ -211,14 +211,14 @@
                 "body": {
                   "type": "BlockStatement",
                   "start": 92,
-                  "end": 185,
+                  "end": 206,
                   "loc": {
                     "start": {
                       "line": 4,
                       "column": 17
                     },
                     "end": {
-                      "line": 7,
+                      "line": 8,
                       "column": 5
                     }
                   },
@@ -491,6 +491,36 @@
                           }
                         ]
                       }
+                    },
+                    {
+                      "type": "ReturnStatement",
+                      "start": 188,
+                      "end": 200,
+                      "loc": {
+                        "start": {
+                          "line": 7,
+                          "column": 8
+                        },
+                        "end": {
+                          "line": 7,
+                          "column": 20
+                        }
+                      },
+                      "argument": {
+                        "type": "ThisExpression",
+                        "start": 195,
+                        "end": 199,
+                        "loc": {
+                          "start": {
+                            "line": 7,
+                            "column": 15
+                          },
+                          "end": {
+                            "line": 7,
+                            "column": 19
+                          }
+                        }
+                      }
                     }
                   ]
                 }
@@ -504,15 +534,15 @@
     },
     {
       "type": "ExportNamedDeclaration",
-      "start": 189,
-      "end": 222,
+      "start": 210,
+      "end": 243,
       "loc": {
         "start": {
-          "line": 10,
+          "line": 11,
           "column": 0
         },
         "end": {
-          "line": 10,
+          "line": 11,
           "column": 33
         }
       },
@@ -520,29 +550,29 @@
       "specifiers": [
         {
           "type": "ExportSpecifier",
-          "start": 197,
-          "end": 220,
+          "start": 218,
+          "end": 241,
           "loc": {
             "start": {
-              "line": 10,
+              "line": 11,
               "column": 8
             },
             "end": {
-              "line": 10,
+              "line": 11,
               "column": 31
             }
           },
           "local": {
             "type": "Identifier",
-            "start": 197,
-            "end": 204,
+            "start": 218,
+            "end": 225,
             "loc": {
               "start": {
-                "line": 10,
+                "line": 11,
                 "column": 8
               },
               "end": {
-                "line": 10,
+                "line": 11,
                 "column": 15
               }
             },
@@ -550,15 +580,15 @@
           },
           "exported": {
             "type": "Identifier",
-            "start": 208,
-            "end": 220,
+            "start": 229,
+            "end": 241,
             "loc": {
               "start": {
-                "line": 10,
+                "line": 11,
                 "column": 19
               },
               "end": {
-                "line": 10,
+                "line": 11,
                 "column": 31
               }
             },

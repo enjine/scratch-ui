@@ -102,6 +102,12 @@ window.esdocSearchIndex = [
     "class"
   ],
   [
+    "e750-micro/src/client/com.e750/lib/behaviors/progressable.js~progressable",
+    "variable/index.html#static-variable-Progressable",
+    "<span>Progressable</span> <span class=\"search-result-import-path\">e750-Micro/src/client/com.e750/lib/behaviors/Progressable.js</span>",
+    "variable"
+  ],
+  [
     "e750-micro/src/client/com.e750/lib/event/registry.js~registry",
     "variable/index.html#static-variable-Registry",
     "<span>Registry</span> <span class=\"search-result-import-path\">e750-Micro/src/client/com.e750/lib/event/Registry.js</span>",
@@ -558,6 +564,12 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
+    "src/client/com.e750/lib/behaviors/progressable.js",
+    "file/src/client/com.e750/lib/behaviors/Progressable.js.html",
+    "src/client/com.e750/lib/behaviors/Progressable.js",
+    "file"
+  ],
+  [
     "src/client/com.e750/lib/classes/collections/collection.js",
     "file/src/client/com.e750/lib/classes/collections/Collection.js.html",
     "src/client/com.e750/lib/classes/collections/Collection.js",
@@ -600,6 +612,18 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "src/client/com.e750/lib/classes/collections/collection.js~collection#request",
+    "class/src/client/com.e750/lib/classes/collections/Collection.js~Collection.html#instance-method-request",
+    "src/client/com.e750/lib/classes/collections/Collection.js~Collection#request",
+    "method"
+  ],
+  [
+    "src/client/com.e750/lib/classes/collections/collection.js~collection#save",
+    "class/src/client/com.e750/lib/classes/collections/Collection.js~Collection.html#instance-method-save",
+    "src/client/com.e750/lib/classes/collections/Collection.js~Collection#save",
+    "method"
+  ],
+  [
     "src/client/com.e750/lib/classes/collections/collection.js~collection#serialize",
     "class/src/client/com.e750/lib/classes/collections/Collection.js~Collection.html#instance-method-serialize",
     "src/client/com.e750/lib/classes/collections/Collection.js~Collection#serialize",
@@ -615,6 +639,12 @@ window.esdocSearchIndex = [
     "src/client/com.e750/lib/classes/collections/collection.js~collection#tometa",
     "class/src/client/com.e750/lib/classes/collections/Collection.js~Collection.html#instance-method-toMeta",
     "src/client/com.e750/lib/classes/collections/Collection.js~Collection#toMeta",
+    "method"
+  ],
+  [
+    "src/client/com.e750/lib/classes/collections/collection.js~collection#verifyresource",
+    "class/src/client/com.e750/lib/classes/collections/Collection.js~Collection.html#instance-method-verifyResource",
+    "src/client/com.e750/lib/classes/collections/Collection.js~Collection#verifyResource",
     "method"
   ],
   [
@@ -882,12 +912,6 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "src/client/com.e750/lib/components/component.js~component#done",
-    "class/src/client/com.e750/lib/components/Component.js~Component.html#instance-method-done",
-    "src/client/com.e750/lib/components/Component.js~Component#done",
-    "method"
-  ],
-  [
     "src/client/com.e750/lib/components/component.js~component#el",
     "class/src/client/com.e750/lib/components/Component.js~Component.html#instance-member-el",
     "src/client/com.e750/lib/components/Component.js~Component#el",
@@ -897,6 +921,12 @@ window.esdocSearchIndex = [
     "src/client/com.e750/lib/components/component.js~component#ensureelement",
     "class/src/client/com.e750/lib/components/Component.js~Component.html#instance-method-ensureElement",
     "src/client/com.e750/lib/components/Component.js~Component#ensureElement",
+    "method"
+  ],
+  [
+    "src/client/com.e750/lib/components/component.js~component#findcomponents",
+    "class/src/client/com.e750/lib/components/Component.js~Component.html#instance-method-findComponents",
+    "src/client/com.e750/lib/components/Component.js~Component#findComponents",
     "method"
   ],
   [
@@ -912,9 +942,21 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "src/client/com.e750/lib/components/component.js~component#getcomponentattrselector",
+    "class/src/client/com.e750/lib/components/Component.js~Component.html#instance-method-getComponentAttrSelector",
+    "src/client/com.e750/lib/components/Component.js~Component#getComponentAttrSelector",
+    "method"
+  ],
+  [
     "src/client/com.e750/lib/components/component.js~component#getcomponentid",
     "class/src/client/com.e750/lib/components/Component.js~Component.html#instance-method-getComponentId",
     "src/client/com.e750/lib/components/Component.js~Component#getComponentId",
+    "method"
+  ],
+  [
+    "src/client/com.e750/lib/components/component.js~component#getcomponentselector",
+    "class/src/client/com.e750/lib/components/Component.js~Component.html#instance-method-getComponentSelector",
+    "src/client/com.e750/lib/components/Component.js~Component#getComponentSelector",
     "method"
   ],
   [
@@ -940,18 +982,6 @@ window.esdocSearchIndex = [
     "class/src/client/com.e750/lib/components/Component.js~Component.html#instance-member-model",
     "src/client/com.e750/lib/components/Component.js~Component#model",
     "member"
-  ],
-  [
-    "src/client/com.e750/lib/components/component.js~component#progressid",
-    "class/src/client/com.e750/lib/components/Component.js~Component.html#instance-member-progressId",
-    "src/client/com.e750/lib/components/Component.js~Component#progressId",
-    "member"
-  ],
-  [
-    "src/client/com.e750/lib/components/component.js~component#showprogress",
-    "class/src/client/com.e750/lib/components/Component.js~Component.html#instance-method-showProgress",
-    "src/client/com.e750/lib/components/Component.js~Component#showProgress",
-    "method"
   ],
   [
     "src/client/com.e750/lib/components/component.js~component#template",
@@ -1053,6 +1083,12 @@ window.esdocSearchIndex = [
     "src/client/com.e750/lib/components/productlist.js~productlist#binddomevents",
     "class/src/client/com.e750/lib/components/ProductList.js~ProductList.html#instance-method-bindDOMEvents",
     "src/client/com.e750/lib/components/ProductList.js~ProductList#bindDOMEvents",
+    "method"
+  ],
+  [
+    "src/client/com.e750/lib/components/productlist.js~productlist#bindsubscriptions",
+    "class/src/client/com.e750/lib/components/ProductList.js~ProductList.html#instance-method-bindSubscriptions",
+    "src/client/com.e750/lib/components/ProductList.js~ProductList#bindSubscriptions",
     "method"
   ],
   [
