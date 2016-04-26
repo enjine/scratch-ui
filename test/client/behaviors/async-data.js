@@ -9,77 +9,61 @@ let expect = chai.expect;
 settings.init();
 
 export var AsyncDataBehavior = {
-	describe: function () {
-		return 'Can make network requests via a `fetch()` method.';
-	},
-	test: function (o, reqOpts) {
-		let thenable;
+    describe: function () {
+        return 'Can make network requests.';
+    },
+    test: function (o, reqOpts) {
+        let thenable;
 
-		it('Implements fetch()', () => {
-			expect(o).to.respondTo('fetch');
-		});
+        it('Implements fetch()', () => {
+            expect(o).to.respondTo('fetch');
+        });
 
-		it('Request options should have a request type of `JSON`.', () => {
-			expect(reqOpts.type).to.exist;
-			chai.assert.match(reqOpts.type, /json/i);
-		});
+        it('Request options should have an X-Auth-Token header property`.', () => {
+            expect(reqOpts.headers).to.exist;
+            expect(reqOpts.headers['X-Auth-Token']).to.exist;
+        });
 
-		it('Request options should have a request method of `GET`.', () => {
-			expect(reqOpts.method).to.exist;
-			chai.assert.match(reqOpts.method, /get/i);
-		});
+        describe('Network requests fire events and return native Promises.', () => {
+            before(() => {
+                mocks.stub(window, 'fetch');
 
-		it('Request options should have an X-Auth-Token header property`.', () => {
-			expect(reqOpts.headers).to.exist;
-			expect(reqOpts.headers['X-Auth-Token']).to.exist;
-		});
+                let res = new window.Response(JSON.stringify('{"success":true}'), {
+                    status: 200,
+                    statusText: 'OK',
+                    headers: {
+                        'Content-type': 'application/json'
+                    }
+                });
 
-		describe('Network requests are Promise/A+ compliant.', () => {
-			let xhr,
-				requests;
+                window.fetch.returns(Promise.resolve(res));
+            });
 
-			before(() => {
-				xhr = mocks.useFakeXMLHttpRequest();
-				requests = [];
+            after(() => {
+                window.fetch.restore();
+            });
 
-				xhr.onCreate = function (req) {
-					requests.push(req);
-				};
-			});
+            it('should emit `beforeFetch` and `beforeAsync` event.', function () {
+                let eventSpy = mocks.spy();
 
-			after(() => {
-				xhr.restore();
-				thenable = null;
-				requests = [];
-			});
+                before(() => {
+                    o.on('beforeFetch', eventSpy);
+                    o.on('beforeAsync', eventSpy);
+                });
 
-			it('should emit `beforeFetch` and `beforeAsync` event.', function () {
-				let eventSpy = mocks.spy();
-
-				before(() => {
-					o.on('beforeFetch', eventSpy);
-					o.on('beforeAsync', eventSpy);
-				});
-
-				thenable = o.fetch(reqOpts).then(() => {
-					eventSpy.should.have.been.calledTwice;
-					o.off('beforeFetch', eventSpy);
-					o.off('beforeAsync', eventSpy);
-				});
+                thenable = o.fetch(reqOpts).then(() => {
+                    eventSpy.should.have.been.calledTwice;
+                    o.off('beforeFetch', eventSpy);
+                    o.off('beforeAsync', eventSpy);
+                });
 
 
-			});
+            });
 
-			it('`fetch()` makes a network request to: `' + reqOpts.url + '`.', () => {
-				expect(requests.length).to.equal(1);
-				expect(requests[0].url).to.match(new RegExp(reqOpts.url));
-			});
-
-			it('and returns an A+ `thenable`.', () => {
-				expect(thenable).to.respondTo('then');
-				expect(thenable).to.respondTo('catch');
-				expect(thenable).to.respondTo('finally');
-			});
-		});
-	}
+            it('should return a native Pronise.', () => {
+                expect(thenable).to.respondTo('then');
+                expect(thenable).to.respondTo('catch');
+            });
+        });
+    }
 };

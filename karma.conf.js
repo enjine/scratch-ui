@@ -1,7 +1,28 @@
 // Karma configuration
-// Generated on Thu Jul 23 2015 23:21:04 GMT-0400 (EDT)
-var istanbul = require('browserify-istanbul');
-var isparta = require('isparta');
+var path = require('path');
+var webpackConfig = require('./webpack.config.js');
+
+webpackConfig.entry = [];
+webpackConfig.module.noParse = [/\/sinon\.js/];
+webpackConfig.module.preLoaders.push(
+    {
+        test: /\.js$/,
+        loader: 'babel-loader',
+        include: [
+            path.resolve(__dirname, 'test')
+        ],
+        exclude: /(node_modules|bower_components)/
+    },
+    {
+        test: /sinon\.js$/,
+        loader: 'imports?define=>false,require=>false'
+    },
+    {
+        test: /\.js$/,
+        include: path.resolve('src/client'),
+        loader: 'isparta'
+    }
+);
 
 module.exports = function (config) {
     config.set({
@@ -9,51 +30,59 @@ module.exports = function (config) {
         // base path that will be used to resolve all patterns (eg. files, exclude)
         basePath: '',
 
-        // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-        frameworks: ['browserify', 'mocha', 'sinon-chai'],
+        frameworks: ['mocha', 'sinon-chai', 'phantomjs-shim'],
 
         client: {
             captureConsole: true,
             mocha: {
                 reporter: 'html', // change Karma's debug.html to the mocha web reporter
                 ui: 'bdd'
+            },
+            chai: {
+                includeStack: true,
+                showDiff: true,
+                truncateThreshold: 0
             }
         },
 
-
         // list of files / patterns to load in the browser test runner
         files: [
-            {pattern: './src/**/*.js', included: false},
-            {pattern: './test/**/*.js', included: true}
+            './test/fixtures.js',
+            './test/index.js'
         ],
 
-
         // list of files to exclude
-        exclude: ['./test/client/behaviors/**/*.js', './lib/client/com.e750/events-old.js'],
+        exclude: [
+            './test/client/behaviors/**/*.js'
+        ],
 
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
         preprocessors: {
-            // create the ES5 equivalents of these ES6 com.e750.
-            './src/**/*.js': ['browserify'],
-            // create the ES5 versions of the tests written in ES6 (these are included in the test runner page)
-            './test/**/*.js': ['browserify']
+            './test/index.js': ['webpack']
         },
 
-        browserify: {
+        webpack: {
+            devtool: 'inline-source-map',
             debug: true,
-            bundleDelay: 1000,
-            transform: [istanbul({
-                instrumenter: isparta,
-                ignore: ['./node_modules/**', './test/**']
-            }), 'babelify']
+            module: webpackConfig.module,
+            resolve: webpackConfig.resolve,
+            isparta: {
+                embedSource: true,
+                noAutoWrap: true
+            }
         },
 
-        // test results reporter to use
-        // possible values: 'dots', 'progress'
+        webpackMiddleware: {
+            noInfo: true,
+            stats: {
+                colors: true
+            }
+        },
+
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-        reporters: ['progress', 'coverage', 'mocha', 'notify'], //'junit'
+        reporters: ['progress', 'mocha', 'notify', 'coverage', 'junit'],
 
         mochaReporter: {
             output: 'full' //full, autowatch, minimal
@@ -70,14 +99,13 @@ module.exports = function (config) {
             dir: './reports/coverage',
             reporters: [
                 {type: 'html', subdir: 'html'},
-                //{type: 'lcov', subdir: 'lcov'}
                 {type: 'text', subdir: '.'}
             ]
         },
 
         notifyReporter: {
             reportEachFailure: true, // Default: false, Will notify on every failed sepc
-            reportSuccess: false // Default: true, Will notify when a suite was successful
+            reportSuccess: true // Default: true, Will notify when a suite was successful
         },
 
 
@@ -110,10 +138,10 @@ module.exports = function (config) {
 
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-        //browsers: ['ChromeES6', 'Chrome', 'ChromeCanaryES6', 'ChromeCanary', 'Firefox', 'Safari', 'PhantomJS'],
-        browsers: ['Chrome'],
-
-
+        //browsers: ['ChromeES6', 'ChromeCanaryES6', 'Firefox', 'Safari'],
+        //browsers: ['Chrome', 'ChromeCanary', 'Firefox', 'Safari', 'PhantomJS'],
+        browsers: ['PhantomJS', 'Chrome'],
+        
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits
         singleRun: false,

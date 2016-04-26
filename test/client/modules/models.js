@@ -75,9 +75,6 @@ describe('Models::Generic', () => {
 describe('Models::Product', () => {
 	let p = new ProductModel(),
 		reqOpts = {
-			url: '/api/product/',
-			type: 'json',
-			method: 'GET',
 			headers: {
 				'X-Auth-Token': 'xxxxxxxxx'
 			}
@@ -137,27 +134,28 @@ describe('Models::Product', () => {
 
 
 	describe('Can retrieve JSON from a remote endpoint.', () => {
-		let server,
-			fakeResponse = {id: 1, name: 'Acme House Red', price: '$100.00'};
+		let fakeResponse = {id: 1, name: 'Acme House Red', price: '$100.00'};
 
 		before(() => {
-			server = mocks.fakeServer.create();
+			mocks.stub(window, 'fetch');
+
+			let res = new window.Response('{"status":"OK"}', {
+				status: 200,
+				headers: {
+					'Content-type': 'application/json'
+				}
+			});
+
+			window.fetch.returns(Promise.resolve(res));
 		});
 
 		after(() => {
-			server.restore();
+			window.fetch.restore();
 			thenable = null;
 		});
 
 		it('receives JSON back from the API.', () => {
 			thenable = p.fetch(reqOpts);
-			// This is part of the FakeXMLHttpRequest API
-			server.requests[0].respond(
-				200,
-				{'Content-Type': 'application/json'},
-				JSON.stringify(fakeResponse)
-			);
-
 			expect(thenable).to.eventually.become(fakeResponse);
 
 		});

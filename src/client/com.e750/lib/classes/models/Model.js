@@ -50,18 +50,18 @@ class Model {
     }
 
     /**
-     * returns an A+ promise
+     * returns a native promise
      * @param options
      * @returns {*}
      */
-    fetch (options) {
+    fetch (options = {}) {
         try {
             this.emit(Evt.BEFORE_FETCH);
-            return net.http.get.call(this, options);
         } catch (e) {
             console.error(e);
             //throw e;
         }
+        return net.http.getJSON.call(this, options.url, options);
     }
 
     parse (data) {
@@ -87,7 +87,7 @@ class Model {
     get (propName) {
         try {
             let prop = this.values[propName];
-            return (typeof prop === 'function') ? prop.call(this) : prop;
+            return typeof prop === 'function' ? prop.call(this) : prop;
         } catch (e) {
             console.error(e);
             throw new ReferenceError('Property `' + propName + '` not found in ' + this.constructor.name);
