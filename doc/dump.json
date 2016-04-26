@@ -88,7 +88,7 @@
     "access": null,
     "description": null,
     "lineNumber": 1,
-    "content": "const Initializable = {\n    initState: function () {\n        return this;\n    },\n\n    initProps: function (props) {\n        this.options = {};\n        Object.assign(this.options, props);\n    }\n};\n\nexport default Initializable;\n"
+    "content": "const Initializable = {\n    initState: function () {\n        return this;\n    },\n\n    initProps: function (props) {\n        this.options = {};\n        Object.assign(this.options, props);\n        return this;\n    }\n};\n\nexport default Initializable;\n"
   },
   {
     "__docId__": 6,
@@ -116,16 +116,50 @@
     "kind": "file",
     "static": true,
     "variation": null,
+    "name": "src/client/com.e750/lib/behaviors/Progressable.js",
+    "memberof": null,
+    "longname": "src/client/com.e750/lib/behaviors/Progressable.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1,
+    "content": "import Evt from '../event/Registry';\nimport utils from '../util/defaults';\n\nconst Progressable = {\n    showProgress: function() {\n        if(!this.el || !this.emit) return false;\n\n        this.el.classList.add('loading');\n        this.emit(Evt.PROGRESS_START);\n        this.progressId = window.setInterval(() => {\n            let progress = this.el.querySelector('progress');\n            if(progress){\n                let value = parseInt(progress.getAttribute('value'), 10);\n                progress.setAttribute('value', value + utils.anyIntBetween(1, 10));\n            }else{\n                window.clearInterval(this.progressId);\n                throw new Error('<progress> element not found in component DOM.');\n            }\n\n        }, 200);\n        return this;\n    },\n\n    done: function () {\n        if(!this.el || !this.progressId) return false;\n\n        window.clearInterval(this.progressId);\n        this.el.classList.remove('loading');\n        return this;\n    }\n};\n\nexport default Progressable;\n"
+  },
+  {
+    "__docId__": 8,
+    "kind": "variable",
+    "static": true,
+    "variation": null,
+    "name": "Progressable",
+    "memberof": "src/client/com.e750/lib/behaviors/Progressable.js",
+    "longname": "src/client/com.e750/lib/behaviors/Progressable.js~Progressable",
+    "access": null,
+    "export": true,
+    "importPath": "e750-Micro/src/client/com.e750/lib/behaviors/Progressable.js",
+    "importStyle": "Progressable",
+    "description": null,
+    "lineNumber": 4,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 9,
+    "kind": "file",
+    "static": true,
+    "variation": null,
     "name": "src/client/com.e750/lib/classes/collections/Collection.js",
     "memberof": null,
     "longname": "src/client/com.e750/lib/classes/collections/Collection.js",
     "access": null,
     "description": null,
     "lineNumber": 1,
-    "content": "import Evented from '../../behaviors/Evented';\nimport {net} from '../../core';\nimport Model from '../../classes/models/Model';\nimport Initializable from '../../behaviors/Initializable';\nimport mixes from '../../util/mixes';\nimport Evt from '../../event/Registry';\n\nlet overrides = {\n    initProps: function (models = [], options = {}) {\n        this.options = {};\n        Object.assign(this.options, options);\n        this.model = (options.model) ? options.model : Model;\n        this.models = [];\n        this.parse(models);\n    }\n};\n\n@mixes(Evented, Initializable, overrides)\nexport default class Collection {\n    constructor (models = [], options = {}) {\n        this.initProps(models, options);\n        this.initState();\n    }\n\n    parse (data) {\n        //console.log('incoming model data:', data, Object.getOwnPropertyNames(data), data.length);\n        try {\n            if (data.length) {\n                if (data[0] instanceof this.model) {\n                    this.models = data;\n                } else {\n                    let item;\n                    for (item in data) {\n                        if (data.hasOwnProperty(item)) {\n                            let m = new this.model(data[item]);\n                            //console.log('new model:', m, item, 'data:', data[item]);\n                            this.models.push(m);\n                        }\n                    }\n                }\n            }\n        } catch (e) {\n            console.error(e);\n            throw e;\n        }\n\n        return this;\n    }\n\n    serialize () {\n        return this.models.map((model) => {\n            return model.serialize();\n        });\n    }\n\n    toJSON () {\n        return JSON.stringify(this.models.map((model) => {\n            return model.serialize();\n        }), null, 0);\n    }\n\n    toMeta (transformer, options) {\n        return JSON.stringify(transformer.collection(this.models.map((model) => {\n            return transformer.model(model.serialize());\n        }), options), null, 0);\n    }\n\n    /**\n     * returns an A+ promise\n     * @param options\n     * @returns {*}\n     */\n    fetch (options) {\n        this.emit(Evt.BEFORE_FETCH);\n        console.log('fetch:', options);\n        return net.http.get.call(this, options);\n    }\n\n    get (options) {\n        return this.fetch(options).then(this.parse.bind(this), this.onParseFailed.bind(this), 'collection.fetch');\n    }\n\n    onParseFailed () {\n        console.error('Parsing Failed.', this, arguments);\n        return false;\n    }\n}\n\nCollection.model = Model;\n\n"
+    "content": "import Evented from '../../behaviors/Evented';\nimport {net} from '../../core';\nimport Model from '../../classes/models/Model';\nimport Initializable from '../../behaviors/Initializable';\nimport mixes from '../../util/mixes';\nimport Evt from '../../event/Registry';\n\nlet overrides = {\n    initProps: function (models = [], options = {}) {\n        this.options = {};\n        Object.assign(this.options, options);\n        this.model = options.model ? options.model : Model;\n        this.models = [];\n        this.parse(models);\n    }\n};\n\n@mixes(Evented, Initializable, overrides)\nexport default class Collection {\n    constructor (models = [], options = {}) {\n        this.initProps(models, options);\n        this.initState();\n    }\n\n    parse (data) {\n        //console.log('incoming model data:', data, Object.getOwnPropertyNames(data), data.length);\n        try {\n            if (data.length) {\n                if (data[0] instanceof this.model) {\n                    this.models = data;\n                } else {\n                    let item;\n                    for (item in data) {\n                        if (data.hasOwnProperty(item)) {\n                            let m = new this.model(data[item]);\n                            //console.log('new model:', m, item, 'data:', data[item]);\n                            this.models.push(m);\n                        }\n                    }\n                }\n            }\n        } catch (e) {\n            console.error(e);\n            throw e;\n        }\n\n        return this;\n    }\n\n    serialize () {\n        return this.models.map((model) => {\n            return model.serialize();\n        });\n    }\n\n    toJSON () {\n        return JSON.stringify(this.models.map((model) => {\n            return model.serialize();\n        }), null, 0);\n    }\n\n    toMeta (transformer, options) {\n        return JSON.stringify(transformer.collection(this.models.map((model) => {\n            return transformer.model(model.serialize());\n        }), options), null, 0);\n    }\n\n    request (url, options) {\n        this.emit(Evt.BEFORE_REQUEST);\n        return net.http.getJSON.call(this, url, options);\n    }\n\n    verifyResource (url){\n        let endpoint = url || this.options.url;\n        if (!endpoint) {\n            throw new Error('No URL set for collection!');\n        }\n        return endpoint;\n    }\n\n    fetch (options = {}) {\n        return this.request(this.verifyResource(options.url), options).then(this.parse.bind(this), this.onParseFailed.bind(this), 'collection.get');\n    }\n\n    get (index){\n        return this.models[index];\n    }\n\n    save (options = {}) {\n        console.log('SAVE:', options);\n    }\n\n    /*post (options = {}) {\n        options.method = 'POST';\n        console.log('POST:', options);\n    }\n\n    put (options = {}) {\n        options.method = 'PUT';\n        console.log('PUT:', options);\n    }\n\n    del (options = {}) {\n        options.method = 'DELETE';\n        console.log('DEL:', options);\n    }*/\n\n    onParseFailed () {\n        console.error('Parsing Failed.', this, arguments);\n        return false;\n    }\n}\n\nCollection.model = Model;\n\n"
   },
   {
-    "__docId__": 8,
+    "__docId__": 10,
     "kind": "variable",
     "static": true,
     "variation": null,
@@ -146,7 +180,7 @@
     }
   },
   {
-    "__docId__": 9,
+    "__docId__": 11,
     "kind": "class",
     "static": true,
     "variation": null,
@@ -163,7 +197,7 @@
     "interface": false
   },
   {
-    "__docId__": 10,
+    "__docId__": 12,
     "kind": "constructor",
     "static": false,
     "variation": null,
@@ -197,7 +231,7 @@
     "generator": false
   },
   {
-    "__docId__": 11,
+    "__docId__": 13,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -224,7 +258,7 @@
     "generator": false
   },
   {
-    "__docId__": 12,
+    "__docId__": 14,
     "kind": "member",
     "static": false,
     "variation": null,
@@ -242,7 +276,7 @@
     }
   },
   {
-    "__docId__": 13,
+    "__docId__": 15,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -262,7 +296,7 @@
     "generator": false
   },
   {
-    "__docId__": 14,
+    "__docId__": 16,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -282,7 +316,7 @@
     "generator": false
   },
   {
-    "__docId__": 15,
+    "__docId__": 17,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -315,57 +349,24 @@
     "generator": false
   },
   {
-    "__docId__": 16,
+    "__docId__": 18,
     "kind": "method",
     "static": false,
     "variation": null,
-    "name": "fetch",
+    "name": "request",
     "memberof": "src/client/com.e750/lib/classes/collections/Collection.js~Collection",
-    "longname": "src/client/com.e750/lib/classes/collections/Collection.js~Collection#fetch",
-    "access": null,
-    "description": "returns an A+ promise",
-    "lineNumber": 73,
-    "unknown": [
-      {
-        "tagName": "@returns",
-        "tagValue": "{*}"
-      }
-    ],
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "*"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "options",
-        "description": ""
-      }
-    ],
-    "return": {
-      "nullable": null,
-      "types": [
-        "*"
-      ],
-      "spread": false,
-      "description": ""
-    },
-    "generator": false
-  },
-  {
-    "__docId__": 17,
-    "kind": "method",
-    "static": false,
-    "variation": null,
-    "name": "get",
-    "memberof": "src/client/com.e750/lib/classes/collections/Collection.js~Collection",
-    "longname": "src/client/com.e750/lib/classes/collections/Collection.js~Collection#get",
+    "longname": "src/client/com.e750/lib/classes/collections/Collection.js~Collection#request",
     "access": null,
     "description": null,
-    "lineNumber": 79,
+    "lineNumber": 68,
     "undocument": true,
     "params": [
+      {
+        "name": "url",
+        "types": [
+          "*"
+        ]
+      },
       {
         "name": "options",
         "types": [
@@ -381,7 +382,116 @@
     "generator": false
   },
   {
-    "__docId__": 18,
+    "__docId__": 19,
+    "kind": "method",
+    "static": false,
+    "variation": null,
+    "name": "verifyResource",
+    "memberof": "src/client/com.e750/lib/classes/collections/Collection.js~Collection",
+    "longname": "src/client/com.e750/lib/classes/collections/Collection.js~Collection#verifyResource",
+    "access": null,
+    "description": null,
+    "lineNumber": 73,
+    "undocument": true,
+    "params": [
+      {
+        "name": "url",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 20,
+    "kind": "method",
+    "static": false,
+    "variation": null,
+    "name": "fetch",
+    "memberof": "src/client/com.e750/lib/classes/collections/Collection.js~Collection",
+    "longname": "src/client/com.e750/lib/classes/collections/Collection.js~Collection#fetch",
+    "access": null,
+    "description": null,
+    "lineNumber": 81,
+    "undocument": true,
+    "params": [
+      {
+        "name": "options",
+        "optional": true,
+        "types": [
+          "{}"
+        ],
+        "defaultRaw": {},
+        "defaultValue": "{}"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 21,
+    "kind": "method",
+    "static": false,
+    "variation": null,
+    "name": "get",
+    "memberof": "src/client/com.e750/lib/classes/collections/Collection.js~Collection",
+    "longname": "src/client/com.e750/lib/classes/collections/Collection.js~Collection#get",
+    "access": null,
+    "description": null,
+    "lineNumber": 85,
+    "undocument": true,
+    "params": [
+      {
+        "name": "index",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 22,
+    "kind": "method",
+    "static": false,
+    "variation": null,
+    "name": "save",
+    "memberof": "src/client/com.e750/lib/classes/collections/Collection.js~Collection",
+    "longname": "src/client/com.e750/lib/classes/collections/Collection.js~Collection#save",
+    "access": null,
+    "description": null,
+    "lineNumber": 89,
+    "undocument": true,
+    "params": [
+      {
+        "name": "options",
+        "optional": true,
+        "types": [
+          "{}"
+        ],
+        "defaultRaw": {},
+        "defaultValue": "{}"
+      }
+    ],
+    "generator": false
+  },
+  {
+    "__docId__": 23,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -390,7 +500,7 @@
     "longname": "src/client/com.e750/lib/classes/collections/Collection.js~Collection#onParseFailed",
     "access": null,
     "description": null,
-    "lineNumber": 83,
+    "lineNumber": 108,
     "undocument": true,
     "params": [],
     "return": {
@@ -401,7 +511,7 @@
     "generator": false
   },
   {
-    "__docId__": 19,
+    "__docId__": 24,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -411,10 +521,10 @@
     "access": null,
     "description": null,
     "lineNumber": 1,
-    "content": "import Collection from './Collection';\nimport Product from '../../classes/models/Product';\n\nexport default class ProductCollection extends Collection {\n    initProps (models = [], options = {}) {\n        super.initProps(models, options);\n        this.model = (options.model) ? options.model : Product;\n    }\n}\n"
+    "content": "import Collection from './Collection';\nimport Product from '../../classes/models/Product';\n\nexport default class ProductCollection extends Collection {\n    initProps (models = [], options = {}) {\n        super.initProps(models, options);\n        this.model = options.model ? options.model : Product;\n        return this;\n    }\n}\n"
   },
   {
-    "__docId__": 20,
+    "__docId__": 25,
     "kind": "class",
     "static": true,
     "variation": null,
@@ -434,7 +544,7 @@
     ]
   },
   {
-    "__docId__": 21,
+    "__docId__": 26,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -465,10 +575,15 @@
         "defaultValue": "{}"
       }
     ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
     "generator": false
   },
   {
-    "__docId__": 22,
+    "__docId__": 27,
     "kind": "member",
     "static": false,
     "variation": null,
@@ -486,7 +601,7 @@
     }
   },
   {
-    "__docId__": 23,
+    "__docId__": 28,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -496,10 +611,10 @@
     "access": null,
     "description": null,
     "lineNumber": 1,
-    "content": "import {net} from '../../core';\nimport Evented from '../../behaviors/Evented';\nimport guid from '../../util/Guid.js';\nimport Initializable from '../../behaviors/Initializable';\nimport mixes from '../../util/mixes';\nimport Evt from '../../event/Registry';\n\nlet attributes = {\n    id: null,\n    _guid: guid(),\n    all: function () {\n        let values = {};\n        Object.keys(this).map((p) => {\n            values[p] = this[p];\n        });\n\n        return values;\n    }\n};\n\nlet overrides = {\n    initProps: function (props) {\n        this.values = Object.create(attributes);\n\n        Object.assign(this.values, this.defaults || {});\n\n        if (props) {\n            this.parse(props);\n        }\n\n    }\n};\n\n@mixes(Evented, Initializable, overrides)\nexport default\nclass Model {\n    constructor (props, options) {\n        Initializable.initProps.call(this, options);\n        this.initProps(props);\n        this.initState();\n    }\n\n    setId (val) {\n        let id = Number(val);\n        if (!isNaN(id)) {\n            this.values.id = id;\n        } else {\n            throw new TypeError('ID attribute value must be a number.');\n        }\n    }\n\n    /**\n     * returns an A+ promise\n     * @param options\n     * @returns {*}\n     */\n    fetch (options) {\n        try {\n            this.emit(Evt.BEFORE_FETCH);\n            return net.http.get.call(this, options);\n        } catch (e) {\n            console.error(e);\n            //throw e;\n        }\n    }\n\n    parse (data) {\n        //console.log('parsing model', data, Object.keys(data).length);\n        try {\n            if (Object.keys(data).length > 0) {\n                for (let prop in data) {\n                    if (data.hasOwnProperty(prop)) {\n                        this.set(prop, data[prop]);\n                    }\n                }\n            } else {\n                throw new Error('Data has zero length.');\n            }\n        } catch (e) {\n            console.error(e);\n            //throw e;\n        }\n\n        return this;\n    }\n\n    get (propName) {\n        try {\n            let prop = this.values[propName];\n            return (typeof prop === 'function') ? prop.call(this) : prop;\n        } catch (e) {\n            console.error(e);\n            throw new ReferenceError('Property `' + propName + '` not found in ' + this.constructor.name);\n        }\n    }\n\n    set (propName, value) {\n        if (propName.toLowerCase() === 'id') {\n            this.setId(value);\n        } else {\n            this.values[propName] = value;\n        }\n\n        return this;\n    }\n\n    serialize () {\n        return this.values.all();\n    }\n\n    toJSON () {\n        return JSON.stringify(this.values.all(), null, 0);\n    }\n\n    toMeta (transformer, options) {\n        return JSON.stringify(transformer(this.values.all(), options), null, 0);\n    }\n\n}\n\nexport {Model};\n"
+    "content": "import {net} from '../../core';\nimport Evented from '../../behaviors/Evented';\nimport guid from '../../util/Guid.js';\nimport Initializable from '../../behaviors/Initializable';\nimport mixes from '../../util/mixes';\nimport Evt from '../../event/Registry';\n\nlet attributes = {\n    id: null,\n    _guid: guid(),\n    all: function () {\n        let values = {};\n        Object.keys(this).map((p) => {\n            values[p] = this[p];\n        });\n\n        return values;\n    }\n};\n\nlet overrides = {\n    initProps: function (props) {\n        this.values = Object.create(attributes);\n\n        Object.assign(this.values, this.defaults || {});\n\n        if (props) {\n            this.parse(props);\n        }\n        return this;\n    }\n};\n\n@mixes(Evented, Initializable, overrides)\nexport default\nclass Model {\n    constructor (props, options) {\n        Initializable.initProps.call(this, options);\n        this.initProps(props);\n        this.initState();\n    }\n\n    setId (val) {\n        let id = Number(val);\n        if (!isNaN(id)) {\n            this.values.id = id;\n        } else {\n            throw new TypeError('ID attribute value must be a number.');\n        }\n    }\n\n    /**\n     * returns a native promise\n     * @param options\n     * @returns {*}\n     */\n    fetch (options = {}) {\n        try {\n            this.emit(Evt.BEFORE_FETCH);\n        } catch (e) {\n            console.error(e);\n            //throw e;\n        }\n        return net.http.getJSON.call(this, options.url, options);\n    }\n\n    parse (data) {\n        //console.log('parsing model', data, Object.keys(data).length);\n        try {\n            if (Object.keys(data).length > 0) {\n                for (let prop in data) {\n                    if (data.hasOwnProperty(prop)) {\n                        this.set(prop, data[prop]);\n                    }\n                }\n            } else {\n                throw new Error('Data has zero length.');\n            }\n        } catch (e) {\n            console.error(e);\n            //throw e;\n        }\n\n        return this;\n    }\n\n    get (propName) {\n        try {\n            let prop = this.values[propName];\n            return typeof prop === 'function' ? prop.call(this) : prop;\n        } catch (e) {\n            console.error(e);\n            throw new ReferenceError('Property `' + propName + '` not found in ' + this.constructor.name);\n        }\n    }\n\n    set (propName, value) {\n        if (propName.toLowerCase() === 'id') {\n            this.setId(value);\n        } else {\n            this.values[propName] = value;\n        }\n\n        return this;\n    }\n\n    serialize () {\n        return this.values.all();\n    }\n\n    toJSON () {\n        return JSON.stringify(this.values.all(), null, 0);\n    }\n\n    toMeta (transformer, options) {\n        return JSON.stringify(transformer(this.values.all(), options), null, 0);\n    }\n\n}\n\nexport {Model};\n"
   },
   {
-    "__docId__": 24,
+    "__docId__": 29,
     "kind": "variable",
     "static": true,
     "variation": null,
@@ -520,7 +635,7 @@
     }
   },
   {
-    "__docId__": 25,
+    "__docId__": 30,
     "kind": "variable",
     "static": true,
     "variation": null,
@@ -541,7 +656,7 @@
     }
   },
   {
-    "__docId__": 26,
+    "__docId__": 31,
     "kind": "class",
     "static": true,
     "variation": null,
@@ -558,7 +673,7 @@
     "interface": false
   },
   {
-    "__docId__": 27,
+    "__docId__": 32,
     "kind": "constructor",
     "static": false,
     "variation": null,
@@ -586,7 +701,7 @@
     "generator": false
   },
   {
-    "__docId__": 28,
+    "__docId__": 33,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -608,7 +723,7 @@
     "generator": false
   },
   {
-    "__docId__": 29,
+    "__docId__": 34,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -616,7 +731,7 @@
     "memberof": "src/client/com.e750/lib/classes/models/Model.js~Model",
     "longname": "src/client/com.e750/lib/classes/models/Model.js~Model#fetch",
     "access": null,
-    "description": "returns an A+ promise",
+    "description": "returns a native promise",
     "lineNumber": 57,
     "unknown": [
       {
@@ -647,7 +762,7 @@
     "generator": false
   },
   {
-    "__docId__": 30,
+    "__docId__": 35,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -674,7 +789,7 @@
     "generator": false
   },
   {
-    "__docId__": 31,
+    "__docId__": 36,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -701,7 +816,7 @@
     "generator": false
   },
   {
-    "__docId__": 32,
+    "__docId__": 37,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -734,7 +849,7 @@
     "generator": false
   },
   {
-    "__docId__": 33,
+    "__docId__": 38,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -754,7 +869,7 @@
     "generator": false
   },
   {
-    "__docId__": 34,
+    "__docId__": 39,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -774,7 +889,7 @@
     "generator": false
   },
   {
-    "__docId__": 35,
+    "__docId__": 40,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -807,7 +922,7 @@
     "generator": false
   },
   {
-    "__docId__": 36,
+    "__docId__": 41,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -817,10 +932,10 @@
     "access": null,
     "description": null,
     "lineNumber": 1,
-    "content": "import Model from './Model';\n\nexport default class Product extends Model {\n    initProps () {\n        this.defaults = {};\n        Model.prototype.initProps.apply(this, arguments);\n    }\n}\n\nexport {Product as ProductModel};\n\n"
+    "content": "import Model from './Model';\n\nexport default class Product extends Model {\n    initProps () {\n        this.defaults = {};\n        Model.prototype.initProps.apply(this, arguments);\n        return this;\n    }\n}\n\nexport {Product as ProductModel};\n\n"
   },
   {
-    "__docId__": 37,
+    "__docId__": 42,
     "kind": "class",
     "static": true,
     "variation": null,
@@ -840,7 +955,7 @@
     ]
   },
   {
-    "__docId__": 38,
+    "__docId__": 43,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -852,10 +967,15 @@
     "lineNumber": 4,
     "undocument": true,
     "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
     "generator": false
   },
   {
-    "__docId__": 39,
+    "__docId__": 44,
     "kind": "member",
     "static": false,
     "variation": null,
@@ -873,7 +993,7 @@
     }
   },
   {
-    "__docId__": 40,
+    "__docId__": 45,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -883,10 +1003,10 @@
     "access": null,
     "description": null,
     "lineNumber": 1,
-    "content": "import Evented from '../../behaviors/Evented';\nimport Initializable from '../../behaviors/Initializable';\nimport mixes from '../../util/mixes';\n\n@mixes(Evented, Initializable)\nexport default class View {\n    constructor (options) {\n        Initializable.initProps.call(this, options);\n    }\n\n    render () {\n        return this;\n    }\n\n    bindSubscriptions () {\n\n    }\n\n    destroy () {\n        let ret = [];\n        ret.push(this.detachEvents());\n        return ret;\n    }\n\n    detachEvents () {\n        if(this.subscriptions) {\n            return this.subscriptions.map((subscription) => {\n                //console.log('detaching event', this, subscription);\n                let evt = subscription.evt,\n                    fn = subscription.fn;\n                return this.off(evt, fn);\n            });\n        }\n    }\n}\n"
+    "content": "import Evented from '../../behaviors/Evented';\nimport Initializable from '../../behaviors/Initializable';\nimport mixes from '../../util/mixes';\n\n@mixes(Evented, Initializable)\nexport default class View {\n    constructor (options) {\n        Initializable.initProps.call(this, options);\n    }\n\n    render () {\n        return this;\n    }\n\n    bindSubscriptions () {\n        return this;\n    }\n\n    destroy () {\n        let ret = [];\n        ret.push(this.detachEvents());\n        return ret;\n    }\n\n    detachEvents () {\n        if (this.subscriptions) {\n            return this.subscriptions.map((subscription) => {\n                //console.log('detaching event', this, subscription);\n                let evt = subscription.evt,\n                    fn = subscription.fn;\n                return this.off(evt, fn);\n            });\n        }\n        return false;\n    }\n}\n"
   },
   {
-    "__docId__": 41,
+    "__docId__": 46,
     "kind": "class",
     "static": true,
     "variation": null,
@@ -903,7 +1023,7 @@
     "interface": false
   },
   {
-    "__docId__": 42,
+    "__docId__": 47,
     "kind": "constructor",
     "static": false,
     "variation": null,
@@ -925,7 +1045,7 @@
     "generator": false
   },
   {
-    "__docId__": 43,
+    "__docId__": 48,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -945,7 +1065,7 @@
     "generator": false
   },
   {
-    "__docId__": 44,
+    "__docId__": 49,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -957,10 +1077,15 @@
     "lineNumber": 15,
     "undocument": true,
     "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
     "generator": false
   },
   {
-    "__docId__": 45,
+    "__docId__": 50,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -980,7 +1105,7 @@
     "generator": false
   },
   {
-    "__docId__": 46,
+    "__docId__": 51,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -994,13 +1119,13 @@
     "params": [],
     "return": {
       "types": [
-        "*"
+        "boolean"
       ]
     },
     "generator": false
   },
   {
-    "__docId__": 47,
+    "__docId__": 52,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -1010,10 +1135,10 @@
     "access": null,
     "description": null,
     "lineNumber": 1,
-    "content": "import Component from './Component';\n\nexport default class AddToCart extends Component {\n    initProps (el, options) {\n        super.initProps(el, options);\n    }\n\n    initState () {\n        this.bindDOMEvents();\n    }\n\n    bindDOMEvents () {\n        this.on('submit', this.onSubmit.bind(this));\n\n        this.on('click', (e) => {\n            console.log('CLICKED', this, e);\n        });\n    }\n\n    onSubmit (e) {\n        console.log('SUBMITTED', this, e);\n        e.preventDefault();\n        return false;\n    }\n}\n"
+    "content": "import Component from './Component';\n\nexport default class AddToCart extends Component {\n    initProps (el, options) {\n        return super.initProps(el, options);\n    }\n\n    initState () {\n        this.bindDOMEvents();\n        return this;\n    }\n\n    bindDOMEvents () {\n        this.on('submit', this.onSubmit.bind(this));\n\n        this.on('click', (e) => {\n            console.log('CLICKED', this, e);\n        });\n\n        return this;\n    }\n\n    onSubmit (e) {\n        console.log('SUBMITTED', this, e);\n        e.preventDefault();\n        return false;\n    }\n}\n"
   },
   {
-    "__docId__": 48,
+    "__docId__": 53,
     "kind": "class",
     "static": true,
     "variation": null,
@@ -1033,7 +1158,7 @@
     ]
   },
   {
-    "__docId__": 49,
+    "__docId__": 54,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -1058,10 +1183,15 @@
         ]
       }
     ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
     "generator": false
   },
   {
-    "__docId__": 50,
+    "__docId__": 55,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -1073,10 +1203,15 @@
     "lineNumber": 8,
     "undocument": true,
     "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
     "generator": false
   },
   {
-    "__docId__": 51,
+    "__docId__": 56,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -1085,13 +1220,18 @@
     "longname": "src/client/com.e750/lib/components/AddToCart.js~AddToCart#bindDOMEvents",
     "access": null,
     "description": null,
-    "lineNumber": 12,
+    "lineNumber": 13,
     "undocument": true,
     "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
     "generator": false
   },
   {
-    "__docId__": 52,
+    "__docId__": 57,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -1100,7 +1240,7 @@
     "longname": "src/client/com.e750/lib/components/AddToCart.js~AddToCart#onSubmit",
     "access": null,
     "description": null,
-    "lineNumber": 20,
+    "lineNumber": 23,
     "undocument": true,
     "params": [
       {
@@ -1118,7 +1258,7 @@
     "generator": false
   },
   {
-    "__docId__": 53,
+    "__docId__": 58,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -1131,7 +1271,7 @@
     "content": "import Component from './Component';\nimport Resolver from './Resolver';\nimport Evt from '../event/Registry';\n\nComponent.Resolver = new Resolver();\n\nexport default class Application extends Component {\n    start () {\n        this.emit(Evt.APP_START);\n        return this;\n    }\n\n    attachPartials () {\n        return this.updateChildren('[data-partial]');\n    }\n}\n"
   },
   {
-    "__docId__": 54,
+    "__docId__": 59,
     "kind": "class",
     "static": true,
     "variation": null,
@@ -1151,7 +1291,7 @@
     ]
   },
   {
-    "__docId__": 55,
+    "__docId__": 60,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -1171,7 +1311,7 @@
     "generator": false
   },
   {
-    "__docId__": 56,
+    "__docId__": 61,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -1191,7 +1331,7 @@
     "generator": false
   },
   {
-    "__docId__": 57,
+    "__docId__": 62,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -1201,10 +1341,10 @@
     "access": null,
     "description": null,
     "lineNumber": 1,
-    "content": "import {Model} from '../classes/models/Model';\nimport Component from '../components/Component';\n\n\nexport default class Carousel extends Component {\n    model = Model;\n    id = 'ui/slider';\n\n    initState () {\n\n    }\n\n    initProps (el, options) {\n        super.initProps(el, options);\n        this.model = options.model || new Model();\n        if (this.el.dataset.mounted === undefined) {\n            this.template = options.template || document.querySelector(this.getComponentId());\n        }\n    }\n\n    render () {\n        try {\n            this.attachNestedComponents();\n            return this;\n        } catch (e) {\n            console.error(e);\n            throw e;\n        }\n    }\n}\n"
+    "content": "import {Model} from '../classes/models/Model';\nimport Component from '../components/Component';\n\n\nexport default class Carousel extends Component {\n    model = Model;\n    id = 'ui/slider';\n\n    initState () {\n        return this;\n    }\n\n    initProps (el, options) {\n        super.initProps(el, options);\n        this.model = options.model || new Model();\n        if (this.el.dataset.mounted === undefined) {\n            this.template = options.template || document.querySelector(this.getComponentSelector());\n        }\n        return this;\n    }\n\n    render () {\n        try {\n            this.attachNestedComponents();\n            return this;\n        } catch (e) {\n            console.error(e);\n            throw e;\n        }\n    }\n}\n"
   },
   {
-    "__docId__": 58,
+    "__docId__": 63,
     "kind": "class",
     "static": true,
     "variation": null,
@@ -1224,7 +1364,7 @@
     ]
   },
   {
-    "__docId__": 59,
+    "__docId__": 64,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -1236,10 +1376,15 @@
     "lineNumber": 9,
     "undocument": true,
     "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
     "generator": false
   },
   {
-    "__docId__": 60,
+    "__docId__": 65,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -1264,10 +1409,15 @@
         ]
       }
     ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
     "generator": false
   },
   {
-    "__docId__": 61,
+    "__docId__": 66,
     "kind": "member",
     "static": false,
     "variation": null,
@@ -1285,7 +1435,7 @@
     }
   },
   {
-    "__docId__": 62,
+    "__docId__": 67,
     "kind": "member",
     "static": false,
     "variation": null,
@@ -1303,7 +1453,7 @@
     }
   },
   {
-    "__docId__": 63,
+    "__docId__": 68,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -1312,7 +1462,7 @@
     "longname": "src/client/com.e750/lib/components/Carousel.js~Carousel#render",
     "access": null,
     "description": null,
-    "lineNumber": 21,
+    "lineNumber": 22,
     "undocument": true,
     "params": [],
     "return": {
@@ -1323,7 +1473,7 @@
     "generator": false
   },
   {
-    "__docId__": 64,
+    "__docId__": 69,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -1333,10 +1483,10 @@
     "access": null,
     "description": null,
     "lineNumber": 1,
-    "content": "import View from '../classes/views/View';\nimport Model from '../classes/models/Model';\nimport Collection from '../classes/collections/Collection';\nimport {isElement} from '../util/DOMUtils';\nimport LookupTable from '../util/LookupTable';\nimport Evt from '../event/Registry';\nimport utils from '../util/defaults';\n\n\nexport default class Component extends View {\n    componentIdentifier = '[data-component]';\n\n    constructor (el, options = {}) {\n        super(options);\n        this.initProps(el, options);\n    }\n\n    initProps (el, options) {\n        this.ensureElement(el);\n        this.id = this.options.id || this.generateComponentId();\n        this.model = new Model(this.options.model);\n        this.collection = new Collection(this.options.collection);\n        this.template = this.options.template || null;\n        this.childViews = Object.create(LookupTable);\n        this.initState();\n    }\n\n    generateComponentId () {\n        return (new Date).getTime();\n    }\n\n    ensureElement (el) {\n        try {\n            this.el = isElement(el) ? el :\n                (Component.reservedElements.indexOf(el.toUpperCase()) !== -1) ?\n                    document.getElementsByTagName(el)[0] :\n                    document.createElement(el || Component.defaults.el);\n            return true;\n        } catch (e) {\n            console.error(e);\n            throw new Error('Component must have a DOMElement.', e);\n        }\n    }\n\n    getComponentId () {\n        return '[' + this.componentIdentifier.slice(1, -1) + '=' + this.id + ']';\n    }\n\n    getBootstrap () {\n        if (window.e750.bootstrap) {\n            return window.e750.bootstrap[this.constructor.name] || [];\n        }\n        return [];\n    }\n\n    isMounted () {\n        let components = this.componentIdentifier ? this.el.querySelectorAll(this.componentIdentifier) : this.el.children;\n        if (components.length) {\n            let list = [];\n            [].forEach.call(components, (component) => {\n                list.push(component.dataset.mounted);\n            });\n            return !!list.indexOf(false);\n        }\n        return false;\n    }\n\n    destroy () {\n        let ret = [];\n        Object.keys(this.childViews, (view) => {\n            //console.log('removing child view: ', view);\n            ret.push(view.destroy());\n        });\n        return ret.push([super.destroy(), this.unmount()]);\n    }\n\n    unmount () {\n        let el = this.el,\n            parent = el.parentElement;\n        if (!parent) {\n            return true; //not in DOM;\n        }\n        try {\n            return parent.removeChild(this.el);\n        } catch (e) {\n            console.error('Unable to unmount View.', e);\n            return false;\n        }\n    }\n\n    showProgress () {\n        //TODO: change this to use a proper 'progrees' component;\n        this.el.classList.add('loading');\n        this.emit(Evt.PROGRESS_START);\n        this.progressId = window.setInterval(() => {\n            let progress = this.el.querySelector('progress');\n            if(progress){\n                let value = parseInt(progress.getAttribute('value'), 10);\n                progress.setAttribute('value', value + utils.anyIntBetween(1, 10));\n            }else{\n                window.clearInterval(this.progressId);\n            }\n\n        }, 200);\n        return this;\n    }\n\n    done () {\n        window.clearInterval(this.progressId);\n        this.el.classList.remove('loading');\n        return this;\n    }\n\n    addChildView (view) {\n        let componentId = Component.Resolver.getComponentId(view),\n            childViews = this.childViews;\n        if (!childViews.has(componentId)) {\n            childViews[componentId] = [];\n        }\n        childViews[componentId].push(view);\n        return this;\n    }\n\n    bindDOMEvents () {\n\n    }\n\n    attachNestedComponents () {\n        return this.updateChildren(this.componentIdentifier);\n    }\n\n    updateChildren (selector) {\n\n        let components = selector ? this.el.querySelectorAll(selector) : this.el.children,\n            Resolver = Component.Resolver;\n\n        //console.log('registering child components for: ', this, components, selector, this.el.querySelectorAll(selector), this.el.children);\n\n        if (components.length) {\n            this.emit(Evt.WILL_UPDATE_CHILDREN);\n            try {\n                [].filter.call(components, (node) => {\n                    return node.dataset.component;\n                });\n            } catch (e) {\n                console.error(e);\n                throw e;\n            }\n\n            try {\n                //console.log('components: ', components, this, this.childViews);\n                [].forEach.call(components, (componentEl) => {\n                    let componentId = componentEl.dataset.component;\n                    if (!this.childViews.has(componentId)) {\n                        this.childViews[componentId] = [];\n                    }\n                    if (Resolver.has(componentId)) {\n                        let C = Resolver.get(componentId),\n                            c = new C(componentEl, componentEl.dataset.options);\n                        this.childViews[componentId].push(c);\n                        //console.info('registered component: ', componentId, componentEl, C);\n                    } else {\n                        throw new ReferenceError(componentId + ' not found in component resolver.', Resolver);\n                    }\n                });\n                this.emit(Evt.DID_UPDATE_CHILDREN);\n            } catch (e) {\n                console.error(e);\n                throw e;\n            }\n        } else {\n            console.info('No child components to register.');\n        }\n\n        this.emit(Evt.COMPONENTS_LOADED, {test: 'abcd'}, [1, 2, 3], true);\n        return this;\n    }\n}\n\nComponent.defaults = {\n    el: 'div'\n};\n\nComponent.reservedElements = [\n    'HTML',\n    'HEAD',\n    'BODY'\n];\n\n\n"
+    "content": "import View from '../classes/views/View';\nimport Model from '../classes/models/Model';\nimport Collection from '../classes/collections/Collection';\nimport {isElement} from '../util/DOMUtils';\nimport LookupTable from '../util/LookupTable';\nimport Evt from '../event/Registry';\n\nimport Progressable from '../behaviors/Progressable';\nimport mixes from '../util/mixes';\n\n@mixes(Progressable)\nexport default class Component extends View {\n    constructor (el, options = {}) {\n        super(options);\n        this.initProps(el, options);\n    }\n\n    initProps (el, options) {\n        this.ensureElement(el);\n        this.id = this.options.id || this.generateComponentId();\n        this.model = new Model(this.options.model);\n        this.collection = new Collection(this.options.collection);\n        this.template = this.options.template || null;\n        this.childViews = Object.create(LookupTable);\n        this.initState();\n    }\n\n    generateComponentId () {\n        return (new Date()).getTime();\n    }\n\n    ensureElement (el) {\n        this.el = !el ? document.createElement(Component.defaults.el) : isElement(el) ? el :\n            Component.reservedElements.indexOf(el.toUpperCase()) !== -1 ?\n                document.getElementsByTagName(el)[0] :\n                document.createElement(el);\n        return true;\n    }\n\n    getComponentAttrSelector () {\n        return '[' + Component.attr + ']';\n    }\n\n    findComponents () {\n        return this.el.querySelectorAll(this.getComponentAttrSelector());\n    }\n\n    getComponentSelector () {\n        return '[' + Component.attr + '=\"' + this.getComponentId() + '\"]';\n    }\n\n    getComponentId () {\n        return this.id;\n    }\n\n    getBootstrap () {\n        if (window.e750.bootstrap) {\n            return window.e750.bootstrap[this.constructor.name] || [];\n        }\n        return [];\n    }\n\n    isMounted () {\n        let components = this.id ? this.findComponents() : this.el.children;\n        if (components.length) {\n            let list = [];\n            [].forEach.call(components, (component) => {\n                list.push(component.dataset.mounted);\n            });\n            return !!list.indexOf(false);\n        }\n        return false;\n    }\n\n    destroy () {\n        let ret = [];\n        Object.keys(this.childViews, (view) => {\n            //console.log('removing child view: ', view);\n            ret.push(view.destroy());\n        });\n        return ret.push([super.destroy(), this.unmount()]);\n    }\n\n    unmount () {\n        let el = this.el,\n            parent = el.parentElement;\n        if (!parent) {\n            return true; //not in DOM;\n        }\n        try {\n            return parent.removeChild(this.el);\n        } catch (e) {\n            console.error('Unable to unmount View.', e);\n            return false;\n        }\n    }\n\n    addChildView (view) {\n        let componentId = Component.Resolver.getComponentId(view),\n            childViews = this.childViews;\n        if (!childViews.has(componentId)) {\n            childViews[componentId] = [];\n        }\n        childViews[componentId].push(view);\n        return this;\n    }\n\n    bindDOMEvents () {\n        return this;\n    }\n\n    attachNestedComponents () {\n        return this.updateChildren(this.getComponentAttrSelector());\n    }\n\n    updateChildren (selector) {\n\n        let components = selector ? this.el.querySelectorAll(selector) : this.el.children,\n            Resolver = Component.Resolver;\n\n        //console.log('registering child components for: ', this, components, selector, this.el.querySelectorAll(selector), this.el.children);\n\n        if (components.length) {\n            this.emit(Evt.WILL_UPDATE_CHILDREN);\n            try {\n                [].filter.call(components, (node) => {\n                    return node.dataset.component;\n                });\n            } catch (e) {\n                console.error(e);\n                throw e;\n            }\n\n            try {\n                //console.log('components: ', components, this, this.childViews);\n                [].forEach.call(components, (componentEl) => {\n                    let componentId = componentEl.dataset.component;\n                    if (!this.childViews.has(componentId)) {\n                        this.childViews[componentId] = [];\n                    }\n                    if (Resolver.has(componentId)) {\n                        let C = Resolver.get(componentId),\n                            c = new C(componentEl, componentEl.dataset.options);\n                        this.childViews[componentId].push(c);\n                        //console.info('registered component: ', componentId, componentEl, C);\n                    } else {\n                        throw new ReferenceError(componentId + ' not found in component resolver.', Resolver);\n                    }\n                });\n                this.emit(Evt.DID_UPDATE_CHILDREN);\n            } catch (e) {\n                console.error(e);\n                throw e;\n            }\n        } else {\n            console.info('No child components to register.');\n        }\n\n        this.emit(Evt.COMPONENTS_LOADED);\n        return this;\n    }\n}\n\nComponent.attr = 'data-component';\n\nComponent.defaults = {\n    el: 'div'\n};\n\nComponent.reservedElements = [\n    'HTML',\n    'HEAD',\n    'BODY'\n];\n\n\n"
   },
   {
-    "__docId__": 65,
+    "__docId__": 70,
     "kind": "class",
     "static": true,
     "variation": null,
@@ -1348,7 +1498,7 @@
     "importPath": "e750-Micro/src/client/com.e750/lib/components/Component.js",
     "importStyle": "Component",
     "description": null,
-    "lineNumber": 10,
+    "lineNumber": 12,
     "undocument": true,
     "interface": false,
     "extends": [
@@ -1356,7 +1506,7 @@
     ]
   },
   {
-    "__docId__": 66,
+    "__docId__": 71,
     "kind": "constructor",
     "static": false,
     "variation": null,
@@ -1387,7 +1537,7 @@
     "generator": false
   },
   {
-    "__docId__": 67,
+    "__docId__": 72,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -1415,7 +1565,7 @@
     "generator": false
   },
   {
-    "__docId__": 68,
+    "__docId__": 73,
     "kind": "member",
     "static": false,
     "variation": null,
@@ -1433,7 +1583,7 @@
     }
   },
   {
-    "__docId__": 69,
+    "__docId__": 74,
     "kind": "member",
     "static": false,
     "variation": null,
@@ -1451,7 +1601,7 @@
     }
   },
   {
-    "__docId__": 70,
+    "__docId__": 75,
     "kind": "member",
     "static": false,
     "variation": null,
@@ -1469,7 +1619,7 @@
     }
   },
   {
-    "__docId__": 71,
+    "__docId__": 76,
     "kind": "member",
     "static": false,
     "variation": null,
@@ -1487,7 +1637,7 @@
     }
   },
   {
-    "__docId__": 72,
+    "__docId__": 77,
     "kind": "member",
     "static": false,
     "variation": null,
@@ -1505,7 +1655,7 @@
     }
   },
   {
-    "__docId__": 73,
+    "__docId__": 78,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -1525,7 +1675,7 @@
     "generator": false
   },
   {
-    "__docId__": 74,
+    "__docId__": 79,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -1552,7 +1702,7 @@
     "generator": false
   },
   {
-    "__docId__": 75,
+    "__docId__": 80,
     "kind": "member",
     "static": false,
     "variation": null,
@@ -1561,7 +1711,7 @@
     "longname": "src/client/com.e750/lib/components/Component.js~Component#el",
     "access": null,
     "description": null,
-    "lineNumber": 34,
+    "lineNumber": 33,
     "undocument": true,
     "type": {
       "types": [
@@ -1570,116 +1720,16 @@
     }
   },
   {
-    "__docId__": 76,
-    "kind": "method",
-    "static": false,
-    "variation": null,
-    "name": "getComponentId",
-    "memberof": "src/client/com.e750/lib/components/Component.js~Component",
-    "longname": "src/client/com.e750/lib/components/Component.js~Component#getComponentId",
-    "access": null,
-    "description": null,
-    "lineNumber": 45,
-    "undocument": true,
-    "params": [],
-    "return": {
-      "types": [
-        "*"
-      ]
-    },
-    "generator": false
-  },
-  {
-    "__docId__": 77,
-    "kind": "method",
-    "static": false,
-    "variation": null,
-    "name": "getBootstrap",
-    "memberof": "src/client/com.e750/lib/components/Component.js~Component",
-    "longname": "src/client/com.e750/lib/components/Component.js~Component#getBootstrap",
-    "access": null,
-    "description": null,
-    "lineNumber": 49,
-    "undocument": true,
-    "params": [],
-    "return": {
-      "types": [
-        "*"
-      ]
-    },
-    "generator": false
-  },
-  {
-    "__docId__": 78,
-    "kind": "method",
-    "static": false,
-    "variation": null,
-    "name": "isMounted",
-    "memberof": "src/client/com.e750/lib/components/Component.js~Component",
-    "longname": "src/client/com.e750/lib/components/Component.js~Component#isMounted",
-    "access": null,
-    "description": null,
-    "lineNumber": 56,
-    "undocument": true,
-    "params": [],
-    "return": {
-      "types": [
-        "boolean"
-      ]
-    },
-    "generator": false
-  },
-  {
-    "__docId__": 79,
-    "kind": "method",
-    "static": false,
-    "variation": null,
-    "name": "destroy",
-    "memberof": "src/client/com.e750/lib/components/Component.js~Component",
-    "longname": "src/client/com.e750/lib/components/Component.js~Component#destroy",
-    "access": null,
-    "description": null,
-    "lineNumber": 68,
-    "undocument": true,
-    "params": [],
-    "return": {
-      "types": [
-        "*"
-      ]
-    },
-    "generator": false
-  },
-  {
-    "__docId__": 80,
-    "kind": "method",
-    "static": false,
-    "variation": null,
-    "name": "unmount",
-    "memberof": "src/client/com.e750/lib/components/Component.js~Component",
-    "longname": "src/client/com.e750/lib/components/Component.js~Component#unmount",
-    "access": null,
-    "description": null,
-    "lineNumber": 77,
-    "undocument": true,
-    "params": [],
-    "return": {
-      "types": [
-        "boolean"
-      ]
-    },
-    "generator": false
-  },
-  {
     "__docId__": 81,
     "kind": "method",
     "static": false,
     "variation": null,
-    "name": "showProgress",
+    "name": "getComponentAttrSelector",
     "memberof": "src/client/com.e750/lib/components/Component.js~Component",
-    "longname": "src/client/com.e750/lib/components/Component.js~Component#showProgress",
+    "longname": "src/client/com.e750/lib/components/Component.js~Component#getComponentAttrSelector",
     "access": null,
     "description": null,
-    "lineNumber": 91,
+    "lineNumber": 40,
     "undocument": true,
     "params": [],
     "return": {
@@ -1691,33 +1741,35 @@
   },
   {
     "__docId__": 82,
-    "kind": "member",
+    "kind": "method",
     "static": false,
     "variation": null,
-    "name": "progressId",
+    "name": "findComponents",
     "memberof": "src/client/com.e750/lib/components/Component.js~Component",
-    "longname": "src/client/com.e750/lib/components/Component.js~Component#progressId",
+    "longname": "src/client/com.e750/lib/components/Component.js~Component#findComponents",
     "access": null,
     "description": null,
-    "lineNumber": 95,
+    "lineNumber": 44,
     "undocument": true,
-    "type": {
+    "params": [],
+    "return": {
       "types": [
         "*"
       ]
-    }
+    },
+    "generator": false
   },
   {
     "__docId__": 83,
     "kind": "method",
     "static": false,
     "variation": null,
-    "name": "done",
+    "name": "getComponentSelector",
     "memberof": "src/client/com.e750/lib/components/Component.js~Component",
-    "longname": "src/client/com.e750/lib/components/Component.js~Component#done",
+    "longname": "src/client/com.e750/lib/components/Component.js~Component#getComponentSelector",
     "access": null,
     "description": null,
-    "lineNumber": 108,
+    "lineNumber": 48,
     "undocument": true,
     "params": [],
     "return": {
@@ -1732,12 +1784,112 @@
     "kind": "method",
     "static": false,
     "variation": null,
+    "name": "getComponentId",
+    "memberof": "src/client/com.e750/lib/components/Component.js~Component",
+    "longname": "src/client/com.e750/lib/components/Component.js~Component#getComponentId",
+    "access": null,
+    "description": null,
+    "lineNumber": 52,
+    "undocument": true,
+    "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 85,
+    "kind": "method",
+    "static": false,
+    "variation": null,
+    "name": "getBootstrap",
+    "memberof": "src/client/com.e750/lib/components/Component.js~Component",
+    "longname": "src/client/com.e750/lib/components/Component.js~Component#getBootstrap",
+    "access": null,
+    "description": null,
+    "lineNumber": 56,
+    "undocument": true,
+    "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 86,
+    "kind": "method",
+    "static": false,
+    "variation": null,
+    "name": "isMounted",
+    "memberof": "src/client/com.e750/lib/components/Component.js~Component",
+    "longname": "src/client/com.e750/lib/components/Component.js~Component#isMounted",
+    "access": null,
+    "description": null,
+    "lineNumber": 63,
+    "undocument": true,
+    "params": [],
+    "return": {
+      "types": [
+        "boolean"
+      ]
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 87,
+    "kind": "method",
+    "static": false,
+    "variation": null,
+    "name": "destroy",
+    "memberof": "src/client/com.e750/lib/components/Component.js~Component",
+    "longname": "src/client/com.e750/lib/components/Component.js~Component#destroy",
+    "access": null,
+    "description": null,
+    "lineNumber": 75,
+    "undocument": true,
+    "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 88,
+    "kind": "method",
+    "static": false,
+    "variation": null,
+    "name": "unmount",
+    "memberof": "src/client/com.e750/lib/components/Component.js~Component",
+    "longname": "src/client/com.e750/lib/components/Component.js~Component#unmount",
+    "access": null,
+    "description": null,
+    "lineNumber": 84,
+    "undocument": true,
+    "params": [],
+    "return": {
+      "types": [
+        "boolean"
+      ]
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 89,
+    "kind": "method",
+    "static": false,
+    "variation": null,
     "name": "addChildView",
     "memberof": "src/client/com.e750/lib/components/Component.js~Component",
     "longname": "src/client/com.e750/lib/components/Component.js~Component#addChildView",
     "access": null,
     "description": null,
-    "lineNumber": 114,
+    "lineNumber": 98,
     "undocument": true,
     "params": [
       {
@@ -1755,7 +1907,7 @@
     "generator": false
   },
   {
-    "__docId__": 85,
+    "__docId__": 90,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -1764,22 +1916,7 @@
     "longname": "src/client/com.e750/lib/components/Component.js~Component#bindDOMEvents",
     "access": null,
     "description": null,
-    "lineNumber": 124,
-    "undocument": true,
-    "params": [],
-    "generator": false
-  },
-  {
-    "__docId__": 86,
-    "kind": "method",
-    "static": false,
-    "variation": null,
-    "name": "attachNestedComponents",
-    "memberof": "src/client/com.e750/lib/components/Component.js~Component",
-    "longname": "src/client/com.e750/lib/components/Component.js~Component#attachNestedComponents",
-    "access": null,
-    "description": null,
-    "lineNumber": 128,
+    "lineNumber": 108,
     "undocument": true,
     "params": [],
     "return": {
@@ -1790,7 +1927,27 @@
     "generator": false
   },
   {
-    "__docId__": 87,
+    "__docId__": 91,
+    "kind": "method",
+    "static": false,
+    "variation": null,
+    "name": "attachNestedComponents",
+    "memberof": "src/client/com.e750/lib/components/Component.js~Component",
+    "longname": "src/client/com.e750/lib/components/Component.js~Component#attachNestedComponents",
+    "access": null,
+    "description": null,
+    "lineNumber": 112,
+    "undocument": true,
+    "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 92,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -1799,7 +1956,7 @@
     "longname": "src/client/com.e750/lib/components/Component.js~Component#updateChildren",
     "access": null,
     "description": null,
-    "lineNumber": 132,
+    "lineNumber": 116,
     "undocument": true,
     "params": [
       {
@@ -1817,7 +1974,7 @@
     "generator": false
   },
   {
-    "__docId__": 88,
+    "__docId__": 93,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -1827,10 +1984,10 @@
     "access": null,
     "description": null,
     "lineNumber": 1,
-    "content": "import {Model} from '../classes/models/Model';\nimport Component from '../components/Component';\n\n\nexport default class Header extends Component {\n    model = Model;\n    id = 'ui/header'\n\n    initState () {\n\n    }\n\n    initProps (el, options) {\n        super.initProps(el, options);\n        this.model = options.model || new Model();\n        if (this.el.dataset.mounted === undefined) {\n            this.template = options.template || document.querySelector(this.getComponentId());\n        }\n    }\n\n    render () {\n        try {\n            this.attachNestedComponents();\n            return this;\n        } catch (e) {\n            console.error(e);\n            throw e;\n        }\n    }\n}\n"
+    "content": "import {Model} from '../classes/models/Model';\nimport Component from '../components/Component';\n\n\nexport default class Header extends Component {\n    model = Model;\n    id = 'ui/header';\n\n    initState () {\n        return this;\n    }\n\n    initProps (el, options) {\n        super.initProps(el, options);\n        this.model = options.model || new Model();\n        if (this.el.dataset.mounted === undefined) {\n            this.template = options.template || document.querySelector(this.getComponentSelector());\n        }\n        return this;\n    }\n\n    render () {\n        try {\n            this.attachNestedComponents();\n            return this;\n        } catch (e) {\n            console.error(e);\n            throw e;\n        }\n    }\n}\n"
   },
   {
-    "__docId__": 89,
+    "__docId__": 94,
     "kind": "class",
     "static": true,
     "variation": null,
@@ -1850,7 +2007,7 @@
     ]
   },
   {
-    "__docId__": 90,
+    "__docId__": 95,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -1862,10 +2019,15 @@
     "lineNumber": 9,
     "undocument": true,
     "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
     "generator": false
   },
   {
-    "__docId__": 91,
+    "__docId__": 96,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -1890,10 +2052,15 @@
         ]
       }
     ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
     "generator": false
   },
   {
-    "__docId__": 92,
+    "__docId__": 97,
     "kind": "member",
     "static": false,
     "variation": null,
@@ -1911,7 +2078,7 @@
     }
   },
   {
-    "__docId__": 93,
+    "__docId__": 98,
     "kind": "member",
     "static": false,
     "variation": null,
@@ -1929,7 +2096,7 @@
     }
   },
   {
-    "__docId__": 94,
+    "__docId__": 99,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -1938,7 +2105,7 @@
     "longname": "src/client/com.e750/lib/components/Header.js~Header#render",
     "access": null,
     "description": null,
-    "lineNumber": 21,
+    "lineNumber": 22,
     "undocument": true,
     "params": [],
     "return": {
@@ -1949,7 +2116,7 @@
     "generator": false
   },
   {
-    "__docId__": 95,
+    "__docId__": 100,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -1959,10 +2126,10 @@
     "access": null,
     "description": null,
     "lineNumber": 1,
-    "content": "import {jst} from '../core';\nimport {ProductModel} from '../classes/models/Product';\nimport Component from '../components/Component';\n\n\nexport default class Product extends Component {\n    initProps (el, options) {\n        super.initProps(el, options);\n        this.model = options.model || new ProductModel();\n        if (this.el.dataset.mounted === undefined) {\n            this.template = options.template || jst.getFromDOM('product/simple');\n        }\n    }\n\n    render () {\n        try {\n            //console.log('render product', this.model.serialize());\n            if (this.el.dataset.mounted === undefined) {\n                this.el = jst.compile(this.template, this.model.serialize());\n            }\n            this.attachNestedComponents();\n            return this;\n        } catch (e) {\n            console.error(e);\n            throw e;\n        }\n    }\n}\n"
+    "content": "import {jst} from '../core';\nimport {ProductModel} from '../classes/models/Product';\nimport Component from '../components/Component';\n\n\nexport default class Product extends Component {\n    initProps (el, options) {\n        super.initProps(el, options);\n        this.model = options.model || new ProductModel();\n        if (this.el.dataset.mounted === undefined) {\n            this.template = options.template || jst.getFromDOM('product/simple');\n        }\n        return this;\n    }\n\n    render () {\n        try {\n            //console.log('render product', this.model.serialize());\n            if (this.el.dataset.mounted === undefined) {\n                this.el = jst.compile(this.template, this.model.serialize());\n            }\n            this.attachNestedComponents();\n            return this;\n        } catch (e) {\n            console.error(e);\n            throw e;\n        }\n    }\n}\n"
   },
   {
-    "__docId__": 96,
+    "__docId__": 101,
     "kind": "class",
     "static": true,
     "variation": null,
@@ -1982,7 +2149,7 @@
     ]
   },
   {
-    "__docId__": 97,
+    "__docId__": 102,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -2007,10 +2174,15 @@
         ]
       }
     ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
     "generator": false
   },
   {
-    "__docId__": 98,
+    "__docId__": 103,
     "kind": "member",
     "static": false,
     "variation": null,
@@ -2028,7 +2200,7 @@
     }
   },
   {
-    "__docId__": 99,
+    "__docId__": 104,
     "kind": "member",
     "static": false,
     "variation": null,
@@ -2046,7 +2218,7 @@
     }
   },
   {
-    "__docId__": 100,
+    "__docId__": 105,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -2055,7 +2227,7 @@
     "longname": "src/client/com.e750/lib/components/Product.js~Product#render",
     "access": null,
     "description": null,
-    "lineNumber": 15,
+    "lineNumber": 16,
     "undocument": true,
     "params": [],
     "return": {
@@ -2066,7 +2238,7 @@
     "generator": false
   },
   {
-    "__docId__": 101,
+    "__docId__": 106,
     "kind": "member",
     "static": false,
     "variation": null,
@@ -2075,7 +2247,7 @@
     "longname": "src/client/com.e750/lib/components/Product.js~Product#el",
     "access": null,
     "description": null,
-    "lineNumber": 19,
+    "lineNumber": 20,
     "undocument": true,
     "type": {
       "types": [
@@ -2084,7 +2256,7 @@
     }
   },
   {
-    "__docId__": 102,
+    "__docId__": 107,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -2094,10 +2266,10 @@
     "access": null,
     "description": null,
     "lineNumber": 1,
-    "content": "import Component from './Component';\nimport Product from './Product';\nimport ProductCollection from '../classes/collections/Product';\n\nexport default class ProductList extends Component {\n    initState () {\n        this.collection = new ProductCollection(this.getBootstrap());\n\n        //console.log('PRODUCT LIST:', this.collection.models, window.e750.bootstrap.productList);\n        if (!this.collection.models.length) {\n            var defaults = {\n                url: '/api/products/',\n                type: 'json',\n                method: 'GET',\n                headers: {\n                    'X-Auth-Token': document.cookie.split('=')[1]\n                }\n            }, fetchOpts = {};\n\n\n            Object.assign(fetchOpts, defaults, this.options);\n            this.loadData(fetchOpts);\n        } else {\n            this.render();\n        }\n\n    }\n\n    loadData (fetchOpts) {\n        this.showProgress();\n        this.collection.get(fetchOpts)\n            .then(this.render.bind(this), (reason) => {\n                console.error('Render Failed! ', this, arguments, reason);\n            })\n            .catch((reason) => {\n                console.error('Promise Rejected! ', this, arguments, reason);\n            })\n            .finally(() => {\n                console.log('finally', this, arguments, this.options);\n                this.done();\n            });\n    }\n\n    bindDOMEvents () {\n        this.on('dblclick', () => {\n            console.log('double clicked!');\n        })\n    }\n\n    render () {\n        if (!this.isMounted()) {\n            try {\n                let html = '',\n                    products = this.collection.models,\n                    product;\n                for (let i = 0; i < products.length; i++) {\n                    let model = products[i];\n                    model.set('quantities', window.e750.FIXTURES.quantities);\n                    product = new Product('div', {model: model});\n                    product.render();\n                    this.addChildView(product);\n                    html += product.el.outerHTML;\n                }\n\n                this.el.innerHTML = html;\n                this.bindDOMEvents();\n                this.attachNestedComponents();\n            } catch (e) {\n                throw e;\n            }\n        }\n        return this;\n    }\n\n\n}\n"
+    "content": "import Component from './Component';\nimport Product from './Product';\nimport ProductCollection from '../classes/collections/Product';\nimport Evt from '../event/Registry';\n\nexport default class ProductList extends Component {\n    initState () {\n        this.collection = new ProductCollection(this.getBootstrap(), {url: '/api/products'});\n\n        //console.log('PRODUCT LIST:', this.collection.models, window.e750.bootstrap.productList);\n        if (!this.collection.models.length) {\n            var defaults = {\n                type: 'json',\n                headers: {\n                    'X-Auth-Token': document.cookie.split('=')[1]\n                }\n            }, fetchOpts = {};\n\n            Object.assign(fetchOpts, defaults, this.options);\n            this.loadData(fetchOpts);\n        } else {\n            this.render();\n        }\n        return this;\n    }\n\n    loadData (opts) {\n        this.collection.fetch(opts)\n            .then(this.render.bind(this), (reason) => {\n                console.error('Render Failed! ', this, arguments, reason);\n            })\n            .then(() => {\n                //console.log('finally', this, arguments, this.options);\n                this.done();\n            })\n            .catch((reason) => {\n                console.error('Promise Rejected! ', this, arguments, reason);\n            });\n        return this;\n    }\n\n    bindSubscriptions () {\n        //this.subscribe(Evt.BEFORE_REQUEST, this.showProgress);\n    }\n\n    bindDOMEvents () {\n        this.on('fetch', this.showProgress);\n\n        this.on('dblclick', () => {\n            console.log('double clicked!');\n        });\n        return this;\n    }\n\n    render () {\n        if (!this.isMounted()) {\n            try {\n                let html = '',\n                    products = this.collection.models,\n                    product;\n                for (let i = 0; i < products.length; i++) {\n                    let model = products[i];\n                    model.set('quantities', window.e750.FIXTURES.quantities);\n                    product = new Product('div', {model: model});\n                    product.render();\n                    this.addChildView(product);\n                    html += product.el.outerHTML;\n                }\n\n                this.el.innerHTML = html;\n                this.bindDOMEvents();\n                this.attachNestedComponents();\n            } catch (e) {\n                throw e;\n            }\n        }\n        return this;\n    }\n\n\n}\n"
   },
   {
-    "__docId__": 103,
+    "__docId__": 108,
     "kind": "class",
     "static": true,
     "variation": null,
@@ -2109,7 +2281,7 @@
     "importPath": "e750-Micro/src/client/com.e750/lib/components/ProductList.js",
     "importStyle": "ProductList",
     "description": null,
-    "lineNumber": 5,
+    "lineNumber": 6,
     "undocument": true,
     "interface": false,
     "extends": [
@@ -2117,7 +2289,7 @@
     ]
   },
   {
-    "__docId__": 104,
+    "__docId__": 109,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -2126,77 +2298,7 @@
     "longname": "src/client/com.e750/lib/components/ProductList.js~ProductList#initState",
     "access": null,
     "description": null,
-    "lineNumber": 6,
-    "undocument": true,
-    "params": [],
-    "generator": false
-  },
-  {
-    "__docId__": 105,
-    "kind": "member",
-    "static": false,
-    "variation": null,
-    "name": "collection",
-    "memberof": "src/client/com.e750/lib/components/ProductList.js~ProductList",
-    "longname": "src/client/com.e750/lib/components/ProductList.js~ProductList#collection",
-    "access": null,
-    "description": null,
     "lineNumber": 7,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    }
-  },
-  {
-    "__docId__": 106,
-    "kind": "method",
-    "static": false,
-    "variation": null,
-    "name": "loadData",
-    "memberof": "src/client/com.e750/lib/components/ProductList.js~ProductList",
-    "longname": "src/client/com.e750/lib/components/ProductList.js~ProductList#loadData",
-    "access": null,
-    "description": null,
-    "lineNumber": 29,
-    "undocument": true,
-    "params": [
-      {
-        "name": "fetchOpts",
-        "types": [
-          "*"
-        ]
-      }
-    ],
-    "generator": false
-  },
-  {
-    "__docId__": 107,
-    "kind": "method",
-    "static": false,
-    "variation": null,
-    "name": "bindDOMEvents",
-    "memberof": "src/client/com.e750/lib/components/ProductList.js~ProductList",
-    "longname": "src/client/com.e750/lib/components/ProductList.js~ProductList#bindDOMEvents",
-    "access": null,
-    "description": null,
-    "lineNumber": 44,
-    "undocument": true,
-    "params": [],
-    "generator": false
-  },
-  {
-    "__docId__": 108,
-    "kind": "method",
-    "static": false,
-    "variation": null,
-    "name": "render",
-    "memberof": "src/client/com.e750/lib/components/ProductList.js~ProductList",
-    "longname": "src/client/com.e750/lib/components/ProductList.js~ProductList#render",
-    "access": null,
-    "description": null,
-    "lineNumber": 50,
     "undocument": true,
     "params": [],
     "return": {
@@ -2207,7 +2309,107 @@
     "generator": false
   },
   {
-    "__docId__": 109,
+    "__docId__": 110,
+    "kind": "member",
+    "static": false,
+    "variation": null,
+    "name": "collection",
+    "memberof": "src/client/com.e750/lib/components/ProductList.js~ProductList",
+    "longname": "src/client/com.e750/lib/components/ProductList.js~ProductList#collection",
+    "access": null,
+    "description": null,
+    "lineNumber": 8,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 111,
+    "kind": "method",
+    "static": false,
+    "variation": null,
+    "name": "loadData",
+    "memberof": "src/client/com.e750/lib/components/ProductList.js~ProductList",
+    "longname": "src/client/com.e750/lib/components/ProductList.js~ProductList#loadData",
+    "access": null,
+    "description": null,
+    "lineNumber": 27,
+    "undocument": true,
+    "params": [
+      {
+        "name": "opts",
+        "types": [
+          "*"
+        ]
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 112,
+    "kind": "method",
+    "static": false,
+    "variation": null,
+    "name": "bindSubscriptions",
+    "memberof": "src/client/com.e750/lib/components/ProductList.js~ProductList",
+    "longname": "src/client/com.e750/lib/components/ProductList.js~ProductList#bindSubscriptions",
+    "access": null,
+    "description": null,
+    "lineNumber": 42,
+    "undocument": true,
+    "params": [],
+    "generator": false
+  },
+  {
+    "__docId__": 113,
+    "kind": "method",
+    "static": false,
+    "variation": null,
+    "name": "bindDOMEvents",
+    "memberof": "src/client/com.e750/lib/components/ProductList.js~ProductList",
+    "longname": "src/client/com.e750/lib/components/ProductList.js~ProductList#bindDOMEvents",
+    "access": null,
+    "description": null,
+    "lineNumber": 46,
+    "undocument": true,
+    "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 114,
+    "kind": "method",
+    "static": false,
+    "variation": null,
+    "name": "render",
+    "memberof": "src/client/com.e750/lib/components/ProductList.js~ProductList",
+    "longname": "src/client/com.e750/lib/components/ProductList.js~ProductList#render",
+    "access": null,
+    "description": null,
+    "lineNumber": 55,
+    "undocument": true,
+    "params": [],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 115,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -2220,7 +2422,7 @@
     "content": "import {ui} from '../../cart';\n\nexport default function Resolver () {\n}\n\nResolver.prototype.registry = {\n    'ui/header': ui.header,\n    'ui/slider': ui.carousel,\n    'ui/intro': ui.component,\n    'cart/add': ui.addToCart,\n    'cart/product-list': ui.productList,\n    'cart/product/simple': ui.baseProduct\n};\n\nResolver.prototype.getComponentId = function (view) {\n    return Object.getOwnPropertyNames(this.registry).filter((componentId) => {\n            return Object.getPrototypeOf(view).constructor === this[componentId];\n        })[0] || null;\n};\n\nResolver.prototype.register = function () {\n    if (arguments.length === 1 && typeof arguments[0] === 'object') {\n        let c;\n        for (c in arguments[0]) {\n            this.registry[c] = arguments[0][c];\n        }\n    } else {\n        this.registry[arguments[0]] = arguments[1];\n    }\n    return this;\n};\n\nResolver.prototype.unregister = function (name) {\n    delete this.registry[name];\n    return this;\n};\n\nResolver.prototype.has = function (component) {\n    return this.registry[component];\n};\n\nResolver.prototype.get = function (component) {\n    return this.has(component) ? this.registry[component] : null;\n};\n\n"
   },
   {
-    "__docId__": 110,
+    "__docId__": 116,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -2238,7 +2440,7 @@
     "generator": false
   },
   {
-    "__docId__": 111,
+    "__docId__": 117,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -2268,7 +2470,7 @@
     "generator": false
   },
   {
-    "__docId__": 112,
+    "__docId__": 118,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -2291,7 +2493,7 @@
     "generator": false
   },
   {
-    "__docId__": 113,
+    "__docId__": 119,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -2321,7 +2523,7 @@
     "generator": false
   },
   {
-    "__docId__": 114,
+    "__docId__": 120,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -2351,7 +2553,7 @@
     "generator": false
   },
   {
-    "__docId__": 115,
+    "__docId__": 121,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -2381,7 +2583,7 @@
     "generator": false
   },
   {
-    "__docId__": 116,
+    "__docId__": 122,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -2391,31 +2593,10 @@
     "access": null,
     "description": null,
     "lineNumber": 1,
-    "content": "import templeton from 'templeton';\nimport Evented from './behaviors/Evented';\nimport {htmlToDom} from './util/DOMUtils';\nimport RSVP from 'rsvp';\nimport Evt from './event/Registry';\nvar xhttp = require('xhttp/custom')(RSVP.Promise);\n\n\nexport const net = {\n    http: {\n        /**\n         * Base NET request function\n         * returns an A+ promise\n         * @param options\n         * @returns {*}\n         */\n        ajax: function (options) {\n            let defaults = {\n                method: 'GET'\n            };\n\n            Object.assign(defaults, options);\n            this.emit(Evt.BEFORE_AJAX, options);\n            return xhttp(options);\n        },\n        /**\n         * Alias for an ASYNC HTTP GET\n         * returns an A+ promise\n         * @param options\n         * @returns {*}\n         */\n        get: function (options) {\n            options.method = 'GET';\n            return net.http.ajax.call(this, options);\n        }\n    }\n};\n\nexport const storage = {\n\n    cookie: (name, value, options) => {\n\n        function encode (val) {\n            try {\n                return encodeURIComponent(val);\n            } catch (e) {\n                return null;\n            }\n        }\n\n        function decode (val) {\n            try {\n                return decodeURIComponent(val);\n            } catch (e) {\n                return null;\n            }\n        }\n\n        function set (key, val) {\n            let opts = arguments[2] === undefined ? {} : arguments[2];\n\n            var str = '' + encode(key) + '=' + encode(val);\n\n            if (val == null) options.maxage = -1;\n\n            if (opts.maxage) {\n                opts.expires = new Date(+new Date() + opts.maxage);\n            }\n\n            if (opts.path) str += '; path=' + opts.path;\n            if (opts.domain) str += '; domain=' + opts.domain;\n            if (opts.expires) str += '; expires=' + opts.expires.toUTCString();\n            if (opts.secure) str += '; secure';\n\n            document.cookie = str;\n        }\n\n        function get (key) {\n            var cookies = parse(document.cookie);\n            return !!key ? cookies[key] : cookies;\n        }\n\n        function parse (str) {\n            var obj = {},\n                pairs = str.split(/ *; */);\n\n            if (!pairs[0]) {\n                return obj;\n            }\n            var _iteratorNormalCompletion = true;\n            var _didIteratorError = false;\n            var _iteratorError = undefined;\n            var _iterator, _step;\n\n            try {\n                for (_iterator = pairs[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {\n                    var pair = _step.value;\n\n                    pair = pair.split('=');\n                    obj[decode(pair[0])] = decode(pair[1]);\n                }\n            } catch (err) {\n                _didIteratorError = true;\n                _iteratorError = err;\n            } finally {\n                try {\n                    if (!_iteratorNormalCompletion && _iterator.return) {\n                        _iterator.return();\n                    }\n                } finally {\n                    if (_didIteratorError) {\n                        throw _iteratorError;\n                    }\n                }\n            }\n\n            return obj;\n        }\n\n        if (arguments.length < 2) {\n            return get(name);\n        }\n\n        set(name, value, options);\n    }\n};\n\nexport const jst = {\n    templates: {},\n\n    getFromDOM: (name) => {\n        return document.getElementById(name).innerHTML;\n    },\n\n    compile: (templateStr, data, overrides) => {\n        return htmlToDom(templeton.template(templateStr, data, overrides));\n    }\n\n};\n\nexport default {net, storage, jst};\n"
+    "content": "import templeton from 'templeton';\nimport Evented from './behaviors/Evented';\nimport {htmlToDom} from './util/DOMUtils';\nimport Evt from './event/Registry';\n\nrequire('whatwg-fetch');\n\n\nexport const net = {\n    http: {\n        /**\n         * Base NET request function\n         * returns an A+ promise\n         * @param options\n         * @returns {*}\n         */\n        exec: function (url, options) {\n            console.info('FETCH', url, options);\n            function checkStatus (response) {\n                if (response.status >= 200 && response.status < 300 || response === 0 /*local file*/) {\n                    return response;\n                } else {\n                    return Promise.reject(new Error(response.statusText));\n                }\n            }\n\n            function parseResponse (response) {\n                var contentType = response.headers.get('content-type');\n                if (contentType && contentType.indexOf('application/json') !== -1) {\n                    return response.json();\n                }\n                return response.text();\n            }\n\n            this.emit(Evt.BEFORE_FETCH, options);\n            return fetch(url, options).then(checkStatus).then(parseResponse);\n        },\n        /**\n         * GET, POST, PUT, DELETE methods\n         * @param String url\n         * @param Object options\n         * @returns native promises\n         */\n\n        getJSON: function (url, options) {\n            Object.assign(options, {\n                method: 'GET',\n                headers: Object.assign(options.headers, {\n                    'Accept': 'application/json',\n                    'Content-Type': 'application/json'\n                })\n            });\n            return net.http.exec.call(this, url, options);\n        },\n\n        postJSON: function (url, data, options) {\n            Object.assign(options, {\n                method: 'POST',\n                headers: Object.assign(options.headers, {\n                    'Accept': 'application/json',\n                    'Content-Type': 'application/json'\n                }),\n                body: JSON.stringify(data)\n            });\n            return net.http.exec.call(this, url, options);\n        },\n\n        get: function (url, options) {\n            options.method = 'GET';\n            return net.http.exec.call(this, url, options);\n        },\n\n        post: function (url, options) {\n            options.method = 'POST';\n            return net.http.exec.call(this, url, options);\n        },\n\n        put: function (url, options) {\n            options.method = 'PUT';\n            return net.http.exec.call(this, url, options);\n        },\n\n        del: function (url, options) {\n            options.method = 'DELETE';\n            return net.http.exec.call(this, url, options);\n        }\n    }\n};\n\nexport const storage = {\n\n    cookie: (name, value, options) => {\n\n        function encode (val) {\n            try {\n                return encodeURIComponent(val);\n            } catch (e) {\n                return null;\n            }\n        }\n\n        function decode (val) {\n            try {\n                return decodeURIComponent(val);\n            } catch (e) {\n                return null;\n            }\n        }\n\n        function set (key, val) {\n            let opts = arguments[2] === undefined ? {} : arguments[2];\n\n            var str = '' + encode(key) + '=' + encode(val);\n\n            if (val === null) options.maxage = -1;\n\n            if (opts.maxage) {\n                opts.expires = new Date(+new Date() + opts.maxage);\n            }\n\n            if (opts.path) str += '; path=' + opts.path;\n            if (opts.domain) str += '; domain=' + opts.domain;\n            if (opts.expires) str += '; expires=' + opts.expires.toUTCString();\n            if (opts.secure) str += '; secure';\n\n            document.cookie = str;\n        }\n\n        function get (key) {\n            var cookies = parse(document.cookie);\n            return !!key ? cookies[key] : cookies;\n        }\n\n        function parse (str) {\n            var obj = {},\n                pairs = str.split(/ *; */);\n\n            if (!pairs[0]) {\n                return obj;\n            }\n            var _iteratorNormalCompletion = true;\n            var _didIteratorError = false;\n            var _iteratorError = undefined;\n            var _iterator, _step;\n\n            try {\n                for (_iterator = pairs[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {\n                    var pair = _step.value;\n\n                    pair = pair.split('=');\n                    obj[decode(pair[0])] = decode(pair[1]);\n                }\n            } catch (err) {\n                _didIteratorError = true;\n                _iteratorError = err;\n            } finally {\n                try {\n                    if (!_iteratorNormalCompletion && _iterator.return) {\n                        _iterator.return();\n                    }\n                } finally {\n                    if (_didIteratorError) {\n                        throw _iteratorError;\n                    }\n                }\n            }\n\n            return obj;\n        }\n\n        if (arguments.length < 2) {\n            return get(name);\n        }\n\n        set(name, value, options);\n    }\n};\n\nexport const jst = {\n    templates: {},\n\n    getFromDOM: (name) => {\n        return document.getElementById(name).innerHTML;\n    },\n\n    compile: (templateStr, data, overrides) => {\n        return htmlToDom(templeton.template(templateStr, data, overrides));\n    }\n\n};\n\nexport default {net, storage, jst};\n"
   },
   {
-    "__docId__": 117,
-    "kind": "variable",
-    "static": true,
-    "variation": null,
-    "name": "xhttp",
-    "memberof": "src/client/com.e750/lib/core.js",
-    "longname": "src/client/com.e750/lib/core.js~xhttp",
-    "access": null,
-    "export": false,
-    "importPath": "e750-Micro/src/client/com.e750/lib/core.js",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 6,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    }
-  },
-  {
-    "__docId__": 118,
+    "__docId__": 123,
     "kind": "variable",
     "static": true,
     "variation": null,
@@ -2436,7 +2617,7 @@
     }
   },
   {
-    "__docId__": 119,
+    "__docId__": 124,
     "kind": "variable",
     "static": true,
     "variation": null,
@@ -2448,7 +2629,7 @@
     "importPath": "e750-Micro/src/client/com.e750/lib/core.js",
     "importStyle": "{storage}",
     "description": null,
-    "lineNumber": 39,
+    "lineNumber": 90,
     "undocument": true,
     "type": {
       "types": [
@@ -2457,7 +2638,7 @@
     }
   },
   {
-    "__docId__": 120,
+    "__docId__": 125,
     "kind": "variable",
     "static": true,
     "variation": null,
@@ -2469,7 +2650,7 @@
     "importPath": "e750-Micro/src/client/com.e750/lib/core.js",
     "importStyle": "{jst}",
     "description": null,
-    "lineNumber": 128,
+    "lineNumber": 179,
     "undocument": true,
     "type": {
       "types": [
@@ -2478,7 +2659,7 @@
     }
   },
   {
-    "__docId__": 121,
+    "__docId__": 126,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -2491,7 +2672,7 @@
     "content": "import guid from '../util/Guid';\nimport LookupTable from '../util/LookupTable';\n\nexport default function Dispatcher () {\n    if (!(this instanceof Dispatcher)) {\n        return new Dispatcher();\n    }\n\n    this.subscribers = Object.create(LookupTable);\n}\n\nfunction addSubscriber (channel, handler) {\n    let subscriptionId = handler.sId || guid(),\n        subs = this.subscribers,\n        ret;\n    if (!subs.has(channel)) {\n        subs[channel] = Object.create(LookupTable);\n    }\n    handler.sId = subscriptionId;\n    subs[channel][subscriptionId] = handler;\n    ret = {evt: channel, id: subscriptionId, fn: handler};\n    return ret;\n}\n\nfunction removeSubscriber (channel, subscriberId) {\n    let subs = this.subscribers;\n\n    if (subs.has(channel) && subs[channel].has(subscriberId)) {\n        delete subs[channel][subscriberId];\n        return subscriberId;\n    }\n    return false;\n}\n\nfunction removeChannel (channel) {\n    let subs = this.getSubscribers(channel);\n\n    if (subs.has(channel)) {\n        delete subs[channel];\n        return true;\n    }\n    return false;\n}\n\nfunction getSubscribers (channel) {\n    if (!this.subscribers.has(channel)) {\n        return Object.create(LookupTable);\n    }\n    let all = this.subscribers;\n\n    return all[channel];\n}\n\nfunction dispatch (channel, payload, args) {\n    let channelSubs = this.getSubscribers(channel),\n        recipient,\n        responses = [];\n\n    try {\n        for (recipient in channelSubs.all()) {\n            let handler = channelSubs[recipient],\n                ret;\n\n            //console.log('dispatch!', 'evt:', channel, 'rcp:', recipient, 'fn:', handler, 'data:', payload, 'args:', args);\n            ret = handler(payload, args);\n            responses.push(ret || 0);\n        }\n        //console.log('responses', responses);\n    } catch (e) {\n        console.error('Unable to dispatch event!', e);\n    }\n    return responses;\n}\n\nDispatcher.prototype.add = addSubscriber;\nDispatcher.prototype.remove = removeSubscriber;\nDispatcher.prototype.removeChannel = removeChannel;\nDispatcher.prototype.getSubscribers = getSubscribers;\nDispatcher.prototype.dispatch = dispatch;\nDispatcher.prototype.subscribe = addSubscriber;\n"
   },
   {
-    "__docId__": 122,
+    "__docId__": 127,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -2514,7 +2695,7 @@
     "generator": false
   },
   {
-    "__docId__": 123,
+    "__docId__": 128,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -2550,7 +2731,7 @@
     "generator": false
   },
   {
-    "__docId__": 124,
+    "__docId__": 129,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -2586,7 +2767,7 @@
     "generator": false
   },
   {
-    "__docId__": 125,
+    "__docId__": 130,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -2616,7 +2797,7 @@
     "generator": false
   },
   {
-    "__docId__": 126,
+    "__docId__": 131,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -2646,7 +2827,7 @@
     "generator": false
   },
   {
-    "__docId__": 127,
+    "__docId__": 132,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -2688,7 +2869,7 @@
     "generator": false
   },
   {
-    "__docId__": 128,
+    "__docId__": 133,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -2698,10 +2879,10 @@
     "access": null,
     "description": null,
     "lineNumber": 1,
-    "content": "const Registry = {\n    APP_START: 'start',\n    BEFORE_AJAX: 'beforeAjax',\n    BEFORE_FETCH: 'beforeFetch',\n    COMPONENTS_LOADED: 'componentsLoaded',\n    BEFORE_RENDER: 'beforeRender',\n    WILL_UPDATE_CHILDREN: 'willUpdateChildren',\n    DID_UPDATE_CHILDREN: 'didUpdateChildren',\n    PROGRESS_START: 'progress:start',\n    PROGRESS_END: 'progress:end'\n};\nexport default Registry;\nexport {Registry as Evt};\n"
+    "content": "const Registry = {\n    APP_START: 'start',\n    BEFORE_REQUEST: 'beforeAjax',\n    BEFORE_FETCH: 'beforeFetch',\n    COMPONENTS_LOADED: 'componentsLoaded',\n    BEFORE_RENDER: 'beforeRender',\n    WILL_UPDATE_CHILDREN: 'willUpdateChildren',\n    DID_UPDATE_CHILDREN: 'didUpdateChildren',\n    PROGRESS_START: 'progress:start',\n    PROGRESS_END: 'progress:end'\n};\nexport default Registry;\nexport {Registry as Evt};\n"
   },
   {
-    "__docId__": 129,
+    "__docId__": 134,
     "kind": "variable",
     "static": true,
     "variation": null,
@@ -2722,7 +2903,7 @@
     }
   },
   {
-    "__docId__": 130,
+    "__docId__": 135,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -2735,7 +2916,7 @@
     "content": "export default function nEvent (type = '', data = {}, target = null) {\n    this.type = type;\n    this.data = data;\n    this.target = target;\n    this.cancelled = false;\n}\n"
   },
   {
-    "__docId__": 131,
+    "__docId__": 136,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -2781,7 +2962,7 @@
     "generator": false
   },
   {
-    "__docId__": 132,
+    "__docId__": 137,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -2794,7 +2975,7 @@
     "content": "/**\n * returns true if HTML Node\n * @param o\n * @returns Boolean\n */\nexport function isNode (o) {\n\treturn (\n\t\ttypeof Node === 'object' ? o instanceof Node :\n\t\to && typeof o === 'object' && typeof o.nodeType === 'number' && typeof o.nodeName === 'string'\n\t);\n}\n\n/**\n * Returns true if DOM Elemebt\n * @param o\n * @returns Boolean\n */\nexport function isElement (o) {\n\treturn (\n\t\ttypeof HTMLElement === 'object' ? o instanceof HTMLElement : //DOM2\n\t\to && typeof o === 'object' && o !== null && o.nodeType === 1 && typeof o.nodeName === 'string'\n\t);\n}\n\n/**\n * Transforms an HTML string into DOM Elements\n * * strips <script> tags by default\n * @param HTMLString\n * @param stripScripts {Boolean}\n * @returns {Element}\n */\nexport function htmlToDom (HTMLString, stripScripts = true) {\n\tlet tmp = document.createElement('div');\n\ttmp.innerHTML = HTMLString;\n\n\tif (stripScripts) {\n\t\tlet scripts = tmp.getElementsByTagName('script'),\n\t\t\ti = scripts.length;\n\t\twhile (i--) {\n\t\t\tscripts[i].parentNode.removeChild(scripts[i]);\n\t\t}\n\t}\n\n\treturn tmp.firstElementChild;\n}\n\nexport default {isNode, isElement, htmlToDom};\n"
   },
   {
-    "__docId__": 133,
+    "__docId__": 138,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -2836,7 +3017,7 @@
     "generator": false
   },
   {
-    "__docId__": 134,
+    "__docId__": 139,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -2878,7 +3059,7 @@
     "generator": false
   },
   {
-    "__docId__": 135,
+    "__docId__": 140,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -2930,7 +3111,7 @@
     "generator": false
   },
   {
-    "__docId__": 136,
+    "__docId__": 141,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -2943,7 +3124,7 @@
     "content": "import guid from '../util/Guid';\n\n/**\n * Cross-Browser event listener.\n *\n * @param addOrRemove {String}\n * @param obj {DOM Element or Node}\n * @param eventNames {String: list of events to listen for}\n * @param handler {Function}\n * @param useCapture {Boolean}\n */\nexport function manageNativeEvents (addOrRemove, obj, eventNames, handler, useCapture = false) {\n    var i = 0,\n        events = eventNames.split(' '),\n        prefix = obj.addEventListener ? '' : 'on';\n\n    try {\n        return events.map(() => {\n            let e = prefix + events[i],\n                listenerId,\n                addlistenerMethods = ['addEventListener', 'attachEvent'],\n                ret;\n\n            if (addlistenerMethods.indexOf(addOrRemove) !== -1) {\n                listenerId = guid();\n                handler.sId = listenerId;\n            } else {\n                //console.log('Removing DOM event:', e, handler);\n                delete handler.sId;\n            }\n            obj[addOrRemove](e, handler, useCapture);\n            ret = {evt: e, id: listenerId, fn: handler};\n            return ret;\n        });\n    } catch (e) {\n        console.error('Error attaching event listener', e, addOrRemove, obj, eventNames, handler);\n        return false;\n    }\n\n}\n\n/**\n * Determines if event is browser/device-native as opposed to a custom event\n * @param eventname\n * @returns {boolean}\n */\nexport function isNativeEvent (eventname) {\n    return typeof document.body['on' + eventname] !== 'undefined';\n}\n\n/**\n * Cross-browser addEventListener()\n * @param target\n * @param eventNames\n * @param handler\n */\nexport function addHandler (target, eventNames, handler) {\n    let bindType = target.addEventListener ? 'addEventListener' : 'attachEvent';\n    return manageNativeEvents(bindType, target, eventNames, handler);\n}\n\n/**\n * Cross-browser removeEventListener()\n * @param target\n * @param eventNames\n * @param handler\n */\nexport function removeHandler (target, eventNames, handler) {\n    let bindType = target.removeEventListener ? 'removeEventListener' : 'detachEvent';\n    return manageNativeEvents(bindType, target, eventNames, handler);\n}\n\nexport default {isNativeEvent, addHandler, removeHandler};\n\n"
   },
   {
-    "__docId__": 137,
+    "__docId__": 142,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -3016,7 +3197,7 @@
     "generator": false
   },
   {
-    "__docId__": 138,
+    "__docId__": 143,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -3058,7 +3239,7 @@
     "generator": false
   },
   {
-    "__docId__": 139,
+    "__docId__": 144,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -3111,7 +3292,7 @@
     "generator": false
   },
   {
-    "__docId__": 140,
+    "__docId__": 145,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -3164,7 +3345,7 @@
     "generator": false
   },
   {
-    "__docId__": 141,
+    "__docId__": 146,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -3177,7 +3358,7 @@
     "content": "/**\n * Generates an  RFC4122 version 4 compliant identifier.\n * @returns {string}\n */\nexport default function guid () {\n\treturn 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {\n\t\tvar r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);\n\t\treturn v.toString(16);\n\t});\n}\n"
   },
   {
-    "__docId__": 142,
+    "__docId__": 147,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -3208,7 +3389,7 @@
     "generator": false
   },
   {
-    "__docId__": 143,
+    "__docId__": 148,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -3221,7 +3402,7 @@
     "content": "/**\n * For your health!\n * @type {{has: *}}\n */\nconst LookupTable = {\n    add: function (name, value) {\n        if(value === undefined)\n            return false;\n\n        if(this[name] === undefined){ // because 0, false and null are OK!\n            this[name] = value;\n            return true;\n        }else{\n            throw new ReferenceError('`' + name + '` already exists in lookup table.');\n        }\n    },\n    remove: function (name) {\n        if(this[name] !== undefined){\n            delete this[name];\n            return true;\n        }else{\n            throw new ReferenceError('`' + name + '` does not exist in lookup table.');\n        }\n\n    },\n    all: function () {\n        let p,\n            values = {};\n        for (p in this) {\n            if (this.has(p)) {\n                values[p] = this[p];\n            }\n        }\n        return values;\n    },\n    toArray: function () {\n        let p,\n            values = [];\n        for (p in this) {\n            if (this.has(p)) {\n                values.push({key: p, value: this[p]});\n            }\n        }\n        return values;\n    },\n    reset: function () {\n        for (var x in this) if (this.hasOwnProperty(x) && typeof x !== 'function') delete this[x];\n        return true;\n    }\n};\n\nObject.defineProperty(LookupTable, 'size', {value: function () { return Object.keys(this).length}, enumerable: false});\nObject.defineProperty(LookupTable, 'has', {value: Object.prototype.hasOwnProperty, enumerable: false});\n\nexport default LookupTable;\n"
   },
   {
-    "__docId__": 144,
+    "__docId__": 149,
     "kind": "variable",
     "static": true,
     "variation": null,
@@ -3244,7 +3425,7 @@
     }
   },
   {
-    "__docId__": 145,
+    "__docId__": 150,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -3257,7 +3438,7 @@
     "content": "import guid from './Guid';\nimport mixes from './mixes';\n\nconst Compose = (...args) => initial => args.reduceRight(\n    (result, fn) => fn(result),\n    initial\n);\n\n/**\n *  Returns a random number between min (inclusive) and max (exclusive)\n */\nfunction getRandomArbitrary (min, max) {\n    return Math.random() * (max - min) + min;\n}\n\n/**\n * Returns a random integer between min (inclusive) and max (inclusive)\n * Using Math.round() will give you a non-uniform distribution!\n */\nconst anyIntBetween = function getRandomInt (min, max) {\n    return Math.floor(Math.random() * (max - min + 1)) + min;\n};\n\nexport default {Compose, mixes, guid, anyIntBetween};\n"
   },
   {
-    "__docId__": 146,
+    "__docId__": 151,
     "kind": "variable",
     "static": true,
     "variation": null,
@@ -3278,7 +3459,7 @@
     }
   },
   {
-    "__docId__": 147,
+    "__docId__": 152,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -3313,7 +3494,7 @@
     "generator": false
   },
   {
-    "__docId__": 148,
+    "__docId__": 153,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -3348,7 +3529,7 @@
     "generator": false
   },
   {
-    "__docId__": 149,
+    "__docId__": 154,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -3361,7 +3542,7 @@
     "content": "export default function mixes (...behaviors) {\n\treturn target => behaviors.forEach(behavior => {\n\t\tlet b = behavior.prototype || behavior;\n\n\t\tObject.assign(target.prototype, b);\n\t});\n}\n"
   },
   {
-    "__docId__": 150,
+    "__docId__": 155,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -3392,7 +3573,7 @@
     "generator": false
   },
   {
-    "__docId__": 151,
+    "__docId__": 156,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -3405,7 +3586,7 @@
     "content": "export function ElementPrototypeRemove () {}\n\nElementPrototypeRemove.shim = function () {\n\tElement.prototype.remove = function () {\n\t\tthis.parentElement.removeChild(this);\n\t};\n};\n\nElementPrototypeRemove.unshim = function () {\n\tdelete Element.prototype.remove;\n};\n\nexport function NodeListPrototypeRemove () {}\n\nNodeListPrototypeRemove.shim = function () {\n\tNodeList.prototype.remove = HTMLCollection.prototype.remove = function () {\n\t\tfor (var i = this.length - 1; i >= 0; i--) {\n\t\t\tif (this[i] && this[i].parentElement) {\n\t\t\t\tthis[i].parentElement.removeChild(this[i]);\n\t\t\t}\n\t\t}\n\t};\n};\n\nNodeListPrototypeRemove.unshim = function () {\n\tdelete NodeList.prototype.remove;\n};\n"
   },
   {
-    "__docId__": 152,
+    "__docId__": 157,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -3423,7 +3604,7 @@
     "generator": false
   },
   {
-    "__docId__": 153,
+    "__docId__": 158,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -3441,7 +3622,7 @@
     "generator": false
   },
   {
-    "__docId__": 154,
+    "__docId__": 159,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -3459,7 +3640,7 @@
     "generator": false
   },
   {
-    "__docId__": 155,
+    "__docId__": 160,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -3477,7 +3658,7 @@
     "generator": false
   },
   {
-    "__docId__": 156,
+    "__docId__": 161,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -3495,7 +3676,7 @@
     "generator": false
   },
   {
-    "__docId__": 157,
+    "__docId__": 162,
     "kind": "function",
     "static": true,
     "variation": null,
@@ -3513,7 +3694,7 @@
     "generator": false
   },
   {
-    "__docId__": 158,
+    "__docId__": 163,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -3526,7 +3707,7 @@
     "content": "import Application from './com.e750/lib/components/Application';\n\nconst app_version = '0.0.1';\n\nclass e750 extends Application {\n    constructor (rootNode, options) {\n        super(rootNode, options);\n\n        this.bootstrap(options.FIXTURES || {});\n    }\n\n    start () {\n        //console.log('app init():', this, arguments);\n        //console.log('cookies:', document.cookie);\n        console.info('E750.js v' + app_version);\n        this.attachNestedComponents();\n        //TODO: implement this\n        //this.attachPartials();\n    }\n\n    bootstrap (data = {}) {\n        this.fixtures = data;\n    }\n}\n\nvar app = new e750('body', {fixtures: window.e750.FIXTURES, options: window.e750.options || {}});\ndocument.addEventListener('DOMContentLoaded', app.start.bind(app));\n"
   },
   {
-    "__docId__": 159,
+    "__docId__": 164,
     "kind": "variable",
     "static": true,
     "variation": null,
@@ -3547,7 +3728,7 @@
     }
   },
   {
-    "__docId__": 160,
+    "__docId__": 165,
     "kind": "class",
     "static": true,
     "variation": null,
@@ -3567,7 +3748,7 @@
     ]
   },
   {
-    "__docId__": 161,
+    "__docId__": 166,
     "kind": "constructor",
     "static": false,
     "variation": null,
@@ -3595,7 +3776,7 @@
     "generator": false
   },
   {
-    "__docId__": 162,
+    "__docId__": 167,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -3610,7 +3791,7 @@
     "generator": false
   },
   {
-    "__docId__": 163,
+    "__docId__": 168,
     "kind": "method",
     "static": false,
     "variation": null,
@@ -3635,7 +3816,7 @@
     "generator": false
   },
   {
-    "__docId__": 164,
+    "__docId__": 169,
     "kind": "member",
     "static": false,
     "variation": null,
@@ -3653,7 +3834,7 @@
     }
   },
   {
-    "__docId__": 165,
+    "__docId__": 170,
     "kind": "variable",
     "static": true,
     "variation": null,
@@ -3674,7 +3855,7 @@
     }
   },
   {
-    "__docId__": 166,
+    "__docId__": 171,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -3684,10 +3865,10 @@
     "access": null,
     "description": null,
     "lineNumber": 1,
-    "content": "var request = require('request-promise');\n\nmodule.exports = {\n\n\tcookie: (req, res, next) => {\n\t\tfunction setCookie (response, name, data) {\n\t\t\tconsole.log(':: setting cookie: ' + name + '=' + data);\n\t\t\tresponse.cookie(name, data, {secure: true, maxAge: 36000, httpOnly: false});\n\t\t\tconsole.log('== cookies: ', response.cookies);\n\t\t\tconsole.log('== cookies: ', req.cookies);\n\t\t}\n\n\t\tlet requestedFileType = (req.url.indexOf('.') !== -1) ? req.url.split('.').pop().toLowerCase() : 'html';\n\t\tlet numCookies = Object.keys(req.cookies).length;\n\t\tconsole.log('incoming: ', req.method, req.url.indexOf('.'), requestedFileType, req.url, req.path);\n\t\tif (requestedFileType === 'html' || req.url === '/') {\n\n\t\t\tconsole.log(' -> prefiltering: ', req.method, req.url);\n\n\t\t\t//res.clearCookie('apikey');\n\n\t\t\tconsole.log(' \t-> cookies (' + numCookies + '): ', req.cookies);\n\t\t\tif (numCookies === 0 || !req.cookies.apikey) {\n\t\t\t\tconsole.log('no token!');\n\t\t\t\t// request a token\n\t\t\t\tvar user = 'acmev',\n\t\t\t\t\tsecret = '18Minutes',\n\t\t\t\t\thost = 'auth.securecheckout.com',\n\t\t\t\t\turl = '/v0.1/apiGateway/getToken/',\n\t\t\t\t\toptions = {\n\t\t\t\t\t\thostname: host,\n\t\t\t\t\t\turi: 'https://' + host + url,\n\t\t\t\t\t\tmethod: 'GET',\n\t\t\t\t\t\theaders: {\n\t\t\t\t\t\t\t'X-Auth-User': user,\n\t\t\t\t\t\t\t'X-Auth-Key': secret\n\t\t\t\t\t\t},\n\t\t\t\t\t\tresolveWithFullResponse: true\n\t\t\t\t\t};\n\n\n\t\t\t\tconsole.log(':: requesting token', options);\n\t\t\t\trequest(options).then((r) => {\n\t\t\t\t\tif (r.statusCode === 200 && r.body) {\n\t\t\t\t\t\tconsole.log('GOT: ', r.statusCode, r.body);\n\t\t\t\t\t\tsetCookie(res, 'apikey', JSON.parse(r.body));\n\t\t\t\t\t\tnext();\n\t\t\t\t\t}\n\t\t\t\t}).catch((reason) => {\n\t\t\t\t\tconsole.error(reason);\n\t\t\t\t\tnext();\n\t\t\t\t});\n\t\t\t} else {\n\t\t\t\tconsole.log(':: cookie is there ::', req.cookies.apikey);\n\t\t\t\tnext();\n\t\t\t}\n\t\t} else {\n\t\t\tconsole.log(' -> passthru: ', req.method, req.url);\n\t\t\tnext();\n\t\t}\n\n\t},\n\n\tauth: () => {\n\n\t}\n};\n"
+    "content": "var request = require('request-promise');\n\nmodule.exports = {\n\n\tcookie: (req, res, next) => {\n\t\tfunction setCookie (response, name, data) {\n\t\t\tconsole.log(':: setting cookie: ' + name + '=' + data);\n\t\t\tresponse.cookie(name, data, {secure: true, maxAge: 36000, httpOnly: false});\n\t\t\tconsole.log('== cookies: ', response.cookies);\n\t\t\tconsole.log('== cookies: ', req.cookies);\n\t\t}\n\n\t\tlet requestedFileType = req.url.indexOf('.') !== -1 ? req.url.split('.').pop().toLowerCase() : 'html';\n\t\tlet numCookies = Object.keys(req.cookies).length;\n\t\tconsole.log('incoming: ', req.method, req.url.indexOf('.'), requestedFileType, req.url, req.path);\n\t\tif (requestedFileType === 'html' || req.url === '/') {\n\n\t\t\tconsole.log(' -> prefiltering: ', req.method, req.url);\n\n\t\t\t//res.clearCookie('apikey');\n\n\t\t\tconsole.log(' \t-> cookies (' + numCookies + '): ', req.cookies);\n\t\t\tif (numCookies === 0 || !req.cookies.apikey) {\n\t\t\t\tconsole.log('no token!');\n\t\t\t\t// request a token\n\t\t\t\tvar user = 'acmev',\n\t\t\t\t\tsecret = '18Minutes',\n\t\t\t\t\thost = 'auth.securecheckout.com',\n\t\t\t\t\turl = '/v0.1/apiGateway/getToken/',\n\t\t\t\t\toptions = {\n\t\t\t\t\t\thostname: host,\n\t\t\t\t\t\turi: 'https://' + host + url,\n\t\t\t\t\t\tmethod: 'GET',\n\t\t\t\t\t\theaders: {\n\t\t\t\t\t\t\t'X-Auth-User': user,\n\t\t\t\t\t\t\t'X-Auth-Key': secret\n\t\t\t\t\t\t},\n\t\t\t\t\t\tresolveWithFullResponse: true\n\t\t\t\t\t};\n\n\n\t\t\t\tconsole.log(':: requesting token', options);\n\t\t\t\trequest(options).then((r) => {\n\t\t\t\t\tif (r.statusCode === 200 && r.body) {\n\t\t\t\t\t\tconsole.log('GOT: ', r.statusCode, r.body);\n\t\t\t\t\t\tsetCookie(res, 'apikey', JSON.parse(r.body));\n\t\t\t\t\t\tnext();\n\t\t\t\t\t}\n\t\t\t\t}).catch((reason) => {\n\t\t\t\t\tconsole.error(reason);\n\t\t\t\t\tnext();\n\t\t\t\t});\n\t\t\t} else {\n\t\t\t\tconsole.log(':: cookie is there ::', req.cookies.apikey);\n\t\t\t\tnext();\n\t\t\t}\n\t\t} else {\n\t\t\tconsole.log(' -> passthru: ', req.method, req.url);\n\t\t\tnext();\n\t\t}\n\n\t},\n\n\tauth: () => {\n\n\t}\n};\n"
   },
   {
-    "__docId__": 167,
+    "__docId__": 172,
     "kind": "variable",
     "static": true,
     "variation": null,
@@ -3708,7 +3889,7 @@
     }
   },
   {
-    "__docId__": 168,
+    "__docId__": 173,
     "kind": "file",
     "static": true,
     "variation": null,
@@ -3721,7 +3902,7 @@
     "content": "var express = require('express');\nvar path = require('path');\nvar https = require('https');\nvar pem = require('pem');\nvar bodyParser = require('body-parser');\nvar cookieParser = require('cookie-parser');\nvar rp = require('request-promise');\nvar errors = require('request-promise/errors');\n\n\n// e750 com.e750\nvar routeFilters = require('./filters');\n\n\nvar app;\nvar port = process.env.PORT || 8080;        // set our port\nvar sslPort = 4430;        // set our secure port\nvar staticPath = path.resolve(__dirname, '../../acme-vineyards-webflow'); // static files\n\n//support https\npem.createCertificate({days: 1, selfSigned: true}, function (err, keys) {\n\tapp = express({key: keys.serviceKey, cert: keys.certificate});\n\thttps.createServer({key: keys.serviceKey, cert: keys.certificate}, app).listen(sslPort);\n\n// parse application/x-www-form-urlencoded\n\tapp.use(bodyParser.urlencoded({\n\t\textended: false\n\t}));\n// parse application/json\n\tapp.use(bodyParser.json());\n\tapp.use(cookieParser());\n\n// ROUTERS\n\n\tlet apiRouter = express.Router();\n\tlet appRouter = express.Router();\n\n// ROUTE FILTERS/MIDDLEWARE -------------------------------\n\t/**\n\t * global route prefilter, runs on every request\n\t *\n\t * Checks for APIKEY, if not present, fetches from key server\n\t * and sets cookie.\n\t *\n\t */\n\tapp.use('/', routeFilters.cookie);\n\n// END ROUTE FILTERS/MIDDLEWARE -------------------------------\n\n\n// API ROUTES -------------------------------\n\n\t/**\n\t * all routes relative to router mount point\n\t *    => http://localhost:8080/{mount_point} (/api)\n\t */\n\tapiRouter.route('/products')\n\t\t.get((req, res) => {\n\t\t\tfunction render (result) {\n\t\t\t\tres.setHeader('Content-Type', 'application/json');\n\t\t\t\t//res.writeHead(200)\n\t\t\t\tres.send(result);\n\t\t\t\tres.end();\n\t\t\t}\n\n\t\t\tlet host = 'api.securecheckout.com',\n\t\t\t\turl = '/v1/cart/products/',\n\t\t\t\toptions = {\n\t\t\t\t\thostname: host,\n\t\t\t\t\turi: 'https://' + host + url,\n\t\t\t\t\tmethod: 'GET',\n\t\t\t\t\theaders: {\n\t\t\t\t\t\t'X-Auth-Token': req.cookies.apikey\n\t\t\t\t\t},\n\t\t\t\t\tresolveWithFullResponse: true\n\t\t\t\t};\n\n\n\t\t\tconsole.log(':: requesting products', req.cookies, options);\n\t\t\trp(options).then((r) => {\n\t\t\t\tif (r.statusCode === 200 && r.body) {\n\t\t\t\t\t// success\n\t\t\t\t\t//console.log(\"GOT: \", r.statusCode, r.body);\n\t\t\t\t\tlet data = JSON.parse(r.body),\n\t\t\t\t\t\tconverted = [];\n\t\t\t\t\tObject.keys(data).map(function (k) {\n\t\t\t\t\t\tlet o = data[k];\n\t\t\t\t\t\t// you could set/compute any additional props here\n\t\t\t\t\t\t//o.tagged = true;\n\t\t\t\t\t\tconverted.push(o);\n\t\t\t\t\t});\n\t\t\t\t\trender(JSON.stringify(converted));\n\t\t\t\t} else {\n\t\t\t\t\t//fail\n\t\t\t\t\trender(r.body);\n\t\t\t\t}\n\t\t\t}).catch(errors.RequestError, (reason) => {\n\t\t\t\tconsole.log('FAILED: RequestError -> ');\n\t\t\t\trender(reason.body);\n\t\t\t}).catch(errors.StatusCodeError, (reason) => {\n\t\t\t\tconsole.log('FAILED: StatusCodeError -> ');\n\t\t\t\trender(reason.body);\n\t\t\t});\n\t\t});\n\n\tapiRouter.route('/token')\n\t\t.get((req, res) => {\n\t\t\tconsole.log('processing GET');\n\t\t\tres.end();\n\t\t})\n\t\t.post((req, res) => {\n\t\t\tconsole.log('processing POST');\n\t\t\tres.end();\n\t\t})\n\t\t.put((req, res) => {\n\t\t\tconsole.log('processing PUT');\n\t\t\tres.end();\n\t\t});\n\n// API index route\n\tapiRouter.route('/')\n\t\t.get((req, res) => {\n\t\t\tconsole.log('this is the api:', req.route);\n\t\t\tres.json({message: 'e750 REST API ready.'});\n\t\t\tres.end();\n\t\t});\n\n// END API ROUTES -------------------------------\n\n\n// APP ROUTES -------------------------------\n\tappRouter.route('/ham')\n\t\t.get((req, res) => {\n\t\t\tres.setHeader('Content-Type', 'text/html');\n\t\t\tres.send('<h1>Ham you say? Sure. Why not?</h1>');\n\t\t\tres.end();\n\t\t});\n\n// ENDAPP ROUTES -------------------------------\n\n// mount the API router at /api\n\tapp.use('/api', apiRouter);\n\n// mount a regular router at /\n\tapp.use('/', appRouter);\n\n// static routes always last\n\tapp.use(express.static(staticPath));\n\n\n// plain 'ol http\n\tapp.listen(port);\n\n\tconsole.log('HTTP(S) servers on ports: ' + port + ' / ' + sslPort);\n\tconsole.log('Static files root: ' + staticPath);\n\n\tconsole.log('registered API routes:');\n\tapiRouter.stack.forEach((r) => {\n\t\tif (r.route && r.route.path) {\n\t\t\tconsole.log(r.route.path);\n\t\t}\n\t});\n\n\tconsole.log('registered APP routes:');\n\tappRouter.stack.forEach((r) => {\n\t\tif (r.route && r.route.path) {\n\t\t\tconsole.log(r.route.path);\n\t\t}\n\t});\n});\n\n\n"
   },
   {
-    "__docId__": 169,
+    "__docId__": 174,
     "kind": "variable",
     "static": true,
     "variation": null,
@@ -3742,7 +3923,7 @@
     }
   },
   {
-    "__docId__": 170,
+    "__docId__": 175,
     "kind": "variable",
     "static": true,
     "variation": null,
@@ -3763,7 +3944,7 @@
     }
   },
   {
-    "__docId__": 171,
+    "__docId__": 176,
     "kind": "variable",
     "static": true,
     "variation": null,
@@ -3784,7 +3965,7 @@
     }
   },
   {
-    "__docId__": 172,
+    "__docId__": 177,
     "kind": "variable",
     "static": true,
     "variation": null,
@@ -3805,7 +3986,7 @@
     }
   },
   {
-    "__docId__": 173,
+    "__docId__": 178,
     "kind": "variable",
     "static": true,
     "variation": null,
@@ -3826,7 +4007,7 @@
     }
   },
   {
-    "__docId__": 174,
+    "__docId__": 179,
     "kind": "variable",
     "static": true,
     "variation": null,
@@ -3847,7 +4028,7 @@
     }
   },
   {
-    "__docId__": 175,
+    "__docId__": 180,
     "kind": "variable",
     "static": true,
     "variation": null,
@@ -3868,7 +4049,7 @@
     }
   },
   {
-    "__docId__": 176,
+    "__docId__": 181,
     "kind": "variable",
     "static": true,
     "variation": null,
@@ -3889,7 +4070,7 @@
     }
   },
   {
-    "__docId__": 177,
+    "__docId__": 182,
     "kind": "variable",
     "static": true,
     "variation": null,
@@ -3910,7 +4091,7 @@
     }
   },
   {
-    "__docId__": 178,
+    "__docId__": 183,
     "kind": "variable",
     "static": true,
     "variation": null,
@@ -3931,7 +4112,7 @@
     }
   },
   {
-    "__docId__": 179,
+    "__docId__": 184,
     "kind": "variable",
     "static": true,
     "variation": null,
@@ -3952,7 +4133,7 @@
     }
   },
   {
-    "__docId__": 180,
+    "__docId__": 185,
     "kind": "variable",
     "static": true,
     "variation": null,
@@ -3973,7 +4154,7 @@
     }
   },
   {
-    "__docId__": 182,
+    "__docId__": 187,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -3986,7 +4167,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 183,
+    "__docId__": 188,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -3999,7 +4180,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 184,
+    "__docId__": 189,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4012,7 +4193,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 185,
+    "__docId__": 190,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4025,7 +4206,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 186,
+    "__docId__": 191,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4038,7 +4219,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 187,
+    "__docId__": 192,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4051,7 +4232,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 188,
+    "__docId__": 193,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4064,7 +4245,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 189,
+    "__docId__": 194,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4077,7 +4258,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 190,
+    "__docId__": 195,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4090,7 +4271,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 191,
+    "__docId__": 196,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4103,7 +4284,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 192,
+    "__docId__": 197,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4116,7 +4297,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 193,
+    "__docId__": 198,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4129,7 +4310,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 194,
+    "__docId__": 199,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4142,7 +4323,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 195,
+    "__docId__": 200,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4155,7 +4336,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 196,
+    "__docId__": 201,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4168,7 +4349,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 197,
+    "__docId__": 202,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4181,7 +4362,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 198,
+    "__docId__": 203,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4194,7 +4375,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 199,
+    "__docId__": 204,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4207,7 +4388,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 200,
+    "__docId__": 205,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4220,7 +4401,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 201,
+    "__docId__": 206,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4233,7 +4414,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 202,
+    "__docId__": 207,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4246,7 +4427,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 203,
+    "__docId__": 208,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4259,7 +4440,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 204,
+    "__docId__": 209,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4272,7 +4453,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 205,
+    "__docId__": 210,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4285,7 +4466,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 206,
+    "__docId__": 211,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4298,7 +4479,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 207,
+    "__docId__": 212,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4311,7 +4492,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 208,
+    "__docId__": 213,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4324,7 +4505,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 209,
+    "__docId__": 214,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4337,7 +4518,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 210,
+    "__docId__": 215,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4350,7 +4531,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 211,
+    "__docId__": 216,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4363,7 +4544,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 212,
+    "__docId__": 217,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4376,7 +4557,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 213,
+    "__docId__": 218,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4389,7 +4570,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 214,
+    "__docId__": 219,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4402,7 +4583,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 215,
+    "__docId__": 220,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4415,7 +4596,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 216,
+    "__docId__": 221,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4428,7 +4609,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 217,
+    "__docId__": 222,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4441,7 +4622,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 218,
+    "__docId__": 223,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4454,7 +4635,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 219,
+    "__docId__": 224,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4467,7 +4648,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 220,
+    "__docId__": 225,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4480,7 +4661,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 221,
+    "__docId__": 226,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4493,7 +4674,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 222,
+    "__docId__": 227,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4506,7 +4687,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 223,
+    "__docId__": 228,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4519,7 +4700,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 224,
+    "__docId__": 229,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4532,7 +4713,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 225,
+    "__docId__": 230,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4545,7 +4726,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 226,
+    "__docId__": 231,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4558,7 +4739,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 227,
+    "__docId__": 232,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4571,7 +4752,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 228,
+    "__docId__": 233,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4584,7 +4765,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 230,
+    "__docId__": 235,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4597,7 +4778,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 231,
+    "__docId__": 236,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4610,7 +4791,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 232,
+    "__docId__": 237,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4623,7 +4804,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 233,
+    "__docId__": 238,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4636,7 +4817,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 234,
+    "__docId__": 239,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4649,7 +4830,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 235,
+    "__docId__": 240,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4662,7 +4843,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 236,
+    "__docId__": 241,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -4675,7 +4856,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 237,
+    "__docId__": 242,
     "kind": "external",
     "static": true,
     "variation": null,

@@ -38,6 +38,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-storage">storage</a></span></span></li>
 <li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">client/com.e750/lib/behaviors</div><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Evented">Evented</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Initializable">Initializable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Progressable">Progressable</a></span></span></li>
 <li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">client/com.e750/lib/classes/collections</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/client/com.e750/lib/classes/collections/Collection.js~Collection.html">Collection</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/client/com.e750/lib/classes/collections/Product.js~ProductCollection.html">ProductCollection</a></span></span></li>
 <li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">client/com.e750/lib/classes/models</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/client/com.e750/lib/classes/models/Model.js~Model.html">Model</a></span></span></li>
@@ -86,7 +87,7 @@ export default class View {
     }
 
     bindSubscriptions () {
-
+        return this;
     }
 
     destroy () {
@@ -96,7 +97,7 @@ export default class View {
     }
 
     detachEvents () {
-        if(this.subscriptions) {
+        if (this.subscriptions) {
             return this.subscriptions.map((subscription) =&gt; {
                 //console.log(&apos;detaching event&apos;, this, subscription);
                 let evt = subscription.evt,
@@ -104,6 +105,7 @@ export default class View {
                 return this.off(evt, fn);
             });
         }
+        return false;
     }
 }
 </code></pre>

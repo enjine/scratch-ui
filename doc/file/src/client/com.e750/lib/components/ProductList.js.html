@@ -38,6 +38,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-storage">storage</a></span></span></li>
 <li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">client/com.e750/lib/behaviors</div><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Evented">Evented</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Initializable">Initializable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Progressable">Progressable</a></span></span></li>
 <li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">client/com.e750/lib/classes/collections</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/client/com.e750/lib/classes/collections/Collection.js~Collection.html">Collection</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/client/com.e750/lib/classes/collections/Product.js~ProductCollection.html">ProductCollection</a></span></span></li>
 <li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">client/com.e750/lib/classes/models</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/client/com.e750/lib/classes/models/Model.js~Model.html">Model</a></span></span></li>
@@ -74,50 +75,55 @@
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import Component from &apos;./Component&apos;;
 import Product from &apos;./Product&apos;;
 import ProductCollection from &apos;../classes/collections/Product&apos;;
+import Evt from &apos;../event/Registry&apos;;
 
 export default class ProductList extends Component {
     initState () {
-        this.collection = new ProductCollection(this.getBootstrap());
+        this.collection = new ProductCollection(this.getBootstrap(), {url: &apos;/api/products&apos;});
 
         //console.log(&apos;PRODUCT LIST:&apos;, this.collection.models, window.e750.bootstrap.productList);
         if (!this.collection.models.length) {
             var defaults = {
-                url: &apos;/api/products/&apos;,
                 type: &apos;json&apos;,
-                method: &apos;GET&apos;,
                 headers: {
                     &apos;X-Auth-Token&apos;: document.cookie.split(&apos;=&apos;)[1]
                 }
             }, fetchOpts = {};
-
 
             Object.assign(fetchOpts, defaults, this.options);
             this.loadData(fetchOpts);
         } else {
             this.render();
         }
-
+        return this;
     }
 
-    loadData (fetchOpts) {
-        this.showProgress();
-        this.collection.get(fetchOpts)
+    loadData (opts) {
+        this.collection.fetch(opts)
             .then(this.render.bind(this), (reason) =&gt; {
                 console.error(&apos;Render Failed! &apos;, this, arguments, reason);
             })
+            .then(() =&gt; {
+                //console.log(&apos;finally&apos;, this, arguments, this.options);
+                this.done();
+            })
             .catch((reason) =&gt; {
                 console.error(&apos;Promise Rejected! &apos;, this, arguments, reason);
-            })
-            .finally(() =&gt; {
-                console.log(&apos;finally&apos;, this, arguments, this.options);
-                this.done();
             });
+        return this;
+    }
+
+    bindSubscriptions () {
+        //this.subscribe(Evt.BEFORE_REQUEST, this.showProgress);
     }
 
     bindDOMEvents () {
+        this.on(&apos;fetch&apos;, this.showProgress);
+
         this.on(&apos;dblclick&apos;, () =&gt; {
             console.log(&apos;double clicked!&apos;);
-        })
+        });
+        return this;
     }
 
     render () {

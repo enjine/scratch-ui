@@ -38,6 +38,7 @@
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-storage">storage</a></span></span></li>
 <li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">client/com.e750/lib/behaviors</div><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Evented">Evented</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Initializable">Initializable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-Progressable">Progressable</a></span></span></li>
 <li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">client/com.e750/lib/classes/collections</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/client/com.e750/lib/classes/collections/Collection.js~Collection.html">Collection</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/client/com.e750/lib/classes/collections/Product.js~ProductCollection.html">ProductCollection</a></span></span></li>
 <li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">client/com.e750/lib/classes/models</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/client/com.e750/lib/classes/models/Model.js~Model.html">Model</a></span></span></li>
@@ -100,7 +101,7 @@ let overrides = {
         if (props) {
             this.parse(props);
         }
-
+        return this;
     }
 };
 
@@ -123,18 +124,18 @@ class Model {
     }
 
     /**
-     * returns an A+ promise
+     * returns a native promise
      * @param options
      * @returns {*}
      */
-    fetch (options) {
+    fetch (options = {}) {
         try {
             this.emit(Evt.BEFORE_FETCH);
-            return net.http.get.call(this, options);
         } catch (e) {
             console.error(e);
             //throw e;
         }
+        return net.http.getJSON.call(this, options.url, options);
     }
 
     parse (data) {
@@ -160,7 +161,7 @@ class Model {
     get (propName) {
         try {
             let prop = this.values[propName];
-            return (typeof prop === &apos;function&apos;) ? prop.call(this) : prop;
+            return typeof prop === &apos;function&apos; ? prop.call(this) : prop;
         } catch (e) {
             console.error(e);
             throw new ReferenceError(&apos;Property `&apos; + propName + &apos;` not found in &apos; + this.constructor.name);
