@@ -1,5 +1,5 @@
-import guid from '../util/Guid';
-import LookupTable from '../util/LookupTable';
+import guid from 'lib/util/Guid';
+import LookupTable from 'lib/util/LookupTable';
 
 export default function Dispatcher () {
     if (!(this instanceof Dispatcher)) {
@@ -11,25 +11,27 @@ export default function Dispatcher () {
 
 function addSubscriber (channel, handler) {
     let subscriptionId = handler.sId || guid(),
-        subs = this.subscribers,
-        ret;
+        subs = this.subscribers;
+
     if (!subs.has(channel)) {
         subs[channel] = Object.create(LookupTable);
     }
     handler.sId = subscriptionId;
     subs[channel][subscriptionId] = handler;
-    ret = {evt: channel, id: subscriptionId, fn: handler};
-    return ret;
+    return {ev: channel, id: subscriptionId, fn: handler};
 }
 
 function removeSubscriber (channel, subscriberId) {
-    let subs = this.subscribers;
+    let subs = this.subscribers,
+        ret = false;
 
     if (subs.has(channel) && subs[channel].has(subscriberId)) {
+        let handler = subs[channel][subscriberId];
+        delete handler.sId;
         delete subs[channel][subscriberId];
-        return subscriberId;
+        ret = {ev: channel, id: null, fn: handler};
     }
-    return false;
+    return ret;
 }
 
 function removeChannel (channel) {
@@ -73,8 +75,8 @@ function dispatch (channel, payload, args) {
 }
 
 Dispatcher.prototype.add = addSubscriber;
+Dispatcher.prototype.subscribe = addSubscriber;
 Dispatcher.prototype.remove = removeSubscriber;
 Dispatcher.prototype.removeChannel = removeChannel;
 Dispatcher.prototype.getSubscribers = getSubscribers;
 Dispatcher.prototype.dispatch = dispatch;
-Dispatcher.prototype.subscribe = addSubscriber;

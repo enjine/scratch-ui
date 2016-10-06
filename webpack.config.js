@@ -7,6 +7,7 @@ module.exports = {
     devtool: ENV === 'production' ? 'cheap-module-eval-source-map' : 'inline-source-map',
     context: path.resolve(__dirname, 'src/client'),
     entry: [
+        'babel-polyfill',
         './main.js'
     ],
     output: {
@@ -20,7 +21,7 @@ module.exports = {
         new webpack.optimize.OccurenceOrderPlugin(),
         new webpack.NoErrorsPlugin(),
         new webpack.ProvidePlugin({
-            'fetch': 'imports?this=>global!exports?global.fetch!whatwg-fetch'
+
         }),
         new webpack.DefinePlugin({
             'process.env': {
@@ -52,6 +53,10 @@ module.exports = {
                     path.resolve(__dirname, 'test/client')
                 ],
                 exclude: /(node_modules|bower_components)/
+            },
+            {
+                test: /\.scss$/,
+                loaders: ['style', 'css', 'sass']
             }
         ]
     },
@@ -59,7 +64,7 @@ module.exports = {
     stats: { colors: true },
 
     devServer: {
-        port: process.env.PORT || 8080,
+        port: process.env.PORT || 8000,
         host: '0.0.0.0',
         colors: true,
         publicPath: '/',

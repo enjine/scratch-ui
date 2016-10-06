@@ -2,13 +2,14 @@ import View from '../../../src/client/com.e750/lib/classes/views/View';
 
 import {settings} from '../../setup';
 import {EmitterMixinBehavior} from '../behaviors/emitter';
+import {PubSubBehavior} from '../behaviors/pubsub';
 
 let expect = settings.assertions.expect;
 let mocks = settings.mocking;
 
 settings.init();
 
-let viewRender, quack;
+let viewRender, viewRenderOnce, quackSpy;
 
 class testView extends View {}
 describe('Views', () => {
@@ -16,27 +17,30 @@ describe('Views', () => {
 
 	before(() => {
 		viewRender = mocks.spy();
-		quack = mocks.spy();
+		viewRenderOnce = mocks.spy();
+		quackSpy = mocks.spy();
 
 		viewA = new testView({
-			quack: function () {
-				return 'moooo';
-			},
+			quack: quackSpy,
 			prerender: function () {
-				this.emit('beforeRender', this.options.quack());
+				this.emit('beforeRender');
+				this.options.quack();
 				return this.render();
 			}
 		});
 		viewB = new testView({
-			quack: quack,
+			quack: function () {
+				return 'moooo';
+			},
 			prerender: function () {
-				this.emit('beforeRender', this.options.quack());
+				this.emit('beforeRender');
+				this.options.quack();
 				return this.render();
 			}
 		});
 
 		viewA.on('beforeRender', viewRender);
-		viewB.once('beforeRender', viewRender);
+		viewB.once('beforeRender', viewRenderOnce);
 	});
 
 	after(() => {
@@ -66,11 +70,13 @@ describe('Views', () => {
 		viewA.options.prerender.call(viewA);
 		viewB.options.prerender.call(viewB);
 		viewB.options.prerender.call(viewB);
-		viewRender.should.have.callCount(5);
-		quack.should.have.callCount(2);
+		viewRender.should.have.callCount(4);
+		viewRenderOnce.should.have.callCount(1);
+		quackSpy.should.have.callCount(2);
 	});
 
 	describe(EmitterMixinBehavior.describe(), EmitterMixinBehavior.test.bind(this, new testView()));
+	describe(PubSubBehavior.describe(), PubSubBehavior.test.bind(this, new testView()));
 
 });
 

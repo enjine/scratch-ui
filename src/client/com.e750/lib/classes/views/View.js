@@ -1,11 +1,13 @@
-import Evented from '../../behaviors/Evented';
-import Initializable from '../../behaviors/Initializable';
-import mixes from '../../util/mixes';
+import mixes from 'lib/util/mixes';
+import Evented from 'lib/behaviors/Evented';
+import LookupTable from 'lib/util/LookupTable';
 
-@mixes(Evented, Initializable)
+@mixes(Evented)
 export default class View {
     constructor (options) {
-        Initializable.initProps.call(this, options);
+        this.options = {};
+        Object.assign(this.options, options);
+        this.childViews = Object.create(LookupTable);
     }
 
     render () {
@@ -26,7 +28,7 @@ export default class View {
         if (this.subscriptions) {
             return this.subscriptions.map((subscription) => {
                 //console.log('detaching event', this, subscription);
-                let evt = subscription.evt,
+                let evt = subscription.ev,
                     fn = subscription.fn;
                 return this.off(evt, fn);
             });

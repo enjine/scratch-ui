@@ -140,11 +140,14 @@ module.exports = function (config) {
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
         //browsers: ['ChromeES6', 'ChromeCanaryES6', 'Firefox', 'Safari'],
         //browsers: ['Chrome', 'ChromeCanary', 'Firefox', 'Safari', 'PhantomJS'],
-        browsers: ['PhantomJS', 'Chrome'],
-        
+        browsers: ['Chrome', 'PhantomJS'], //'PhantomJS',
+
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits
         singleRun: false,
-        concurrency: Infinity
+        concurrency: Infinity,
+        phantomjslauncher: {
+            exitOnResourceError: true
+        }
     });
 };

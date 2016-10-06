@@ -2,66 +2,67 @@
 import {settings} from '../../setup';
 
 let expect = settings.assertions.expect;
-//let mocks = settings.mocking;
+let mocks = settings.mocking;
 
 export var EmitterMixinBehavior = {
-	describe: function () {
-		return 'Mixes the Evented behavior.';
-	},
-	test: function (o) {
-		/*let handler = mocks.spy(),
-			onceHandler = mocks.spy();
+    describe: function () {
+        return 'Mixes the Evented behavior.';
+    },
+    test: function (o) {
+        describe('API', () => {
+            it('Implements emit().', () => {
+                expect(o).to.respondTo('emit');
+            });
 
-		o.on('keyup', handler);
-		o.once('resize', onceHandler);*/
+            it('Implements on().', () => {
+                expect(o).to.respondTo('on');
+            });
 
-		it('Implements emit().', () => {
-			expect(o).to.respondTo('emit');
-		});
+            it('Implements trigger().', () => {
+                expect(o).to.respondTo('trigger');
+            });
 
+            it('Implements once().', () => {
+                expect(o).to.respondTo('once');
+            });
 
-		it('Implements on().', () => {
-			expect(o).to.respondTo('on');
-		});
+            it('Implements delegate().', () => {
+                expect(o).to.respondTo('delegate');
+            });
 
-		it('Implements trigger().', () => {
-			expect(o).to.respondTo('trigger');
-		});
+            it('Implements delegateOnce().', () => {
+                expect(o).to.respondTo('delegateOnce');
+            });
 
-		it('Implements once().', () => {
-			expect(o).to.respondTo('once');
-		});
+            it('Implements listenTo().', () => {
+                expect(o).to.respondTo('listenTo');
+            });
 
-		it('Implements off().', () => {
-			expect(o).to.respondTo('off');
-		});
+            it('Implements listenToOnce().', () => {
+                expect(o).to.respondTo('listenToOnce');
+            });
 
-		it('Implements subscribe().', () => {
-			expect(o).to.respondTo('subscribe');
-		});
+            it('Implements off().', () => {
+                expect(o).to.respondTo('off');
+            });
 
-		it('Implements unsubscribe().', () => {
-			expect(o).to.respondTo('unsubscribe');
-		});
+            it('Implements subscribe().', () => {
+                expect(o).to.respondTo('subscribe');
+            });
 
+            it('Implements unsubscribe().', () => {
+                expect(o).to.respondTo('unsubscribe');
+            });
+        });
 
-		/*describe('Event Handling', function () {
-			beforeEach(() => {
-				o.emit('keyup');
-				o.emit('keyup');
-				o.emit('resize');
-				o.emit('resize');
-				o.emit('resize');
-			});
+        xdescribe('Sending Payloads', () => {
+            it('When an event is dispatched, any number of values can be passed along.', () => {
 
-			afterEach(() => {
-				o.off('click', handler);
-			});
+            });
 
-			it('Handles event according to the listener type', () => {
-				handler.should.have.been.calledTwice;
-				onceHandler.should.have.been.calledOnce;
-			});
-		});*/
-	}
+            it('Values will be provided as arguments to the callback, in the same order they were passed', () => {
+
+            });
+        });
+    }
 };

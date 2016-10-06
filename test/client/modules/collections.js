@@ -2,16 +2,21 @@
 import Collection from '../../../src/client/com.e750/lib/classes/collections/Collection';
 import ProductCollection from '../../../src/client/com.e750/lib/classes/collections/Product';
 
+
 import Model from '../../../src/client/com.e750/lib/classes/models/Model';
 import ProductModel from '../../../src/client/com.e750/lib/classes/models/Product';
 
-import {EmitterMixinBehavior} from '../behaviors/emitter';
-import {AsyncDataBehavior} from '../behaviors/async-data';
 import {settings} from '../../setup';
+import Evt from '../../../src/client/com.e750/lib/event/Registry';
 
+
+import {EmitterMixinBehavior} from '../behaviors/emitter';
+import {PubSubBehavior} from '../behaviors/pubsub';
 
 let expect = settings.assertions.expect;
 let mocks = settings.mocking;
+let mockRequest = settings.net.mock;
+let net = settings.net.request;
 
 settings.init();
 
@@ -28,36 +33,13 @@ let c = new Collection(),
 
 describe('Collections::Base', () => {
     it('Has a `model` property set to `Model`.', () => {
-        let model = c.model;
-        expect(model).to.exist;
-        expect(model).to.deep.equal(Model);
+        let modelClass = c.modelClass;
+        expect(modelClass).to.exist;
+        expect(modelClass).to.deep.equal(Model);
     });
 });
 
 describe('Collections::ProductCollection', () => {
-
-
-    beforeEach(() => {
-
-    });
-
-    afterEach(() => {
-
-    });
-
-    before(() => {
-
-    });
-
-    after(() => {
-
-    });
-
-    it('Has a `model` property set to `Product`.', () => {
-        let model = pc.model;
-        expect(model).to.exist;
-        expect(model).to.deep.equal(ProductModel);
-    });
 
     describe('Handles constructor arguments/options appropriately.', () => {
         class testModel extends Model {
@@ -68,7 +50,7 @@ describe('Collections::ProductCollection', () => {
                 {id: 3, name: 'house rosè'}
             ],
             options = {
-                model: testModel,
+                modelClass: testModel,
                 testProp: 'success',
                 testFunc: () => {
                     return true;
@@ -80,18 +62,22 @@ describe('Collections::ProductCollection', () => {
                     }
                 }
             },
+            pcA,
             pcB;
 
-        before(() => {
+        beforeEach(() => {
+            pcA = new ProductCollection(data);
             pcB = new ProductCollection(data, options);
         });
 
-        after(() => {
+        afterEach(() => {
+            pcA = null;
             pcB = null;
         });
 
-        it('Has a `model` propery equal to `testModel`', () => {
-            expect(pcB.model).to.deep.equal(testModel);
+        it('Properly sets `model` property from options.', () => {
+            expect(pcA.modelClass).to.deep.equal(ProductModel);
+            expect(pcB.modelClass).to.deep.equal(testModel);
         });
 
         it('Has a `testProp` property equal to `success` that is a String', () => {
@@ -111,40 +97,41 @@ describe('Collections::ProductCollection', () => {
     });
 
     describe(EmitterMixinBehavior.describe(), EmitterMixinBehavior.test.bind(this, pc));
-
-    describe(AsyncDataBehavior.describe(), AsyncDataBehavior.test.bind(this, pc, reqOpts));
-
+    describe(PubSubBehavior.describe(), PubSubBehavior.test.bind(this, pc));
 
     describe('Can retrieve JSON from a remote endpoint.', () => {
-        let fakeResponse = JSON.stringify([{id: 1, name: 'Acme House Red', price: '$100.00'}], null, 2);
+        let fakeCollectionResponse = JSON.stringify([{id: 1, name: 'Acme House Red', price: '$100.00'}], null, 2);
 
         before(() => {
-            mocks.stub(window, 'fetch');
-
-            let res = new window.Response(fakeResponse, {
-                    status: 200,
-                    statusText: 'OK',
-                    headers: {
-                        'Content-type': 'application/json'
-                    }
-                });
-            window.fetch.returns(Promise.resolve(res));
+            mockRequest.onGet(/.*/).reply(() => {
+                return [200, fakeCollectionResponse];
+            });
+            mocks.stub(pc, 'request', function (url, options) {
+                options.url = url;
+                pc.emit(Evt.BEFORE_XHR);
+                return net.request(options);
+            });
         });
 
         after(() => {
-            window.fetch.restore();
+            pc.request.restore();
+            mockRequest.reset();
             thenable = null;
+
         });
 
         it('receives JSON back from the API.', () => {
-            thenable = pc.fetch(reqOpts);
-            expect(thenable).to.eventually.become(fakeResponse);
+            thenable = pc.request(reqOpts.url, reqOpts).then((response) => {
+                expect(response.data).to.deep.equal(JSON.parse(fakeCollectionResponse));
+            });
+
+            return thenable;
 
         });
 
         it('Parses a non-empty response into an array of Product models.', () => {
             let models = pc.models;
-            pc.parse(fakeResponse);
+            pc.parse(fakeCollectionResponse);
             expect(models).to.not.be.empty;
             expect(models).to.be.an.instanceof(Array);
             expect(models).to.have.length.above(0);

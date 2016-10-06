@@ -3,22 +3,25 @@
  * @type {{has: *}}
  */
 const LookupTable = {
-    add: function (name, value) {
-        if(value === undefined)
-            return false;
+    isEmpty: function () {
+        return this.size() === 0;
+    },
 
-        if(this[name] === undefined){ // because 0, false and null are OK!
+    add: function (name, value) {
+        if (value === undefined) return false;
+
+        if (this[name] === undefined) { // because 0, false and null are OK!
             this[name] = value;
             return true;
-        }else{
+        } else {
             throw new ReferenceError('`' + name + '` already exists in lookup table.');
         }
     },
     remove: function (name) {
-        if(this[name] !== undefined){
+        if (this[name] !== undefined) {
             delete this[name];
             return true;
-        }else{
+        } else {
             throw new ReferenceError('`' + name + '` does not exist in lookup table.');
         }
 
@@ -49,7 +52,18 @@ const LookupTable = {
     }
 };
 
-Object.defineProperty(LookupTable, 'size', {value: function () { return Object.keys(this).length}, enumerable: false});
-Object.defineProperty(LookupTable, 'has', {value: Object.prototype.hasOwnProperty, enumerable: false});
+Object.defineProperty(LookupTable, 'has', {
+    value: Object.prototype.hasOwnProperty,
+    enumerable: false,
+    writable: false
+});
+
+Object.defineProperty(LookupTable, 'size', {
+    value: function () {
+        return Object.keys(this.all()).length;
+    },
+    enumerable: false,
+    writable: false
+});
 
 export default LookupTable;

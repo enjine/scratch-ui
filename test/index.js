@@ -1,3 +1,5 @@
+require('es6-promise'); // polyfill for phantomjs
+
 const testsContext = require.context('./client/modules', true, /.+\.js$/);
 testsContext.keys().forEach(testsContext);
 

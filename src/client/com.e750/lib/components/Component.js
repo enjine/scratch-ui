@@ -1,28 +1,46 @@
-import View from '../classes/views/View';
-import Model from '../classes/models/Model';
-import Collection from '../classes/collections/Collection';
-import {isElement} from '../util/DOMUtils';
-import LookupTable from '../util/LookupTable';
-import Evt from '../event/Registry';
+import mixes from 'lib/util/mixes';
+import Progressable from 'lib/behaviors/Progressable';
 
-import Progressable from '../behaviors/Progressable';
-import mixes from '../util/mixes';
+import View from 'lib/classes/views/View';
+import Model from 'lib/classes/models/Model';
+import Collection from 'lib/classes/collections/Collection';
+import {isElement} from 'lib/util/DOMUtils';
+import Evt from 'lib/event/Registry';
 
 @mixes(Progressable)
 export default class Component extends View {
+
     constructor (el, options = {}) {
         super(options);
-        this.initProps(el, options);
+        this.initProps(el);
+        this.ensureElement(el);
+        this.initState();
     }
 
-    initProps (el, options) {
-        this.ensureElement(el);
+    initState () {
+        return this;
+    }
+
+    initProps (el) {
         this.id = this.options.id || this.generateComponentId();
-        this.model = new Model(this.options.model);
-        this.collection = new Collection(this.options.collection);
-        this.template = this.options.template || null;
-        this.childViews = Object.create(LookupTable);
-        this.initState();
+        this.modelClass = this.options.modelClass || Component.modelClass;
+        this.collectionClass = this.options.modelClass || Component.collectionClass;
+        this.initModel().initCollection().initTemplate();
+    }
+
+    initModel () {
+        this.model = this.options.model || new this.modelClass(this.options.modelData);
+        return this;
+    }
+
+    initCollection () {
+        this.collection = this.options.collection || new this.collectionClass(this.options.collectionData);
+        return this;
+    }
+
+    initTemplate () {
+        this.template = this.options.template;
+        return this;
     }
 
     generateComponentId () {
@@ -34,6 +52,11 @@ export default class Component extends View {
             Component.reservedElements.indexOf(el.toUpperCase()) !== -1 ?
                 document.getElementsByTagName(el)[0] :
                 document.createElement(el);
+
+        if (this.id && this.el) {
+            this.el.dataset.component = this.id;
+        }
+
         return true;
     }
 
@@ -41,7 +64,7 @@ export default class Component extends View {
         return '[' + Component.attr + ']';
     }
 
-    findComponents () {
+    findChildComponents () {
         return this.el.querySelectorAll(this.getComponentAttrSelector());
     }
 
@@ -61,7 +84,10 @@ export default class Component extends View {
     }
 
     isMounted () {
-        let components = this.id ? this.findComponents() : this.el.children;
+        if (this.el.dataset.mounted) {
+            return true;
+        }
+        let components = this.id ? this.findChildComponents() : this.el.children;
         if (components.length) {
             let list = [];
             [].forEach.call(components, (component) => {
@@ -73,20 +99,31 @@ export default class Component extends View {
     }
 
     destroy () {
-        let ret = [];
-        Object.keys(this.childViews, (view) => {
-            //console.log('removing child view: ', view);
-            ret.push(view.destroy());
-        });
-        return ret.push([super.destroy(), this.unmount()]);
+        let flattened = [];
+        if (!this.childViews.isEmpty()) {
+            Object.keys(this.childViews.all()).forEach((componentId) => {
+                flattened.concat(this.childViews[componentId]);
+            });
+            //console.log('destroying children and self', flattened);
+            return flattened.map((view) => {
+                return [view.destroy(), super.destroy(), this.unmount()];
+            });
+        } else {
+            //console.log('destroying self');
+            return [this.unmount()];
+        }
     }
 
     unmount () {
         let el = this.el,
             parent = el.parentElement;
+
+        //console.log('unmounting', this, el, parent, document.documentElement.contains(this.el));
+
         if (!parent) {
             return true; //not in DOM;
         }
+
         try {
             return parent.removeChild(this.el);
         } catch (e) {
@@ -95,21 +132,44 @@ export default class Component extends View {
         }
     }
 
-    addChildView (view) {
+    addChild (view) {
         let componentId = Component.Resolver.getComponentId(view),
             childViews = this.childViews;
+
         if (!childViews.has(componentId)) {
             childViews[componentId] = [];
         }
+
         childViews[componentId].push(view);
+
         return this;
+    }
+
+    removeChild (el) {
+        let childViews = this.childViews,
+            componentId = el.dataset.component,
+            i;
+
+        for (i in childViews[componentId]) {
+            let c = childViews[componentId][i];
+
+            if (el.isSameNode(c.el)) {
+                c.destroy();
+                childViews[componentId].splice(i, 1);
+            }
+
+            if (!childViews[componentId].length) {
+                delete childViews[componentId];
+            }
+        }
+        //console.log('destroyed!', childViews, childViews.isEmpty());
     }
 
     bindDOMEvents () {
         return this;
     }
 
-    attachNestedComponents () {
+    attachChildren () {
         return this.updateChildren(this.getComponentAttrSelector());
     }
 
@@ -150,7 +210,6 @@ export default class Component extends View {
                 this.emit(Evt.DID_UPDATE_CHILDREN);
             } catch (e) {
                 console.error(e);
-                throw e;
             }
         } else {
             console.info('No child components to register.');
@@ -172,5 +231,9 @@ Component.reservedElements = [
     'HEAD',
     'BODY'
 ];
+
+Component.modelClass = Model;
+Component.collectionClass = Collection;
+Component.template = null;
 
 

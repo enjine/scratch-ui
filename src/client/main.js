@@ -13,7 +13,7 @@ class e750 extends Application {
         //console.log('app init():', this, arguments);
         //console.log('cookies:', document.cookie);
         console.info('E750.js v' + app_version);
-        this.attachNestedComponents();
+        this.attachChildren();
         //TODO: implement this
         //this.attachPartials();
     }
