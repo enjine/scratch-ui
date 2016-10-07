@@ -5,7 +5,7 @@ const ENV = process.env.NODE_ENV || 'development';
 
 module.exports = {
     devtool: ENV === 'production' ? 'cheap-module-eval-source-map' : 'inline-source-map',
-    context: path.resolve(__dirname, 'src/unit'),
+    context: path.resolve(__dirname, 'src/client'),
     entry: [
         'babel-polyfill',
         './main.js'
@@ -52,7 +52,7 @@ module.exports = {
                     path.resolve(__dirname, 'src/client'),
                     path.resolve(__dirname, 'test/modules'),
                     path.resolve(__dirname, 'test/behaviors'),
-                    path.resolve(__dirname, 'test/unit')
+                    //path.resolve(__dirname, 'test/unit')
                 ],
                 exclude: /(node_modules|bower_components)/
             },
