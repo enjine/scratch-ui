@@ -6,7 +6,7 @@ import {isElement} from 'lib/util/DOMUtils';
  *
  * @param addOrRemove {String}
  * @param obj {DOM Element or Node}
- * @param eventNames {String: list of events to listen for}
+ * @param event {String: event to listen for}
  * @param handler {Function}
  * @param useCapture {Boolean}
  */
@@ -80,7 +80,10 @@ export function removeHandler (target, eventNames, handler) {
         return {ev: event, id: null, fn: handler};
     });
 }
-
+/**
+ * Parses a space separated event string into an array of event names
+ * @param eventStr
+ */
 export function parseEventStr (eventStr) {
     const eventSplitter = /\s+/;
     let parts = eventStr.split(eventSplitter),

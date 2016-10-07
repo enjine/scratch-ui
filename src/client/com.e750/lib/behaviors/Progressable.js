@@ -1,4 +1,4 @@
-import utils from 'lib/util/defaults';
+import utils from 'lib/util/core';
 
 var styles = require('!style!css!sass!../components/styles/Progress.scss');
 

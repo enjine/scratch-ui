@@ -54,7 +54,8 @@ module.exports = function (config) {
 
         // list of files to exclude
         exclude: [
-            './test/client/behaviors/**/*.js'
+            './test/behaviors/**/*.js',
+            './test/server/**/*.js'
         ],
 
         // preprocess matching files before serving them to the browser

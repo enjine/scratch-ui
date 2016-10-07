@@ -1,7 +1,7 @@
 /*eslint no-unused-expressions: 0*/
-import {settings} from '../../setup';
-import Evt from '../../../src/client/com.e750/lib/event/Registry';
-import Model from '../../../src/client/com.e750/lib/classes/models/Model';
+import {settings} from '../setup';
+import Evt from '../../src/client/com.e750/lib/event/Registry';
+import Model from '../../src/client/com.e750/lib/classes/models/Model';
 
 let mocks = settings.mocking;
 let chai = settings.assertions;

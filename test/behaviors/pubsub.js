@@ -1,5 +1,5 @@
 /*eslint no-unused-expressions: 0*/
-import {settings} from '../../setup';
+import {settings} from '../setup';
 
 let expect = settings.assertions.expect;
 let mocks = settings.mocking;
@@ -15,11 +15,11 @@ export var PubSubBehavior = {
             let viewARubADub = mocks.spy();
 
             it('`once` subscriptions are called exactly once.', () => {
-                let s = o.once('rubadub', viewARubADub);
+                o.once('rubadub', viewARubADub);
                 o.emit('rubadub');
                 o.emit('rubadub');
                 o.emit('rubadub');
-                let u = o.off('rubadub', viewARubADub);
+                o.off('rubadub', viewARubADub);
 
                 viewARubADub.should.have.been.calledOnce;
             });

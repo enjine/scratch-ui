@@ -50,7 +50,7 @@ export default class Collection {
     }
 
     parse (data) {
-        //console.log('incoming model data:', data, Object.getOwnPropertyNames(data), data.length);
+        //console.log('incoming models data:', data, Object.getOwnPropertyNames(data), data.length);
         try {
             if (!data) throw new Error('Incoming data has zero length');
 
@@ -63,7 +63,7 @@ export default class Collection {
                 for (item in data) {
                     if (data.hasOwnProperty(item)) {
                         let m = new this.modelClass(data[item]);
-                        //console.log('new model:', m, item, 'data:', data[item]);
+                        //console.log('new models:', m, item, 'data:', data[item]);
                         this.add(m);
                     }
                 }

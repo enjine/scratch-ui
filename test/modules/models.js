@@ -1,8 +1,8 @@
 /*eslint no-unused-expressions: 0*/
-import Model from '../../../src/client/com.e750/lib/classes/models/Model';
-import ProductModel from '../../../src/client/com.e750/lib/classes/models/Product';
+import Model from '../../src/client/com.e750/lib/classes/models/Model';
+import ProductModel from '../../src/client/com.e750/lib/classes/models/Product';
 
-import {settings} from '../../setup';
+import {settings} from '../setup';
 import {EmitterMixinBehavior} from '../behaviors/emitter';
 import {PubSubBehavior} from '../behaviors/pubsub';
 
@@ -173,9 +173,9 @@ describe('Models::Product', () => {
             expect(p.parse({})).to.be.an.instanceof(ProductModel);
         });
 
-        describe('Has methods to return the model data.', () => {
+        describe('Has methods to return the models data.', () => {
             let pojo = null;
-            describe('Implements a `serialize` method to return all model attributes as a JSON object.', () => {
+            describe('Implements a `serialize` method to return all models attributes as a JSON object.', () => {
                 it('Responds to `serialize', () => {
                     expect(p).to.respondTo('serialize');
                 });
@@ -187,7 +187,7 @@ describe('Models::Product', () => {
                     expect(pojo.id).to.be.a('number');
                 });
 
-                it('Implements a `toJSON` method to return the model as a JSON string.', () => {
+                it('Implements a `toJSON` method to return the models as a JSON string.', () => {
                     let json;
                     expect(p).to.respondTo('toJSON');
                     json = p.toJSON();
@@ -195,7 +195,7 @@ describe('Models::Product', () => {
                     expect(json).to.be.a('string'); //passes
                 });
 
-                xit('Implements a `toMeta` method to return the model as a JSON string.', () => {
+                xit('Implements a `toMeta` method to return the models as a JSON string.', () => {
                     let json;
                     expect(p).to.respondTo('toJSON');
                     json = p.toJSON();

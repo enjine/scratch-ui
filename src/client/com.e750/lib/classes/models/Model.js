@@ -56,7 +56,7 @@ export default class Model {
      */
 
     request (url, options) {
-        console.log('model::request', options);
+        console.log('models::request', options);
         if (!options.method) {
             return net.http.getJSON.call(this, url, options);
         }

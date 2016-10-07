@@ -1,13 +1,13 @@
 /*eslint no-unused-expressions: 0*/
-import Collection from '../../../src/client/com.e750/lib/classes/collections/Collection';
-import ProductCollection from '../../../src/client/com.e750/lib/classes/collections/Product';
+import Collection from '../../src/client/com.e750/lib/classes/collections/Collection';
+import ProductCollection from '../../src/client/com.e750/lib/classes/collections/Product';
 
 
-import Model from '../../../src/client/com.e750/lib/classes/models/Model';
-import ProductModel from '../../../src/client/com.e750/lib/classes/models/Product';
+import Model from '../../src/client/com.e750/lib/classes/models/Model';
+import ProductModel from '../../src/client/com.e750/lib/classes/models/Product';
 
-import {settings} from '../../setup';
-import Evt from '../../../src/client/com.e750/lib/event/Registry';
+import {settings} from '../setup';
+import Evt from '../../src/client/com.e750/lib/event/Registry';
 
 
 import {EmitterMixinBehavior} from '../behaviors/emitter';
@@ -32,7 +32,7 @@ let c = new Collection(),
 
 
 describe('Collections::Base', () => {
-    it('Has a `model` property set to `Model`.', () => {
+    it('Has a `models` property set to `Model`.', () => {
         let modelClass = c.modelClass;
         expect(modelClass).to.exist;
         expect(modelClass).to.deep.equal(Model);
@@ -75,7 +75,7 @@ describe('Collections::ProductCollection', () => {
             pcB = null;
         });
 
-        it('Properly sets `model` property from options.', () => {
+        it('Properly sets `models` property from options.', () => {
             expect(pcA.modelClass).to.deep.equal(ProductModel);
             expect(pcB.modelClass).to.deep.equal(testModel);
         });
@@ -159,7 +159,7 @@ describe('Collections::ProductCollection', () => {
                 expect(json).to.be.a('string'); //passes
             });
 
-            it('Implements a `serialize` method to return all model attributes as an array of JS objects.', () => {
+            it('Implements a `serialize` method to return all models attributes as an array of JS objects.', () => {
                 let serialized;
                 expect(pc).to.respondTo('serialize');
                 serialized = pc.serialize();

@@ -1,14 +1,17 @@
 /*eslint no-unused-expressions: 0*/
-import DOMUtils from '../../../src/client/com.e750/lib/util/DOMUtils';
-import LookupTable from '../../../src/client/com.e750/lib/util/LookupTable';
+import DOMUtils from '../../src/client/com.e750/lib/util/DOMUtils';
+import LookupTable from '../../src/client/com.e750/lib/util/LookupTable';
 
-import {settings} from '../../setup';
+import {settings} from '../setup';
 
 let expect = settings.assertions.expect;
 
 settings.init();
 
 describe('Utils', () => {
+    describe('defaults', () => {
+
+    });
 
     describe('HTML2DOM', () => {
         it('Accepts an HTML string and returns a DOMNode, stripping <script> tags', () => {

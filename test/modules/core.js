@@ -1,7 +1,7 @@
 /*eslint no-unused-expressions: 0*/
-//import {net, storage, jst} from '../../../src/client/com.e750/lib/core';
+//import {net, storage, jst} from '../../src/client/com.e750/lib/core';
 
-import {settings} from '../../setup';
+import {settings} from '../setup';
 
 //let expect = settings.assertions.expect;
 //let mocks = settings.mocking;

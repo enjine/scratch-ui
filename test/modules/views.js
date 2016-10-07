@@ -1,6 +1,6 @@
-import View from '../../../src/client/com.e750/lib/classes/views/View';
+import View from '../../src/client/com.e750/lib/classes/views/View';
 
-import {settings} from '../../setup';
+import {settings} from '../setup';
 import {EmitterMixinBehavior} from '../behaviors/emitter';
 import {PubSubBehavior} from '../behaviors/pubsub';
 
