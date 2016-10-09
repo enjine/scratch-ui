@@ -1,10 +1,10 @@
 /*eslint no-unused-expressions: 0*/
-import Model from '../../src/client/com.e750/lib/classes/models/Model';
-import ProductModel from '../../src/client/com.e750/lib/classes/models/Product';
+import Model from 'lib/classes/models/Model';
+import ProductModel from 'lib/classes/models/Product';
 
-import {settings} from '../setup';
-import {EmitterMixinBehavior} from '../behaviors/emitter';
-import {PubSubBehavior} from '../behaviors/pubsub';
+import {settings} from 'setup';
+import {EmitterMixinBehavior} from 'behaviors/emitter';
+import {PubSubBehavior} from 'behaviors/pubsub';
 
 
 let expect = settings.assertions.expect;

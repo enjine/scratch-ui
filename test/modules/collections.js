@@ -1,17 +1,17 @@
 /*eslint no-unused-expressions: 0*/
-import Collection from '../../src/client/com.e750/lib/classes/collections/Collection';
-import ProductCollection from '../../src/client/com.e750/lib/classes/collections/Product';
+import Collection from 'lib/classes/collections/Collection';
+import ProductCollection from 'lib/classes/collections/Product';
 
 
-import Model from '../../src/client/com.e750/lib/classes/models/Model';
-import ProductModel from '../../src/client/com.e750/lib/classes/models/Product';
+import Model from 'lib/classes/models/Model';
+import ProductModel from 'lib/classes/models/Product';
 
-import {settings} from '../setup';
-import Evt from '../../src/client/com.e750/lib/event/Registry';
+import {settings} from 'setup';
+import Evt from 'lib/event/Registry';
 
 
-import {EmitterMixinBehavior} from '../behaviors/emitter';
-import {PubSubBehavior} from '../behaviors/pubsub';
+import {EmitterMixinBehavior} from 'behaviors/emitter';
+import {PubSubBehavior} from 'behaviors/pubsub';
 
 let expect = settings.assertions.expect;
 let mocks = settings.mocking;

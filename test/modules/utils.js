@@ -1,8 +1,8 @@
 /*eslint no-unused-expressions: 0*/
-import DOMUtils from '../../src/client/com.e750/lib/util/DOMUtils';
-import LookupTable from '../../src/client/com.e750/lib/util/LookupTable';
+import DOMUtils from 'lib/util/DOMUtils';
+import LookupTable from 'lib/util/LookupTable';
 
-import {settings} from '../setup';
+import {settings} from 'setup';
 
 let expect = settings.assertions.expect;
 

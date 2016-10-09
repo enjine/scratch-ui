@@ -1,8 +1,8 @@
-import View from '../../src/client/com.e750/lib/classes/views/View';
+import View from 'lib/classes/views/View';
 
-import {settings} from '../setup';
-import {EmitterMixinBehavior} from '../behaviors/emitter';
-import {PubSubBehavior} from '../behaviors/pubsub';
+import {settings} from 'setup';
+import {EmitterMixinBehavior} from 'behaviors/emitter';
+import {PubSubBehavior} from 'behaviors/pubsub';
 
 let expect = settings.assertions.expect;
 let mocks = settings.mocking;

@@ -1,12 +1,12 @@
 /*eslint no-unused-expressions: 0, no-new: 0*/
 
-import Component from '../../src/client/com.e750/lib/components/Component';
+import Component from 'lib/components/Component';
 
 
-import {settings} from '../setup';
-import {EmitterMixinBehavior} from '../behaviors/emitter';
-import {PubSubBehavior} from '../behaviors/pubsub';
-import {DomEventBehavior} from '../behaviors/domevent';
+import {settings} from 'setup';
+import {EmitterMixinBehavior} from 'behaviors/emitter';
+import {PubSubBehavior} from 'behaviors/pubsub';
+import {DomEventBehavior} from 'behaviors/domevent';
 
 let expect = settings.assertions.expect;
 //let mocks = settings.mocking;

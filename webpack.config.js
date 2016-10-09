@@ -33,14 +33,18 @@ module.exports = {
         { 'sinon': true }
     ],
     resolve: {
+        root: path.resolve(__dirname),
         modulesDirectories: [
             'node_modules',
-            'client/com.e750',
+            'src',
             'test'
         ],
         alias: {
-            sinon: 'sinon/pkg/sinon.js'
-        }
+            sinon: 'sinon/pkg/sinon.js',
+            lib: 'src/client/com.e750/lib',
+            cart: 'src/client/com.e750/cart'
+        },
+        extensions: ['', '.js', '.jsx']
     },
     module: {
         preLoaders: [],
@@ -52,7 +56,7 @@ module.exports = {
                     path.resolve(__dirname, 'src/client'),
                     path.resolve(__dirname, 'test/modules'),
                     path.resolve(__dirname, 'test/behaviors'),
-                    //path.resolve(__dirname, 'test/unit')
+                    path.resolve(__dirname, 'test/unit')
                 ],
                 exclude: /(node_modules|bower_components)/
             },

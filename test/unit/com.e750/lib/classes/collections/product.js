@@ -9,7 +9,7 @@ import {settings} from 'setup';
 
 settings.init();
 
-import ProductCollection from 'lib/classes/collection/Product';
+import ProductCollection from 'lib/classes/collections/Product';
 
 xdescribe('ProductCollection.class', () => {
     it('', () => {

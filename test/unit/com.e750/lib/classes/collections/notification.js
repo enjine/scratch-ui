@@ -9,7 +9,7 @@ import {settings} from 'setup';
 
 settings.init();
 
-import NotificationCollection from 'lib/classes/collection/Notification';
+import NotificationCollection from 'lib/classes/collections/Notification';
 
 xdescribe('NotificationCollection.class', () => {
     it('', () => {
