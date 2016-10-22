@@ -1,4 +1,7 @@
 /**
+ * Defines an ES6 Set -like key/value store
+ * Not yet evaluated for performance vs native implementation
+ *
  * For your health!
  * @type {{has: *}}
  */
@@ -14,7 +17,7 @@ const LookupTable = {
             this[name] = value;
             return true;
         } else {
-            throw new ReferenceError('`' + name + '` already exists in lookup table.');
+            throw new Error('`' + name + '` already exists in lookup table.');
         }
     },
     remove: function (name) {
@@ -64,6 +67,12 @@ Object.defineProperty(LookupTable, 'size', {
     },
     enumerable: false,
     writable: false
+});
+
+Object.defineProperty(LookupTable, 'length', {
+    get: function () {
+        return this.size();
+    }
 });
 
 export default LookupTable;

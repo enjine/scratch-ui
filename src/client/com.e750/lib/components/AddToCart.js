@@ -20,7 +20,7 @@ export default class AddToCart extends Component {
     }
 
     bindDOMEvents () {
-        this.on('submit', this.validator.validate.bind(this.validator));
+        this.on('submit', this.validator.onSubmit.bind(this.validator));
 
         this.on('click', (e) => {
             console.log('CLICKED', this, e);

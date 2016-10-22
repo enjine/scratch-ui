@@ -1,7 +1,7 @@
 import Dispatcher from 'lib/event/Dispatcher';
 import {isNativeEvent as isNative, addHandler, removeHandler} from 'lib/event/utils';
-import {isElement, isNode} from 'lib/util/DOMUtils';
-import guid from 'lib/util/Guid';
+import {isElement, isNode} from 'lib/util/DOM';
+import guid from 'lib/util/guid';
 import nEvent from 'lib/event/nEvent';
 
 
@@ -9,6 +9,15 @@ export default function Evented () {
 };
 
 Object.assign(Evented.prototype, {
+    /**
+     * Delegate an event handler to child elements matching the selector
+     *
+     * @param evTarget
+     * @param eventNames
+     * @param handler
+     * @param context
+     * @returns {delegate}
+     */
     delegate: function (evTarget, eventNames, handler, context) {
         let ctx = context || this;
         this.on(eventNames, function (e) {
@@ -21,6 +30,16 @@ Object.assign(Evented.prototype, {
 
     },
 
+    /**
+     * Delegate an event handler to child elements matching the selector
+     * and remove the event listener after the callback is invoked
+     *
+     * @param evTarget
+     * @param eventNames
+     * @param handler
+     * @param context
+     * @returns {delegateOnce}
+     */
     delegateOnce: function (evTarget, eventNames, handler, context) {
         let ctx = context || this;
         this.once(eventNames, function (e) {
@@ -32,28 +51,54 @@ Object.assign(Evented.prototype, {
         return this;
     },
 
+    /**
+     * Inversion of control, a.k.a `delegate` for objects.
+     * Enables event delegation on objects rather than DOM elements.
+     * @param obj
+     * @param event
+     * @param handler
+     * @param context
+     * @returns {*}
+     */
     listenTo: function (obj, event, handler, context) {
         let ctx = context || this;
-        this.on(event, function (e) {
+        return this.on(event, function (e) {
             if (e.target && e.target === obj) {
                 return handler.apply(ctx, arguments);
             }
             return false;
         });
-        return this;
     },
 
+    /**
+     * Inversion of control, a.k.a `delegate` for objects.
+     * Enables event delegation on objects rather than DOM elements.
+     * Removes the listener after it is invoked once.
+     *
+     * @param obj
+     * @param event
+     * @param handler
+     * @param context
+     * @returns {*}
+     */
     listenToOnce: function (obj, event, handler, context) {
         let ctx = context || this;
-        this.once(event, function (e) {
+        return this.once(event, function (e) {
             if (e.target && e.target === obj) {
                 return handler.apply(ctx, arguments);
             }
             return false;
         });
-        return this;
     },
 
+    /**
+     * Adds and event listener to a DOM node or a subscription to anything else
+     *
+     * @param eventNames
+     * @param handler
+     * @param context
+     * @returns {*}
+     */
     on: function (eventNames, handler, context) {
         let delegate = this.el || this,
             ctx = context || this;
@@ -66,6 +111,13 @@ Object.assign(Evented.prototype, {
         }, []);
     },
 
+    /**
+     * Removes an event listener or subscription
+     *
+     * @param eventNames
+     * @param handler
+     * @returns {*}
+     */
     off: function (eventNames, handler) {
         let delegate = this.el || this;
 
@@ -77,13 +129,20 @@ Object.assign(Evented.prototype, {
         }, []);
     },
 
+    /**
+     * Adds an event listener whose callback will only be invoked once
+     * @param event
+     * @param handler
+     * @param context
+     * @returns {*}
+     */
     once: function (event, handler, context) {
         let that = this,
             ctx = context || this;
 
         function cb () {
-            handler.apply(ctx, arguments);
-            return that.off(event, cb);
+            that.off(event, cb);
+            return handler.apply(ctx, arguments);
         }
 
         cb.sId = guid();
@@ -134,6 +193,13 @@ Object.assign(Evented.prototype, {
         return false;
     },
 
+    /**
+     * Adds a pub/sub event handler
+     *
+     * @param channel
+     * @param handler
+     * @returns {Array}
+     */
     subscribe: function (channel, handler) {
         let subscription = null,
             channels = channel.split(' ');
@@ -155,6 +221,12 @@ Object.assign(Evented.prototype, {
 
     },
 
+    /**
+     * Removes a pub/sub event handler
+     * @param channel
+     * @param handler
+     * @returns {*}
+     */
     unsubscribe: function (channel, handler) {
         let ret,
             channels = channel.split(' ');
@@ -162,7 +234,7 @@ Object.assign(Evented.prototype, {
             channels.forEach((ch) => {
                 let c = ch.trim();
                 ret = this.subscriptions.filter((sub) => {
-                    return sub.ev === c && handler.sId === sub.id;
+                    return sub.ev === c && this.mediator.subscribers[sub.ev][sub.id] === handler;
                 }).map((hit) => {
                     let id = hit.id;
                     delete this.subscriptions[id];

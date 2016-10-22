@@ -4,7 +4,7 @@ import Progressable from 'lib/behaviors/Progressable';
 import View from 'lib/classes/views/View';
 import Model from 'lib/classes/models/Model';
 import Collection from 'lib/classes/collections/Collection';
-import {isElement} from 'lib/util/DOMUtils';
+import {isElement} from 'lib/util/DOM';
 import Evt from 'lib/event/Registry';
 
 @mixes(Progressable)
@@ -217,6 +217,23 @@ export default class Component extends View {
 
         this.emit(Evt.COMPONENTS_LOADED);
         return this;
+    }
+
+    onValidationFailed (e, failures) {
+        console.warn(e, failures);
+        if (failures.length) {
+            Object.keys(failures).forEach((key) => {
+                if (failures.hasOwnProperty(key) && key !== 'length') {
+                    let info = failures[key];
+                    this.emit(Evt.NOTIFY, {
+                        headline: key.toUpperCase() + ' validation failed',
+                        message: info.reason.message
+                    });
+                }
+
+            });
+        }
+
     }
 }
 

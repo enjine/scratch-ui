@@ -1,7 +1,7 @@
 import mixes from 'lib/util/mixes';
 import Evented from 'lib/behaviors/Evented';
 import {net} from 'lib/core';
-import guid from 'lib/util/Guid';
+import guid from 'lib/util/guid';
 import Evt from 'lib/event/Registry';
 
 let attributes = {

@@ -1,5 +1,5 @@
-import guid from 'lib/util/Guid';
-import {isElement} from 'lib/util/DOMUtils';
+import guid from 'lib/util/guid';
+import {isElement} from 'lib/util/DOM';
 
 /**
  * Cross-Browser event listener.

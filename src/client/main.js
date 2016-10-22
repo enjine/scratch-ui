@@ -19,9 +19,13 @@ class e750 extends Application {
     }
 
     bootstrap (data = {}) {
+        this.model.fetch({
+            url: '/api/token',
+            method: 'GET'
+        });
         this.fixtures = data;
     }
 }
 
 var app = new e750('body', {fixtures: window.e750.FIXTURES, options: window.e750.options || {}});
-document.addEventListener('DOMContentLoaded', app.start.bind(app));
+document.addEventListener('DOMContentLoaded', app.start.bind(app), false);

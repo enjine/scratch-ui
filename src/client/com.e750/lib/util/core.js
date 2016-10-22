@@ -1,7 +1,8 @@
-import guid from './Guid';
+import guid from './guid';
 import mixes from './mixes';
+import compose from './compose';
 
-const Compose = (...args) => initial => args.reduceRight(
+const curry = (...args) => initial => args.reduceRight(
     (result, fn) => fn(result),
     initial
 );
@@ -9,16 +10,16 @@ const Compose = (...args) => initial => args.reduceRight(
 /**
  *  Returns a random number between min (inclusive) and max (exclusive)
  */
-function getRandomArbitrary (min, max) {
+const getRandomArbitrary = (min, max) => {
     return Math.random() * (max - min) + min;
-}
+};
 
 /**
  * Returns a random integer between min (inclusive) and max (inclusive)
  * Using Math.round() will give you a non-uniform distribution!
  */
-const anyIntBetween = function getRandomInt (min, max) {
+const anyIntBetween = (min, max) => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-export default {Compose, mixes, guid, anyIntBetween};
+export default {compose, curry, mixes, guid, anyIntBetween, getRandomArbitrary};

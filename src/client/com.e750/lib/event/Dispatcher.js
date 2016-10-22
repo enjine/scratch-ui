@@ -1,4 +1,4 @@
-import guid from 'lib/util/Guid';
+import guid from 'lib/util/guid';
 import LookupTable from 'lib/util/LookupTable';
 
 export default function Dispatcher () {
@@ -15,6 +15,10 @@ function addSubscriber (channel, handler) {
 
     if (!subs.has(channel)) {
         subs[channel] = Object.create(LookupTable);
+    }
+    if (subs[channel][subscriptionId]) {
+        //re-generate guid when same callback for different events.
+        subscriptionId = guid();
     }
     handler.sId = subscriptionId;
     subs[channel][subscriptionId] = handler;

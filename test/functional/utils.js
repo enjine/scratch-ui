@@ -1,5 +1,5 @@
 /*eslint no-unused-expressions: 0*/
-import DOMUtils from 'lib/util/DOMUtils';
+import DOMUtils from 'lib/util/DOM';
 import LookupTable from 'lib/util/LookupTable';
 
 import {settings} from 'setup';
@@ -43,9 +43,9 @@ describe('Utils', () => {
 
         });
 
-        it('add("existingKey", "someValue") should throw a ReferenceError if you attempt to set a value twice.', () => {
+        it('add("existingKey", "someValue") should throw a Error if you attempt to set a value twice.', () => {
             L.add('duplicate', 'yes');
-            expect(L.add.bind(L, 'duplicate', 'no')).to.throw(ReferenceError);
+            expect(L.add.bind(L, 'duplicate', 'no')).to.throw(Error);
 
         });
 

@@ -28,7 +28,7 @@ export default class Login extends Component {
     }
 
     bindDOMEvents () {
-        this.on('submit', this.validator.validate.bind(this.validator));
+        this.on('submit', this.validator.onSubmit.bind(this.validator));
         this.delegate('#username', 'input', this.onUsernameInput, this);
         return this;
     }
@@ -70,21 +70,17 @@ export default class Login extends Component {
 
     onUsernameInput (e) {
         delete this.indicator.dataset.isvalid;
-        this.showIndicator();
-        this.tId = window.setTimeout(() => {
-            this.checkUsername(e.target.value).then((result) => {
-                this.hideIndicator();
-                this.indicator.dataset.isvalid = result.data;
-            }).catch(this.onXHRError.bind(this));
-        }, 3000);
-    }
-
-    onValidationFailed (e, failures) {
-        console.warn(failures);
-        this.emit(Evt.NOTIFY, {
-            headline: 'Validation Failed',
-            message: 'Required field missing.'
-        });
+        if (e.target.value) {
+            this.showIndicator();
+            this.tId = window.setTimeout(() => {
+                this.checkUsername(e.target.value).then((result) => {
+                    this.hideIndicator();
+                    this.indicator.dataset.isvalid = result.data;
+                }).catch(this.onXHRError.bind(this));
+            }, 3000);
+        } else {
+            this.hideIndicator();
+        }
     }
 
     onValidationSuccess (e) {

@@ -11,9 +11,6 @@ export default class Application extends Component {
         return this;
     }
 
-    initProps (el, options) {
-    }
-
     attachPartials () {
         return this.updateChildren('[data-partial]');
     }

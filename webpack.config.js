@@ -4,6 +4,7 @@ var webpack = require('webpack');
 const ENV = process.env.NODE_ENV || 'development';
 
 module.exports = {
+    target: 'web',
     devtool: ENV === 'production' ? 'cheap-module-eval-source-map' : 'inline-source-map',
     context: path.resolve(__dirname, 'src/client'),
     entry: [
@@ -56,7 +57,8 @@ module.exports = {
                     path.resolve(__dirname, 'src/client'),
                     path.resolve(__dirname, 'test/modules'),
                     path.resolve(__dirname, 'test/behaviors'),
-                    path.resolve(__dirname, 'test/unit')
+                    path.resolve(__dirname, 'test/unit'),
+                    path.resolve(__dirname, 'test')
                 ],
                 exclude: /(node_modules|bower_components)/
             },

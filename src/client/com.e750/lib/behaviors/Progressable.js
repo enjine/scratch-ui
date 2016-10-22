@@ -2,9 +2,13 @@ import utils from 'lib/util/core';
 
 var styles = require('!style!css!sass!../components/styles/Progress.scss');
 
-const Progressable = {
+const Progressable = function () {};
+
+Object.assign(Progressable.prototype, {
     showProgress: function () {
-        if (!this.el || !this.emit) return false;
+        if (!this.el) {
+            throw new Error('Progessables must have a DOMElement `el` property');
+        }
         this.el.classList.add('loading');
         return this;
     },
@@ -30,12 +34,14 @@ const Progressable = {
     },
 
     hideProgress: function () {
-        if (!this.el) return false;
+        if (!this.el) {
+            throw new Error('Progessables must have a DOMElement `el`');
+        }
         let progress = this.el.querySelector('progress');
         progress.value = progress.max;
         this.el.classList.remove('loading');
         return this;
     }
-};
+});
 
 export default Progressable;
