@@ -1,4 +1,4 @@
-import {ui} from '../../cart';
+import {ui} from 'cart';
 
 export default function Resolver () {
 }
@@ -7,14 +7,17 @@ Resolver.prototype.registry = {
     'ui/header': ui.header,
     'ui/slider': ui.carousel,
     'ui/intro': ui.component,
-    'cart/add': ui.addToCart,
-    'cart/product-list': ui.productList,
-    'cart/product/simple': ui.baseProduct
+    'ui/addToCart': ui.addToCart,
+    'ui/product-list': ui.productList,
+    'ui/login': ui.login,
+    'ui/notificationList': ui.notificationList,
+    'cart/product/simple': ui.baseProduct,
+    'cart/notification': ui.notification
 };
 
 Resolver.prototype.getComponentId = function (view) {
     return Object.getOwnPropertyNames(this.registry).filter((componentId) => {
-            return Object.getPrototypeOf(view).constructor === this[componentId];
+            return Object.getPrototypeOf(view).constructor === this.registry[componentId];
         })[0] || null;
 };
 

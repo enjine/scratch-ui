@@ -1,6 +1,7 @@
 import Component from './Component';
 import Resolver from './Resolver';
-import Evt from '../event/Registry';
+import Evt from 'lib/event/Registry';
+import LookupTable from 'lib/util/LookupTable';
 
 Component.Resolver = new Resolver();
 

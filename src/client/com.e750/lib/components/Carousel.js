@@ -1,27 +1,21 @@
-import {Model} from '../classes/models/Model';
-import Component from '../components/Component';
+import Component from './Component';
 
 
 export default class Carousel extends Component {
-    model = Model;
-    id = 'ui/slider';
-
-    initState () {
-        return this;
+    constructor (el, options = {}) {
+        options.id = 'ui/slider';
+        super(el, options);
     }
 
-    initProps (el, options) {
-        super.initProps(el, options);
-        this.model = options.model || new Model();
-        if (this.el.dataset.mounted === undefined) {
-            this.template = options.template || document.querySelector(this.getComponentSelector());
+    initState () {
+        if (!this.isMounted()) {
+            this.template = this.options.template || document.querySelector(this.getComponentSelector());
         }
-        return this;
     }
 
     render () {
         try {
-            this.attachNestedComponents();
+            this.attachChildren();
             return this;
         } catch (e) {
             console.error(e);

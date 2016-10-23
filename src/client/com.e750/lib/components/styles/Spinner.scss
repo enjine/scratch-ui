@@ -1,0 +1,66 @@
+/**
+ * (C)Leanest CSS spinner ever
+ */
+
+@keyframes spin {
+  to { transform: rotate(1turn); }
+}
+
+.spinner {
+  animation: spin 1s infinite steps(8);
+  display: inline-block;
+  font-size: 12px;
+  height: 5em;
+  margin: 0 .5em;
+  overflow: hidden;
+  position: relative;
+  text-indent: 999em;
+  width: 5em;
+}
+
+.micro.spinner {
+  font-size: 2px;
+}
+
+.small.spinner {
+  font-size: 6px;
+}
+
+.large.spinner {
+  font-size: 24px;
+}
+
+.spinner::before,
+.spinner::after,
+.spinner > div:before,
+.spinner > div:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 2.25em; // (container width - part width)/2
+  width: .5em;
+  height: 1.5em;
+  border-radius: .2em;
+  background: #eee;
+  box-shadow: 0 3.5em #eee; // container height - part height
+  transform-origin: 50% 2.5em; // container height / 2
+}
+
+.spinner::before {
+  background: #555;
+}
+
+.spinner::after {
+  background: #777;
+  transform: rotate(-45deg);
+}
+
+.spinner > div::before {
+  background: #999;
+  transform: rotate(-90deg);
+}
+
+.spinner > div::after {
+  background: #bbb;
+  transform: rotate(-135deg);
+}

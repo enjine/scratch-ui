@@ -1,9 +1,8 @@
-import {net} from '../../core';
-import Evented from '../../behaviors/Evented';
-import guid from '../../util/Guid.js';
-import Initializable from '../../behaviors/Initializable';
-import mixes from '../../util/mixes';
-import Evt from '../../event/Registry';
+import mixes from 'lib/util/mixes';
+import Evented from 'lib/behaviors/Evented';
+import {net} from 'lib/core';
+import guid from 'lib/util/guid';
+import Evt from 'lib/event/Registry';
 
 let attributes = {
     id: null,
@@ -18,27 +17,27 @@ let attributes = {
     }
 };
 
-let overrides = {
-    initProps: function (props) {
+@mixes(Evented)
+export default class Model {
+    constructor (props, options) {
+        this.initProps(props, options);
+        this.initState();
+    }
+
+    initState () {
+        return this;
+    }
+
+    initProps (props, options) {
+        this.options = {};
+        Object.assign(this.options, options);
         this.values = Object.create(attributes);
-
         Object.assign(this.values, this.defaults || {});
-
         if (props) {
             this.parse(props);
         }
-        return this;
     }
-};
 
-@mixes(Evented, Initializable, overrides)
-export default
-class Model {
-    constructor (props, options) {
-        Initializable.initProps.call(this, options);
-        this.initProps(props);
-        this.initState();
-    }
 
     setId (val) {
         let id = Number(val);
@@ -50,44 +49,54 @@ class Model {
     }
 
     /**
-     * returns an A+ promise
+     * returns a native promise
+     * @param url
      * @param options
-     * @returns {*}
+     * @returns {Promise}
      */
-    fetch (options) {
-        try {
-            this.emit(Evt.BEFORE_FETCH);
-            return net.http.get.call(this, options);
-        } catch (e) {
-            console.error(e);
-            //throw e;
+
+    request (url, options) {
+        console.log('models::request', options);
+        if (!options.method) {
+            return net.http.getJSON.call(this, url, options);
+        }
+
+        switch (options.method.toUpperCase()) {
+            case 'POST':
+                return net.http.postJSON.call(this, url, options.data || {}, options);
+            case 'GET':
+            default:
+                return net.http.getJSON.call(this, url, options);
         }
     }
 
-    parse (data) {
-        //console.log('parsing model', data, Object.keys(data).length);
+    fetch (options = {}) {
+        let res;
         try {
-            if (Object.keys(data).length > 0) {
-                for (let prop in data) {
-                    if (data.hasOwnProperty(prop)) {
-                        this.set(prop, data[prop]);
-                    }
-                }
-            } else {
-                throw new Error('Data has zero length.');
-            }
+            this.emit(Evt.BEFORE_REQUEST);
+            res = this.request(options.url, options);
         } catch (e) {
             console.error(e);
             //throw e;
         }
+        return res;
+    }
 
+    parse (data) {
+        if (Object.keys(data).length > 0) {
+            for (let prop in data) {
+                if (data.hasOwnProperty(prop)) {
+                    this.set(prop, data[prop]);
+                }
+            }
+        }
         return this;
     }
 
     get (propName) {
         try {
             let prop = this.values[propName];
-            return (typeof prop === 'function') ? prop.call(this) : prop;
+            return typeof prop === 'function' ? prop.call(this) : prop;
         } catch (e) {
             console.error(e);
             throw new ReferenceError('Property `' + propName + '` not found in ' + this.constructor.name);

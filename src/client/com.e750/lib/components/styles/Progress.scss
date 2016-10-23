@@ -1,0 +1,9 @@
+progress {
+  display:none;
+}
+
+.loading > progress {
+  display: block;
+  margin: auto;
+  width: 60%;
+}

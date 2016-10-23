@@ -1,43 +1,152 @@
-import Dispatcher from '../event/Dispatcher';
-import {isNativeEvent as isNative, addHandler, removeHandler} from '../util/EventUtils';
-import {isElement, isNode} from '../util/DOMUtils';
-import guid from '../util/Guid';
-import nEvent from '../event/nEvent';
+import Dispatcher from 'lib/event/Dispatcher';
+import {isNativeEvent as isNative, addHandler, removeHandler} from 'lib/event/utils';
+import {isElement, isNode} from 'lib/util/DOM';
+import guid from 'lib/util/guid';
+import nEvent from 'lib/event/nEvent';
 
 
 export default function Evented () {
 };
 
 Object.assign(Evented.prototype, {
-    on: function (event, handler, delegate) {
-        let d = delegate || this.el || this;
-        if (isNative(event)) {
-            return addHandler(d, event, handler);
-        }
+    /**
+     * Delegate an event handler to child elements matching the selector
+     *
+     * @param evTarget
+     * @param eventNames
+     * @param handler
+     * @param context
+     * @returns {delegate}
+     */
+    delegate: function (evTarget, eventNames, handler, context) {
+        let ctx = context || this;
+        this.on(eventNames, function (e) {
+            if (e.target && e.target.matches(evTarget)) {
+                return handler.apply(ctx, arguments);
+            }
+            return false;
+        });
+        return this;
 
-        return this.subscribe(event, handler, d);
     },
 
-    off: function (event, handler, delegate) {
-        if (isNative(event)) {
-            let d = delegate || this.el || this;
-            return removeHandler(d, event, handler);
-        }
-        return this.unsubscribe(event, handler);
+    /**
+     * Delegate an event handler to child elements matching the selector
+     * and remove the event listener after the callback is invoked
+     *
+     * @param evTarget
+     * @param eventNames
+     * @param handler
+     * @param context
+     * @returns {delegateOnce}
+     */
+    delegateOnce: function (evTarget, eventNames, handler, context) {
+        let ctx = context || this;
+        this.once(eventNames, function (e) {
+            if (e.target && e.target.matches(evTarget)) {
+                return handler.apply(ctx, arguments);
+            }
+            return false;
+        });
+        return this;
     },
 
-    once: function (event, handler, delegate) {
-        let that = this;
+    /**
+     * Inversion of control, a.k.a `delegate` for objects.
+     * Enables event delegation on objects rather than DOM elements.
+     * @param obj
+     * @param event
+     * @param handler
+     * @param context
+     * @returns {*}
+     */
+    listenTo: function (obj, event, handler, context) {
+        let ctx = context || this;
+        return this.on(event, function (e) {
+            if (e.target && e.target === obj) {
+                return handler.apply(ctx, arguments);
+            }
+            return false;
+        });
+    },
 
-        function on (data, args) {
-            //console.log('ONCE called:', subscription, handler);
-            that.off(event, on, delegate);
-            handler(data, args);
+    /**
+     * Inversion of control, a.k.a `delegate` for objects.
+     * Enables event delegation on objects rather than DOM elements.
+     * Removes the listener after it is invoked once.
+     *
+     * @param obj
+     * @param event
+     * @param handler
+     * @param context
+     * @returns {*}
+     */
+    listenToOnce: function (obj, event, handler, context) {
+        let ctx = context || this;
+        return this.once(event, function (e) {
+            if (e.target && e.target === obj) {
+                return handler.apply(ctx, arguments);
+            }
+            return false;
+        });
+    },
+
+    /**
+     * Adds and event listener to a DOM node or a subscription to anything else
+     *
+     * @param eventNames
+     * @param handler
+     * @param context
+     * @returns {*}
+     */
+    on: function (eventNames, handler, context) {
+        let delegate = this.el || this,
+            ctx = context || this;
+
+        return addHandler(delegate, eventNames, handler).reduce((ret, result) => {
+            if (!result.id) {
+                return ret.concat(this.subscribe(result.ev, result.fn));
+            }
+            return ret.concat(result);
+        }, []);
+    },
+
+    /**
+     * Removes an event listener or subscription
+     *
+     * @param eventNames
+     * @param handler
+     * @returns {*}
+     */
+    off: function (eventNames, handler) {
+        let delegate = this.el || this;
+
+        return removeHandler(delegate, eventNames, handler).reduce((ret, result) => {
+            if (!result.id) {
+                return ret.concat(this.unsubscribe(result.ev, result.fn));
+            }
+            return ret.concat(result);
+        }, []);
+    },
+
+    /**
+     * Adds an event listener whose callback will only be invoked once
+     * @param event
+     * @param handler
+     * @param context
+     * @returns {*}
+     */
+    once: function (event, handler, context) {
+        let that = this,
+            ctx = context || this;
+
+        function cb () {
+            that.off(event, cb);
+            return handler.apply(ctx, arguments);
         }
 
-        on.sId = guid();
-        //console.log('attaching ONCE:', subscription, handler);
-        let subscription = this.on(event, on, delegate);
+        cb.sId = guid();
+        let subscription = this.on(event, cb);
         return subscription;
     },
 
@@ -76,7 +185,6 @@ Object.assign(Evented.prototype, {
         }
 
         if (subscribers.has(eventName)) {
-            //console.log('PUBSUB');
             let payload = new nEvent(eventName, data, this);
             return this.mediator.dispatch(eventName, payload, args);
 
@@ -85,37 +193,53 @@ Object.assign(Evented.prototype, {
         return false;
     },
 
-    subscribe: function (channel, handler, context) {
-        let ctx = context,
-            subscription = null;
-        if (typeof context === 'undefined') {
-            ctx = this;
-        }
+    /**
+     * Adds a pub/sub event handler
+     *
+     * @param channel
+     * @param handler
+     * @returns {Array}
+     */
+    subscribe: function (channel, handler) {
+        let subscription = null,
+            channels = channel.split(' ');
 
-        try {
-            subscription = this.mediator.add(channel, handler, ctx);
-            if (typeof this.subscriptions === 'undefined') {
-                this.subscriptions = [];
+        return channels.map((ch) => {
+            try {
+                let c = ch.trim();
+                subscription = this.mediator.add(c, handler);
+                if (typeof this.subscriptions === 'undefined') {
+                    this.subscriptions = [];
+                }
+                this.subscriptions.push(subscription);
+                return subscription;
+            } catch (e) {
+                console.error('Failed to subscribe to channel ' + ch, e);
             }
-            this.subscriptions.push(subscription);
-            //console.log('!! subscribed', typeof this, this, this.subscriptions);
-        } catch (e) {
-            console.error('Failed to subscribe to channel ' + channel, e);
-        }
-        return subscription;
+            return false;
+        });
 
     },
 
+    /**
+     * Removes a pub/sub event handler
+     * @param channel
+     * @param handler
+     * @returns {*}
+     */
     unsubscribe: function (channel, handler) {
-        let ret = [];
+        let ret,
+            channels = channel.split(' ');
         try {
-            ret = this.subscriptions.filter((sub) => {
-                //console.log('unsub:', channel, handler, sub.id);
-                return sub.evt === channel && handler.sId === sub.id;
-            }).map((hit) => {
-                let id = hit.id;
-                ret = this.mediator.remove(channel, id);
-                this.subscriptions.splice(id, 1);
+            channels.forEach((ch) => {
+                let c = ch.trim();
+                ret = this.subscriptions.filter((sub) => {
+                    return sub.ev === c && this.mediator.subscribers[sub.ev][sub.id] === handler;
+                }).map((hit) => {
+                    let id = hit.id;
+                    delete this.subscriptions[id];
+                    return this.mediator.remove(channel, id);
+                });
             });
         } catch (e) {
             console.error('Failed to unsubscribe from channel ' + channel, e);

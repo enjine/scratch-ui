@@ -1,22 +1,30 @@
+import {storage} from 'lib/core';
 import Component from './Component';
 import Product from './Product';
-import ProductCollection from '../classes/collections/Product';
+import ProductCollection from 'lib/classes/collections/Product';
+import Evt from 'lib/event/Registry';
 
 export default class ProductList extends Component {
-    initState () {
-        this.collection = new ProductCollection(this.getBootstrap());
+    constructor (el, options = {}) {
+        Object.assign(options, {
+            collectionClass: ProductCollection,
+            id: 'ui/productList'
+        });
+        super(el, options);
+    }
 
-        //console.log('PRODUCT LIST:', this.collection.models, window.e750.bootstrap.productList);
+    initState () {
+        this.collection = new this.collectionClass(this.getBootstrap(), {url: 'https://api.securecheckout.com/v1/cart/products/'});
+
+        this.bindSubscriptions();
+
         if (!this.collection.models.length) {
             var defaults = {
-                url: '/api/products/',
                 type: 'json',
-                method: 'GET',
                 headers: {
-                    'X-Auth-Token': document.cookie.split('=')[1]
-                }
+                    'X-Auth-Token': storage.cookie.get('apiToken')
+                },
             }, fetchOpts = {};
-
 
             Object.assign(fetchOpts, defaults, this.options);
             this.loadData(fetchOpts);
@@ -26,20 +34,24 @@ export default class ProductList extends Component {
         return this;
     }
 
-    loadData (fetchOpts) {
-        this.showProgress();
-        this.collection.get(fetchOpts)
+    loadData (opts) {
+        this.collection.fetch(opts)
             .then(this.render.bind(this), (reason) => {
                 console.error('Render Failed! ', this, arguments, reason);
             })
+            .then(() => {
+                //console.log('finally', this, arguments, this.options);
+                this.hideProgress();
+            })
             .catch((reason) => {
                 console.error('Promise Rejected! ', this, arguments, reason);
-            })
-            .finally(() => {
-                //console.log('finally', this, arguments, this.options);
-                this.done();
             });
         return this;
+    }
+
+    bindSubscriptions () {
+        this.listenTo(this.collection, Evt.BEFORE_XHR, this.showProgress.bind(this));
+        this.listenTo(this.collection, Evt.DOWNLOAD_PROGRESS, this.onProgress.bind(this));
     }
 
     bindDOMEvents () {
@@ -52,25 +64,23 @@ export default class ProductList extends Component {
     render () {
         if (!this.isMounted()) {
             try {
-                let html = '',
-                    products = this.collection.models,
+                let products = this.collection.models,
                     product;
+
                 for (let i = 0; i < products.length; i++) {
                     let model = products[i];
                     model.set('quantities', window.e750.FIXTURES.quantities);
                     product = new Product('div', {model: model});
-                    product.render();
-                    this.addChildView(product);
-                    html += product.el.outerHTML;
+                    this.addChild(product.render());
+                    this.el.appendChild(product.el);
                 }
-
-                this.el.innerHTML = html;
-                this.bindDOMEvents();
-                this.attachNestedComponents();
             } catch (e) {
                 throw e;
             }
+        } else {
+            this.attachChildren();
         }
+        this.bindDOMEvents();
         return this;
     }
 

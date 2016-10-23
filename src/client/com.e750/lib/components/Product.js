@@ -1,28 +1,28 @@
-import {jst} from '../core';
-import {ProductModel} from '../classes/models/Product';
-import Component from '../components/Component';
+import {jst} from 'lib/core';
+import {ProductModel} from 'lib/classes/models/Product';
+import Component from 'lib/components/Component';
 
 
 export default class Product extends Component {
-    initProps (el, options) {
-        super.initProps(el, options);
-        this.model = options.model || new ProductModel();
-        if (this.el.dataset.mounted === undefined) {
-            this.template = options.template || jst.getFromDOM('product/simple');
-        }
-        return this;
+
+
+    constructor (el, options = {}){
+        Object.assign(options, {
+            id: 'cart/product/simple',
+            template: options.template || jst.getFromDOM('product/simple'),
+            modelClass: ProductModel
+        });
+        super(el, options);
     }
 
     render () {
         try {
-            //console.log('render product', this.model.serialize());
-            if (this.el.dataset.mounted === undefined) {
-                this.el = jst.compile(this.template, this.model.serialize());
+            if (!this.isMounted()) {
+                this.el = jst.compileToDOM(this.template, this.model.serialize());
             }
-            this.attachNestedComponents();
+            this.attachChildren();
             return this;
         } catch (e) {
-            console.error(e);
             throw e;
         }
     }
