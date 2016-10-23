@@ -30,14 +30,6 @@ export default class AddToCart extends Component {
         return this;
     }
 
-    onValidationFailed (e, failures) {
-        console.warn(e, failures);
-        this.emit(Evt.NOTIFY, {
-            headline: 'Validation Failed',
-            message: 'Required field missing.'
-        });
-    }
-
     onValidationSuccess (e) {
         let form = e.target;
         console.log('VALID SUBMISSION', this, e);

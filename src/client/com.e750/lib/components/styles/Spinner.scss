@@ -7,15 +7,15 @@
 }
 
 .spinner {
-  position: relative;
+  animation: spin 1s infinite steps(8);
   display: inline-block;
-  width: 5em;
+  font-size: 12px;
   height: 5em;
   margin: 0 .5em;
-  font-size: 12px;
-  text-indent: 999em;
   overflow: hidden;
-  animation: spin 1s infinite steps(8);
+  position: relative;
+  text-indent: 999em;
+  width: 5em;
 }
 
 .micro.spinner {
@@ -30,37 +30,37 @@
   font-size: 24px;
 }
 
-.spinner:before,
-.spinner:after,
+.spinner::before,
+.spinner::after,
 .spinner > div:before,
 .spinner > div:after {
   content: '';
   position: absolute;
   top: 0;
-  left: 2.25em; /* (container width - part width)/2  */
+  left: 2.25em; // (container width - part width)/2
   width: .5em;
   height: 1.5em;
   border-radius: .2em;
   background: #eee;
-  box-shadow: 0 3.5em #eee; /* container height - part height */
-  transform-origin: 50% 2.5em; /* container height / 2 */
+  box-shadow: 0 3.5em #eee; // container height - part height
+  transform-origin: 50% 2.5em; // container height / 2
 }
 
-.spinner:before {
+.spinner::before {
   background: #555;
 }
 
-.spinner:after {
-  transform: rotate(-45deg);
+.spinner::after {
   background: #777;
+  transform: rotate(-45deg);
 }
 
-.spinner > div:before {
-  transform: rotate(-90deg);
+.spinner > div::before {
   background: #999;
+  transform: rotate(-90deg);
 }
 
-.spinner > div:after {
-  transform: rotate(-135deg);
+.spinner > div::after {
   background: #bbb;
+  transform: rotate(-135deg);
 }

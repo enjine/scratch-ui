@@ -21,9 +21,7 @@ module.exports = {
     plugins: [
         new webpack.optimize.OccurenceOrderPlugin(),
         new webpack.NoErrorsPlugin(),
-        new webpack.ProvidePlugin({
-
-        }),
+        new webpack.ProvidePlugin({}),
         new webpack.DefinePlugin({
             'process.env': {
                 'NODE_ENV': JSON.stringify('production')
@@ -31,7 +29,7 @@ module.exports = {
         })
     ],
     externals: [
-        { 'sinon': true }
+        {'sinon': true}
     ],
     resolve: {
         root: path.resolve(__dirname),
@@ -64,12 +62,30 @@ module.exports = {
             },
             {
                 test: /\.scss$/,
-                loaders: ['style', 'css', 'sass']
+                loaders: ['style', 'css?importLoaders=1', 'postcss?sourceMap=inline', 'sass']
+            },
+            {
+                test: /\.woff$/,
+                loader: 'url-loader?limit=10000&mimetype=application/font-woff&name=[path][name].[ext]'
+            }, {
+                test: /\.woff2$/,
+                loader: 'url-loader?limit=10000&mimetype=application/font-woff2&name=[path][name].[ext]'
+            }, {
+                test: /\.(eot|ttf|svg|gif|png)$/,
+                loader: 'file-loader'
             }
         ]
     },
-
-    stats: { colors: true },
+    postcss: (webpack) => {
+        return [
+            require('postcss-import')({ addDependencyTo: webpack }),
+            require('postcss-cssnext')({
+                browsers: ['last 2 versions', '> 1%']
+            }),
+            require('postcss-reporter')()
+        ];
+    },
+    stats: {colors: true},
 
     devServer: {
         port: process.env.PORT || 8000,

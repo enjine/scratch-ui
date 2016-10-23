@@ -222,15 +222,11 @@ export default class Component extends View {
     onValidationFailed (e, failures) {
         console.warn(e, failures);
         if (failures.length) {
-            Object.keys(failures).forEach((key) => {
-                if (failures.hasOwnProperty(key) && key !== 'length') {
-                    let info = failures[key];
-                    this.emit(Evt.NOTIFY, {
-                        headline: key.toUpperCase() + ' validation failed',
-                        message: info.reason.message
-                    });
-                }
-
+            failures.forEach((item) => {
+                this.emit(Evt.NOTIFY, {
+                    headline: item.field + ' validation failed',
+                    message: item.reason.message
+                });
             });
         }
 

@@ -3,7 +3,7 @@ import Component from './Component';
 import Evt from 'lib/event/Registry';
 import Validator from 'lib/util/Validator';
 
-var styles = require('!style!css!sass!./styles/Login.scss');
+var styles = require('!style!css!postcss!sass!./styles/Login.scss');
 
 export default class Login extends Component {
     constructor (el, options = {}) {

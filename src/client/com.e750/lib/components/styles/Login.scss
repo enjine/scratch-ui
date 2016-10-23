@@ -2,12 +2,12 @@
 
 [data-component="ui/login"] {
   figure {
-    position: absolute;
+    height: 15px;
     left: 175px;
     margin: 4px 0 0 5px;
     padding: 0;
+    position: absolute;
     width: 15px;
-    height: 15px;
 
     &[data-isvalid] {
       background-repeat: no-repeat;

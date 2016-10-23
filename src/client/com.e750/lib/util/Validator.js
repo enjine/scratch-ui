@@ -18,7 +18,7 @@ function Validator (options = {}) {
     this.validate = function (rules) {
         let validators = Object.assign({}, this.validators, Validator.prototype.validators),
             passes = [],
-            failures = Object.create({length: 0});
+            failures = [];
 
         rules.forEach((rule) => {
             let dataValidate = rule.validate || rule.dataset.validate;
@@ -34,10 +34,11 @@ function Validator (options = {}) {
                     return result;
                 } catch (e) {
                     failures.length++;
-                    failures[field] = {
+                    failures.push({
+                        field: field,
                         test: test,
                         reason: e
-                    };
+                    });
                     return false;
                 }
             });

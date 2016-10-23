@@ -139,7 +139,7 @@ module.exports = function (config) {
 
         // start these browsers
         // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-        //browsernode_modules/webpack/bin/webpack.js --display-error-details --progress -d s: ['ChromeES6', 'ChromeCanaryES6', 'Firefox', 'Safari'],
+        //browsers: ['ChromeES6', 'ChromeCanaryES6', 'Firefox', 'Safari'],
         //browsers: ['Chrome', 'ChromeCanary', 'Firefox', 'Safari', 'PhantomJS'],
         browsers: ['Chrome', 'PhantomJS'], //'PhantomJS',
 
