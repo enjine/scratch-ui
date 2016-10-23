@@ -71,14 +71,17 @@
     "style-loader": "^0.13.1",
     "url-loader": "^0.5.7",
     "webpack": "^1.13.2",
-    "webpack-dev-server": "^1.14.1"
+    "webpack-dev-server": "^1.14.1",
+    "webpack-validator": "^2.2.9"
   },
   "engines": {
     "node": "5.5.0"
   },
   "scripts": {
+    "validate-webpack": "./node_modules/.bin/webpack-validator ./webpack.config.js",
     "clean": "rm -rf build && rm -rf dist",
     "server": "node --use_strict src/server/main.js",
+    "start": "./node_modules/.bin/webpack-dev-server --progress --inline --hot",
     "karma": "karma start",
     "lint": "eslint -c ./.eslintrc ./src/**/*.js ./test/**/**/*.js",
     "test": "karma start --single-run",
@@ -90,7 +93,6 @@
     "build": "node_modules/webpack/bin/webpack.js --display-error-details --progress -p",
     "postbuild": "npm run metrics",
     "babel": "babel --optional runtime src/client/com.e750 --out-dir ./build/babel",
-    "start": "babel-node ./src/server/main.js",
     "copy": "cp dist/*.js ~/Sync/Clients/750Group/e750.laravel/e750/core/resources/assets/js",
     "metrics": "node --use_strict ./node_modules/.bin/es6-plato -r -t 'e750.js MicroFramework' -d ./reports/metrics ./src/client"
   },

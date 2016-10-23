@@ -90,7 +90,6 @@ module.exports = {
     devServer: {
         port: process.env.PORT || 8000,
         host: '0.0.0.0',
-        colors: true,
         publicPath: '/',
         contentBase: './src',
         historyApiFallback: true,
