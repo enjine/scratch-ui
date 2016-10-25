@@ -9,7 +9,8 @@ module.exports = {
     context: path.resolve(__dirname, 'src/client'),
     entry: [
         'babel-polyfill',
-        './main.js'
+        './main.js',
+        'webpack/hot/dev-server'
     ],
     output: {
         path: path.resolve(__dirname, 'dist'),
@@ -26,7 +27,8 @@ module.exports = {
             'process.env': {
                 'NODE_ENV': JSON.stringify('production')
             }
-        })
+        }),
+        new webpack.HotModuleReplacementPlugin()
     ],
     externals: [
         {'sinon': true}
@@ -90,6 +92,7 @@ module.exports = {
     devServer: {
         port: process.env.PORT || 8000,
         host: '0.0.0.0',
+        hot: true,
         publicPath: '/',
         contentBase: './src',
         historyApiFallback: true,
