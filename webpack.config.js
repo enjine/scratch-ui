@@ -13,7 +13,7 @@ module.exports = {
         'webpack/hot/dev-server'
     ],
     output: {
-        path: path.resolve(__dirname, 'dist'),
+        path: path.resolve(__dirname, 'dist/js'),
         publicPath: '/',
         filename: 'e750.js'
         //filename: '[name].[hash].js',
@@ -93,7 +93,7 @@ module.exports = {
         port: process.env.PORT || 8000,
         host: '0.0.0.0',
         hot: true,
-        publicPath: '/',
+        publicPath: '/js',
         contentBase: './src',
         historyApiFallback: true,
         proxy: [

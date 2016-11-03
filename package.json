@@ -89,7 +89,7 @@
     "dev": "node_modules/webpack/bin/webpack.js --watch -d",
     "precompile": "npm run lint",
     "compile": "node_modules/webpack/bin/webpack.js --display-error-details --progress -d",
-    "prebuild": "npm run lint && npm test && esdoc -c ./esdoc.json",
+    "prebuild": "npm run validate-webpack && npm run lint && npm test && esdoc -c ./esdoc.config.json",
     "build": "node_modules/webpack/bin/webpack.js --display-error-details --progress -p",
     "postbuild": "npm run metrics",
     "babel": "babel --optional runtime src/client/com.e750 --out-dir ./build/babel",
