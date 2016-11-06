@@ -17,8 +17,7 @@ export default class ProductList extends Component {
         this.collection = new this.collectionClass(this.getBootstrap(), {url: 'https://api.securecheckout.com/v1/cart/products/'});
 
         this.bindSubscriptions();
-
-        if (!this.collection.models.length) {
+        if (!this.collection.models.length && !this.isMounted()) {
             var defaults = {
                 type: 'json',
                 headers: {

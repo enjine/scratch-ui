@@ -26,6 +26,7 @@ class e750 extends Application {
         this.fixtures = data;
     }
 }
-
-var app = new e750('body', {fixtures: window.e750.FIXTURES, options: window.e750.options || {}});
+var FIXTURES = window.e750 ? window.e750.fixtures : null;
+var options = window.e750 ? window.e750.options : {};
+var app = new e750('body', {fixtures: FIXTURES, options: options});
 document.addEventListener('DOMContentLoaded', app.start.bind(app), false);
