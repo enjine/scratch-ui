@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "description": "750Commerce Micro-framework",
   "main": "lib/client/main.js",
+  "repository" :  {
+    "type" : "git",
+    "url" : "https://github.com/750code/e750.js"
+  },
   "dependencies": {
     "axios": "^0.14.0",
     "babel-polyfill": "^6.5.0",

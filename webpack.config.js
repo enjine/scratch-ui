@@ -93,7 +93,7 @@ module.exports = {
         port: process.env.PORT || 8000,
         host: '0.0.0.0',
         hot: true,
-        publicPath: '/js',
+        publicPath: '/js/',
         contentBase: './src',
         historyApiFallback: true,
         proxy: [
