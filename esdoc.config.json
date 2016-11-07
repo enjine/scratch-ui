@@ -1,0 +1,16 @@
+{
+  "title": "e750 Micro Framework",
+  "package": "./package.json",
+  "coverage": true,
+  "source": "./src",
+  "destination": "./doc",
+  "test": {
+    "type": "mocha",
+    "source": "./test",
+    "includes": ["\\.js$"]
+  },
+  "plugins": [
+    {"name": "esdoc-es7-plugin"}
+  ],
+  "lint": true
+}

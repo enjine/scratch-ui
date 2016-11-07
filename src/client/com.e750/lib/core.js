@@ -84,7 +84,11 @@ export const jst = {
     templates: {},
 
     getFromDOM: (name) => {
-        return document.getElementById(name).innerText;
+        let template = document.getElementById(name);
+        if (template) {
+            return template.innerText;
+        }
+        throw new ReferenceError('No such elementId: ' + name);
     },
 
     compile: (templateStr, data, partials) => {
