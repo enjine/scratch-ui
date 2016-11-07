@@ -1,11 +1,12 @@
 import Component from './Component';
 import Resolver from './Resolver';
 import Evt from 'lib/event/Registry';
-import LookupTable from 'lib/util/LookupTable';
 
 Component.Resolver = new Resolver();
 
 export default class Application extends Component {
+    VERSION = require('../../../../../package.json').version;
+
     start () {
         this.emit(Evt.APP_START);
         return this;
