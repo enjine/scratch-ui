@@ -11,6 +11,7 @@ const plugins = defaultPlugins.concat([
 
 module.exports = Object.assign({}, defaultConfig, {
     devtool: 'eval-source-map',
+    entry: defaultConfig.entry.push('webpack/hot/dev-server'),
     plugins: plugins,
     externals: [
         {'sinon': true}

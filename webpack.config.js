@@ -6,11 +6,10 @@ module.exports = {
     context: path.resolve(__dirname),
     entry: [
         'babel-polyfill',
-        './src/client/main.js',
-        'webpack/hot/dev-server'
+        './src/client/main.js'
     ],
     output: {
-        path: path.resolve(__dirname),
+        path: path.resolve(__dirname, 'dist/js'),
         publicPath: '/',
         filename: 'e750.js',
         //filename: '[name].[hash].js',
