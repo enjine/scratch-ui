@@ -6,15 +6,16 @@ module.exports = {
     context: path.resolve(__dirname),
     entry: [
         'babel-polyfill',
-        'index.js',
+        './src/client/main.js',
         'webpack/hot/dev-server'
     ],
     output: {
-        path: path.resolve(__dirname, 'dist/js'),
+        path: path.resolve(__dirname),
         publicPath: '/',
         filename: 'e750.js',
         //filename: '[name].[hash].js',
-        //chunkFilename: '[id].[hash].js'
+        //chunkFilename: '[id].[hash].js',
+        library: 'E750',
         libraryTarget: 'umd',
         umdNamedDefine: true
     },
@@ -22,8 +23,7 @@ module.exports = {
     resolve: {
         root: path.resolve(__dirname),
         modulesDirectories: [
-            'node_modules',
-            'src/client/com.e750'
+            'node_modules'
         ],
         alias: {
             sinon: 'sinon/pkg/sinon.js',
@@ -39,7 +39,8 @@ module.exports = {
                 test: /\.js$/,
                 loaders: ['babel-loader'],
                 include: [
-                    path.resolve(__dirname, 'src/client')
+                    path.resolve(__dirname, 'src/client'),
+                    path.resolve(__dirname, 'src/client/com.e750')
                 ],
                 exclude: /(node_modules|bower_components)/
             },
