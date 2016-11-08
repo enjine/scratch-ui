@@ -9,6 +9,9 @@ webpackConfig.module.preLoaders.push(
         test: /\.js$/,
         loader: 'babel-loader',
         include: [
+            path.resolve(__dirname, 'test/modules'),
+            path.resolve(__dirname, 'test/behaviors'),
+            path.resolve(__dirname, 'test/unit'),
             path.resolve(__dirname, 'test')
         ],
         exclude: /(node_modules|bower_components)/
@@ -23,6 +26,7 @@ webpackConfig.module.preLoaders.push(
         loader: 'isparta'
     }
 );
+webpackConfig.resolve.modulesDirectories.push('test');
 
 module.exports = function (config) {
     config.set({

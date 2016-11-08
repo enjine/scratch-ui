@@ -1,44 +1,29 @@
-var path = require('path');
-var webpack = require('webpack');
-
-const ENV = process.env.NODE_ENV || 'development';
+const path = require('path');
+const plugins = require('./webpack.plugins');
 
 module.exports = {
     target: 'web',
-    devtool: ENV === 'production' ? 'cheap-module-eval-source-map' : 'inline-source-map',
-    context: path.resolve(__dirname, 'src/client'),
+    context: path.resolve(__dirname),
     entry: [
         'babel-polyfill',
-        './main.js',
+        'index.js',
         'webpack/hot/dev-server'
     ],
     output: {
         path: path.resolve(__dirname, 'dist/js'),
         publicPath: '/',
-        filename: 'e750.js'
+        filename: 'e750.js',
         //filename: '[name].[hash].js',
         //chunkFilename: '[id].[hash].js'
+        libraryTarget: 'umd',
+        umdNamedDefine: true
     },
-    plugins: [
-        new webpack.optimize.OccurenceOrderPlugin(),
-        new webpack.NoErrorsPlugin(),
-        new webpack.ProvidePlugin({}),
-        new webpack.DefinePlugin({
-            'process.env': {
-                'NODE_ENV': JSON.stringify('production')
-            }
-        }),
-        new webpack.HotModuleReplacementPlugin()
-    ],
-    externals: [
-        {'sinon': true}
-    ],
+    plugins: plugins,
     resolve: {
         root: path.resolve(__dirname),
         modulesDirectories: [
             'node_modules',
-            'src',
-            'test'
+            'src/client/com.e750'
         ],
         alias: {
             sinon: 'sinon/pkg/sinon.js',
@@ -54,11 +39,7 @@ module.exports = {
                 test: /\.js$/,
                 loaders: ['babel-loader'],
                 include: [
-                    path.resolve(__dirname, 'src/client'),
-                    path.resolve(__dirname, 'test/modules'),
-                    path.resolve(__dirname, 'test/behaviors'),
-                    path.resolve(__dirname, 'test/unit'),
-                    path.resolve(__dirname, 'test')
+                    path.resolve(__dirname, 'src/client')
                 ],
                 exclude: /(node_modules|bower_components)/
             },
@@ -87,22 +68,5 @@ module.exports = {
             require('postcss-reporter')()
         ];
     },
-    stats: {colors: true},
-
-    devServer: {
-        port: process.env.PORT || 8000,
-        host: '0.0.0.0',
-        hot: true,
-        publicPath: '/js/',
-        contentBase: './src',
-        historyApiFallback: true,
-        proxy: [
-            // OPTIONAL: proxy configuration:
-            // {
-            // 	path: '/optional-prefix/**',
-            // 	target: 'http://target-host.com',
-            // 	rewrite: req => { req.url = req.url.replace(/^\/[^\/]+\//, ''); }   // strip first path segment
-            // }
-        ]
-    }
+    stats: {colors: true}
 };
