@@ -3,7 +3,7 @@
   "name": "@750group/e750",
   "version": "0.0.1",
   "description": "750Commerce JavaScript Framework",
-  "main": "index.js",
+  "main": "dist/E750.commonjs2.js",
   "repository": {
     "type": "git",
     "url": "git@github.com:750code/e750.js.git"
