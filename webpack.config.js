@@ -4,17 +4,17 @@ const plugins = require('./webpack.plugins');
 module.exports = {
     target: 'web',
     context: path.resolve(__dirname),
-    entry: [
-        'babel-polyfill',
-        './src/client/main.js'
-    ],
+    entry: {
+        'E750': ['babel-polyfill', './index.js'],
+        'E750.browser': ['babel-polyfill', './browser.js']
+    },
     output: {
-        path: path.resolve(__dirname, 'dist/js'),
+        path: path.resolve(__dirname, 'dist'),
         publicPath: '/',
-        filename: 'e750.js',
+        filename: '[name].js',
         //filename: '[name].[hash].js',
         //chunkFilename: '[id].[hash].js',
-        library: 'E750',
+        library: ['E750', 'App'],
         libraryTarget: 'umd',
         umdNamedDefine: true
     },

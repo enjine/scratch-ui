@@ -77,8 +77,8 @@ export default class Component extends View {
     }
 
     getBootstrap () {
-        if (window.e750.bootstrap) {
-            return window.e750.bootstrap[this.constructor.name] || [];
+        if (window.E750 && window.E750.bootstrap) {
+            return window.E750.bootstrap[this.constructor.name] || [];
         }
         return [];
     }
