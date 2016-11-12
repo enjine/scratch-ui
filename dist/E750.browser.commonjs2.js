@@ -7178,7 +7178,7 @@ module.exports =
 	    (0, _createClass3.default)(Application, [{
 	        key: 'start',
 	        value: function start() {
-	            this.VERSION = '0.0.1';
+	            this.VERSION = '0.0.2';
 	            this.emit(_Registry2.default.APP_START, { appVer: this.VERSION });
 	            console.info('e750.js v' + this.VERSION);
 	            return this;
