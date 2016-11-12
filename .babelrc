@@ -1,7 +1,7 @@
 {
     "presets": ["es2015", "stage-0", "react"],
     "plugins": [
-        "inline-package-json",
+        "add-module-exports",
         "transform-runtime",
         "transform-decorators-legacy"
     ]

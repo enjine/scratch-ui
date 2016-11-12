@@ -6,9 +6,9 @@ Component.Resolver = new Resolver();
 
 export default class Application extends Component {
     start () {
-        window.e750.VERSION = this.VERSION;
-        this.emit(Evt.APP_START, {appVer: window.e750.VERSION});
-        console.info('e750.js v' + window.e750.VERSION);
+        this.VERSION = '<{version}>';
+        this.emit(Evt.APP_START, {appVer: this.VERSION});
+        console.info('e750.js v' + this.VERSION);
         return this;
     }
 

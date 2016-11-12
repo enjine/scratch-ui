@@ -1,11 +1,12 @@
 {
+  "private": true,
   "name": "@750group/e750",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "750Commerce JavaScript Framework",
-  "main": "lib/client/main.js",
-  "repository" :  {
-    "type" : "git",
-    "url" : "https://github.com/750code/e750.js"
+  "main": "dist/E750.commonjs2.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:750code/e750.js.git"
   },
   "dependencies": {
     "axios": "^0.14.0",
@@ -21,6 +22,7 @@
     "babel-core": ">=6.0.0",
     "babel-eslint": ">=5.0.0-beta10",
     "babel-loader": ">=5.4.0",
+    "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-inline-package-json": "^2.0.0",
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
     "babel-plugin-transform-runtime": "^6.5.2",
@@ -61,6 +63,7 @@
     "karma-webpack": "^1.7.0",
     "mocha": ">=2.2.5",
     "node-sass": "^3.10.0",
+    "parallel-webpack": "^1.5.0",
     "pem": ">=1.7.2",
     "phantomjs-prebuilt": "^2.1.3",
     "postcss": "^5.2.5",
@@ -76,6 +79,7 @@
     "style-loader": "^0.13.1",
     "url-loader": "^0.5.7",
     "webpack": "^1.13.2",
+    "webpack-auto-inject-version": "^0.2.11",
     "webpack-dev-server": "^1.14.1",
     "webpack-validator": "^2.2.9"
   },
@@ -84,20 +88,20 @@
   },
   "scripts": {
     "validate-webpack": "./node_modules/.bin/webpack-validator ./webpack.config.js",
-    "clean": "rm -rf build && rm -rf dist",
+    "clean": "rm -rf ./build && rm -rf ./dist",
     "server": "node --use_strict src/server/main.js",
-    "start": "./node_modules/.bin/webpack-dev-server --config ./webpack.develop.config.js --progress --inline --hot",
+    "start": "export NODE_ENV=development && node_modules/.bin/webpack-dev-server --config=./webpack.develop.config.js --progress --inline --hot",
     "karma": "karma start",
     "lint": "eslint -c ./.eslintrc ./src/**/*.js ./test/**/**/*.js",
     "test": "karma start --single-run",
     "docs": "esdoc -c ./esdoc.config.json",
-    "dev": "node_modules/webpack/bin/webpack.js --watch -d",
+    "dev": "export NODE_ENV=development && ./node_modules/.bin/webpack.js --config=./webpack.develop.config.js --watch -d",
     "precompile": "npm run lint",
-    "compile": "export NODE_ENV=development && node_modules/webpack/bin/webpack.js --config ./webpack.develop.config.js --display-error-details --progress -d",
-    "prebuild": "npm run validate-webpack && npm run lint && npm test && esdoc -c ./esdoc.config.json",
-    "build": "export NODE_ENV=production && node_modules/webpack/bin/webpack.js --config ./webpack.master.config.js --display-error-details --progress -p",
-    "postbuild": "npm run metrics",
-    "babel": "babel --optional runtime src/client/com.e750 --out-dir ./build/babel",
+    "compile": "export NODE_ENV=development && ./node_modules/.bin/webpack.js --config=./webpack.develop.config.js --display-error-details --progress -d",
+    "prebuild": "npm run validate-webpack && npm run lint && npm test && esdoc -c ./esdoc.config.json && npm run clean",
+    "build": "export NODE_ENV=production && ./node_modules/.bin/parallel-webpack --config=./webpack.master.config.js --display-error-details --progress",
+    "x-postbuild": "npm run metrics",
+    "babel": "babel --optional runtime ./src/client/com.e750 --out-dir ./build/babel",
     "copy": "cp dist/*.js ~/Sync/Clients/750Group/e750.laravel/e750/core/resources/assets/js",
     "metrics": "node --use_strict ./node_modules/.bin/es6-plato -r -t 'e750.js MicroFramework' -d ./reports/metrics ./src/client"
   },

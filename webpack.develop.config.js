@@ -9,6 +9,9 @@ const plugins = defaultPlugins.concat([
     new webpack.HotModuleReplacementPlugin()
 ]);
 
+defaultConfig.entry['E750.browser'].unshift('webpack/hot/dev-server');
+defaultConfig.entry.E750.unshift('webpack/hot/dev-server');
+
 module.exports = Object.assign({}, defaultConfig, {
     devtool: 'eval-source-map',
     plugins: plugins,

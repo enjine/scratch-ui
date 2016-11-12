@@ -68,7 +68,7 @@ export default class ProductList extends Component {
 
                 for (let i = 0; i < products.length; i++) {
                     let model = products[i];
-                    model.set('quantities', window.e750.FIXTURES.quantities);
+                    model.set('quantities', window.E750.config.fixtures.quantities);
                     product = new Product('div', {model: model});
                     this.addChild(product.render());
                     this.el.appendChild(product.el);
