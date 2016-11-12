@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@750group/e750",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "750Commerce JavaScript Framework",
   "main": "dist/E750.commonjs2.js",
   "repository": {
