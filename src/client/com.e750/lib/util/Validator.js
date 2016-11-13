@@ -20,7 +20,7 @@ function Validator (options = {}) {
             passes = [],
             failures = [];
 
-        rules.forEach((rule) => {
+        [].forEach.call(rules, (rule) => {
             let dataValidate = rule.validate || rule.dataset.validate;
             let checks = dataValidate.split(/\s+/),
                 field = rule.id || rule.name || undefined;
