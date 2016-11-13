@@ -4544,7 +4544,7 @@ module.exports =
 	            passes = [],
 	            failures = [];
 
-	        rules.forEach(function (rule) {
+	        [].forEach.call(rules, function (rule) {
 	            var dataValidate = rule.validate || rule.dataset.validate;
 	            var checks = dataValidate.split(/\s+/),
 	                field = rule.id || rule.name || undefined;
