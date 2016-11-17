@@ -1,6 +1,6 @@
 import Dispatcher from 'lib/event/Dispatcher';
 import {isNativeEvent as isNative, addHandler, removeHandler} from 'lib/event/utils';
-import {isElement, isNode} from 'lib/util/DOM';
+import {isElement, isNode, elementMatches} from 'lib/util/DOM';
 import guid from 'lib/util/guid';
 import nEvent from 'lib/event/nEvent';
 
@@ -21,7 +21,8 @@ Object.assign(Evented.prototype, {
     delegate: function (evTarget, eventNames, handler, context) {
         let ctx = context || this;
         this.on(eventNames, function (e) {
-            if (e.target && e.target.matches(evTarget)) {
+            let target = e.target || e.srcElement;
+            if (target && elementMatches(target, evTarget)) {
                 return handler.apply(ctx, arguments);
             }
             return false;
@@ -43,7 +44,8 @@ Object.assign(Evented.prototype, {
     delegateOnce: function (evTarget, eventNames, handler, context) {
         let ctx = context || this;
         this.once(eventNames, function (e) {
-            if (e.target && e.target.matches(evTarget)) {
+            let target = e.target || e.srcElement;
+            if (target && elementMatches(target, evTarget)) {
                 return handler.apply(ctx, arguments);
             }
             return false;
@@ -63,7 +65,8 @@ Object.assign(Evented.prototype, {
     listenTo: function (obj, event, handler, context) {
         let ctx = context || this;
         return this.on(event, function (e) {
-            if (e.target && e.target === obj) {
+            let target = e.target || e.srcElement;
+            if (target && target === obj) {
                 return handler.apply(ctx, arguments);
             }
             return false;
@@ -84,7 +87,8 @@ Object.assign(Evented.prototype, {
     listenToOnce: function (obj, event, handler, context) {
         let ctx = context || this;
         return this.once(event, function (e) {
-            if (e.target && e.target === obj) {
+            let target = e.target || e.srcElement;
+            if (target && target === obj) {
                 return handler.apply(ctx, arguments);
             }
             return false;

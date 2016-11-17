@@ -23,6 +23,20 @@ export function isElement (o) {
 }
 
 /**
+ * Cross-browser Element.matches
+ * @param el
+ * @param selector
+ * @returns {*}
+ */
+export function elementMatches (el, selector) {
+    var p = Element.prototype;
+    var f = p.matches || p.webkitMatchesSelector || p.mozMatchesSelector || p.msMatchesSelector || function (s) {
+            return [].indexOf.call(document.querySelectorAll(s), this) !== -1;
+        };
+    return f.call(el, selector);
+}
+
+/**
  * Transforms an HTML string into DOM Elements
  * * strips <script> tags by default
  * @param HTMLString

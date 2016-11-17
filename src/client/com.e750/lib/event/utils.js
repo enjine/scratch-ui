@@ -96,5 +96,16 @@ export function parseEventStr (eventStr) {
     };
 }
 
+export function getEventPath (event) {
+    let path = [event.target],
+        i = 0,
+        x;
+    while ((x = path[i].parentElement) !== null) {
+        path.push(x);
+        i++;
+    }
+    return path;
+}
+
 export default {isNativeEvent, addHandler, removeHandler, parseEventStr};
 

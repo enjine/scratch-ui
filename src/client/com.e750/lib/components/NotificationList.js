@@ -3,6 +3,7 @@ import Notification from './Notification';
 import NotificationCollection from 'lib/classes/collections/Notification';
 import Evt from 'lib/event/Registry';
 import {jst} from 'lib/core';
+import {getEventPath} from 'lib/event/utils';
 
 export default class NotificationList extends Component {
 
@@ -65,16 +66,17 @@ export default class NotificationList extends Component {
     }
 
     hide (){
-        this.el.style = 'display:none;';
+        this.el.style.cssText = 'display:none;';
     }
 
     show (){
-        this.el.style = 'display:block;';
+        this.el.style.cssText = 'display:block;';
     }
 
     dismiss (e){
         e.stopPropagation();
-        let componentEl = e.path.filter(n => {
+        let path = e.path || getEventPath(e);
+        let componentEl = path.filter(n => {
             if (n.dataset && n.dataset.component) {
                 return true;
             }
