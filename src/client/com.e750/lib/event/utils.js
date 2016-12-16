@@ -28,7 +28,7 @@ export function manageNativeEvents (addOrRemove, obj, event, handler, useCapture
         obj[addOrRemove](e, handler, useCapture);
         return {ev: e, id: listenerId, fn: handler};
     } catch (e) {
-        console.error('Error attaching event listener', e, addOrRemove, obj, event, handler);
+        console.error('Error on ' + addOrRemove + ': ', e, obj, event, handler);
         return false;
     }
 
@@ -51,11 +51,12 @@ export function isNativeEvent (eventname) {
  */
 export function addHandler (target, eventNames, handler) {
     let bindType = target.addEventListener ? 'addEventListener' : 'attachEvent',
+        isDOMEl = isElement(target),
         events = eventNames.split(' ');
 
     return events.map((event) => {
         let ev = event.trim();
-        if (isElement(target) && isNativeEvent(ev)) {
+        if (isDOMEl && isNativeEvent(ev)) {
             return manageNativeEvents(bindType, target, ev, handler);
         }
         return {ev: ev, id: null, fn: handler};
@@ -70,11 +71,12 @@ export function addHandler (target, eventNames, handler) {
  */
 export function removeHandler (target, eventNames, handler) {
     let bindType = target.removeEventListener ? 'removeEventListener' : 'detachEvent',
+        isDOMEl = isElement(target),
         events = eventNames.split(' ');
 
     return events.map((event) => {
         let ev = event.trim();
-        if (isElement(target) && isNativeEvent(ev)) {
+        if (isDOMEl && isNativeEvent(ev)) {
             return manageNativeEvents(bindType, target, event, handler);
         }
         return {ev: event, id: null, fn: handler};
@@ -107,5 +109,5 @@ export function getEventPath (event) {
     return path;
 }
 
-export default {isNativeEvent, addHandler, removeHandler, parseEventStr};
+export default {isNativeEvent, addHandler, removeHandler, parseEventStr, getEventPath};
 

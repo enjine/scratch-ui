@@ -33,6 +33,9 @@ function removeSubscriber (channel, subscriberId) {
         let handler = subs[channel][subscriberId];
         delete handler.sId;
         delete subs[channel][subscriberId];
+        if (subs[channel].isEmpty()) {
+            delete subs[channel];
+        }
         ret = {ev: channel, id: null, fn: handler};
     }
     return ret;

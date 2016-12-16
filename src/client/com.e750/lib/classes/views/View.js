@@ -23,16 +23,4 @@ export default class View {
         ret.push(this.detachEvents());
         return ret;
     }
-
-    detachEvents () {
-        if (this.subscriptions) {
-            return this.subscriptions.map((subscription) => {
-                //console.log('detaching event', this, subscription);
-                let evt = subscription.ev,
-                    fn = subscription.fn;
-                return this.off(evt, fn);
-            });
-        }
-        return false;
-    }
 }

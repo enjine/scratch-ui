@@ -16,16 +16,14 @@ class testClass extends compose(Progressable) {
     constructor () {
         super();
         this.el = document.createElement('div');
-        console.log('class', this);
     }
 }
 
 var testFunc = function () {
     this.el = document.createElement('figure');
-    console.log('func', this);
 };
 
-Object.assign(testFunc.prototype, Progressable.prototype);
+testFunc.prototype = new Progressable();
 
 let testeeC,
     testeeF;

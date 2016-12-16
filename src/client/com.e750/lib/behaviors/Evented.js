@@ -108,10 +108,18 @@ Object.assign(Evented.prototype, {
             ctx = context || this;
 
         return addHandler(delegate, eventNames, handler).reduce((ret, result) => {
-            if (!result.id) {
-                return ret.concat(this.subscribe(result.ev, result.fn));
+            let subscription;
+            if (typeof this.subscriptions === 'undefined') {
+                this.subscriptions = [];
             }
-            return ret.concat(result);
+
+            if (!result.id) {
+                subscription = this.subscribe(result.ev, result.fn);
+            } else {
+                subscription = result;
+                this.subscriptions.push(subscription);
+            }
+            return ret.concat(subscription);
         }, []);
     },
 
@@ -123,13 +131,18 @@ Object.assign(Evented.prototype, {
      * @returns {*}
      */
     off: function (eventNames, handler) {
+        let subscription,
+            subs = this.subscriptions;
         let delegate = this.el || this;
 
         return removeHandler(delegate, eventNames, handler).reduce((ret, result) => {
             if (!result.id) {
-                return ret.concat(this.unsubscribe(result.ev, result.fn));
+                subscription = this.unsubscribe(result.ev, result.fn);
+            } else {
+                subscription = result;
+                subs.splice(subs.indexOf(subscription), 1);
             }
-            return ret.concat(result);
+            return ret.concat(subscription);
         }, []);
     },
 
@@ -233,22 +246,37 @@ Object.assign(Evented.prototype, {
      */
     unsubscribe: function (channel, handler) {
         let ret,
-            channels = channel.split(' ');
+            channels = channel.split(' '),
+            subs = this.subscriptions;
+
         try {
             channels.forEach((ch) => {
                 let c = ch.trim();
-                ret = this.subscriptions.filter((sub) => {
-                    return sub.ev === c && this.mediator.subscribers[sub.ev][sub.id] === handler;
+                ret = subs.filter((sub) => {
+                    return sub.ev === c && this.mediator.subscribers[c][sub.id] === handler;
                 }).map((hit) => {
-                    let id = hit.id;
-                    delete this.subscriptions[id];
-                    return this.mediator.remove(channel, id);
+                    subs.splice(subs.indexOf(hit), 1);
+                    return this.mediator.remove(channel, hit.id);
                 });
             });
         } catch (e) {
             console.error('Failed to unsubscribe from channel ' + channel, e);
         }
         return ret;
+    },
+
+    /**
+     * Detaches all event listeners
+     * @returns {*}
+     */
+    detachEvents () {
+        let subs = this.subscriptions.slice();
+        if (subs) {
+            return subs.map(({ev, fn}) => {
+                return this.off(ev, fn).pop();
+            });
+        }
+        return false;
     }
 });
 
