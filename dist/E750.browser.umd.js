@@ -2315,10 +2315,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	            ctx = context || this;
 
 	        return (0, _utils.addHandler)(delegate, eventNames, handler).reduce(function (ret, result) {
-	            if (!result.id) {
-	                return ret.concat(_this.subscribe(result.ev, result.fn));
+	            var subscription = void 0;
+	            if (typeof _this.subscriptions === 'undefined') {
+	                _this.subscriptions = [];
 	            }
-	            return ret.concat(result);
+
+	            if (!result.id) {
+	                subscription = _this.subscribe(result.ev, result.fn);
+	            } else {
+	                subscription = result;
+	                _this.subscriptions.push(subscription);
+	            }
+	            return ret.concat(subscription);
 	        }, []);
 	    },
 
@@ -2332,13 +2340,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    off: function off(eventNames, handler) {
 	        var _this2 = this;
 
+	        var subscription = void 0,
+	            subs = this.subscriptions;
 	        var delegate = this.el || this;
 
 	        return (0, _utils.removeHandler)(delegate, eventNames, handler).reduce(function (ret, result) {
 	            if (!result.id) {
-	                return ret.concat(_this2.unsubscribe(result.ev, result.fn));
+	                subscription = _this2.unsubscribe(result.ev, result.fn);
+	            } else {
+	                subscription = result;
+	                subs.splice(subs.indexOf(subscription), 1);
 	            }
-	            return ret.concat(result);
+	            return ret.concat(subscription);
 	        }, []);
 	    },
 
@@ -2449,22 +2462,42 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var _this4 = this;
 
 	        var ret = void 0,
-	            channels = channel.split(' ');
+	            channels = channel.split(' '),
+	            subs = this.subscriptions;
+
 	        try {
 	            channels.forEach(function (ch) {
 	                var c = ch.trim();
-	                ret = _this4.subscriptions.filter(function (sub) {
-	                    return sub.ev === c && _this4.mediator.subscribers[sub.ev][sub.id] === handler;
+	                ret = subs.filter(function (sub) {
+	                    return sub.ev === c && _this4.mediator.subscribers[c][sub.id] === handler;
 	                }).map(function (hit) {
-	                    var id = hit.id;
-	                    delete _this4.subscriptions[id];
-	                    return _this4.mediator.remove(channel, id);
+	                    subs.splice(subs.indexOf(hit), 1);
+	                    return _this4.mediator.remove(channel, hit.id);
 	                });
 	            });
 	        } catch (e) {
 	            console.error('Failed to unsubscribe from channel ' + channel, e);
 	        }
 	        return ret;
+	    },
+
+	    /**
+	     * Detaches all event listeners
+	     * @returns {*}
+	     */
+	    detachEvents: function detachEvents() {
+	        var _this5 = this;
+
+	        var subs = this.subscriptions.slice();
+	        if (subs) {
+	            return subs.map(function (_ref) {
+	                var ev = _ref.ev,
+	                    fn = _ref.fn;
+
+	                return _this5.off(ev, fn).pop();
+	            });
+	        }
+	        return false;
 	    }
 	});
 
@@ -4483,7 +4516,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        obj[addOrRemove](e, handler, useCapture);
 	        return { ev: e, id: listenerId, fn: handler };
 	    } catch (e) {
-	        console.error('Error attaching event listener', e, addOrRemove, obj, event, handler);
+	        console.error('Error on ' + addOrRemove + ': ', e, obj, event, handler);
 	        return false;
 	    }
 	}
@@ -4505,11 +4538,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function addHandler(target, eventNames, handler) {
 	    var bindType = target.addEventListener ? 'addEventListener' : 'attachEvent',
+	        isDOMEl = (0, _DOM.isElement)(target),
 	        events = eventNames.split(' ');
 
 	    return events.map(function (event) {
 	        var ev = event.trim();
-	        if ((0, _DOM.isElement)(target) && isNativeEvent(ev)) {
+	        if (isDOMEl && isNativeEvent(ev)) {
 	            return manageNativeEvents(bindType, target, ev, handler);
 	        }
 	        return { ev: ev, id: null, fn: handler };
@@ -4524,11 +4558,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function removeHandler(target, eventNames, handler) {
 	    var bindType = target.removeEventListener ? 'removeEventListener' : 'detachEvent',
+	        isDOMEl = (0, _DOM.isElement)(target),
 	        events = eventNames.split(' ');
 
 	    return events.map(function (event) {
 	        var ev = event.trim();
-	        if ((0, _DOM.isElement)(target) && isNativeEvent(ev)) {
+	        if (isDOMEl && isNativeEvent(ev)) {
 	            return manageNativeEvents(bindType, target, event, handler);
 	        }
 	        return { ev: event, id: null, fn: handler };
@@ -4561,7 +4596,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return path;
 	}
 
-	exports.default = { isNativeEvent: isNativeEvent, addHandler: addHandler, removeHandler: removeHandler, parseEventStr: parseEventStr };
+	exports.default = { isNativeEvent: isNativeEvent, addHandler: addHandler, removeHandler: removeHandler, parseEventStr: parseEventStr, getEventPath: getEventPath };
 
 /***/ },
 /* 149 */
@@ -7144,21 +7179,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            ret.push(this.detachEvents());
 	            return ret;
 	        }
-	    }, {
-	        key: 'detachEvents',
-	        value: function detachEvents() {
-	            var _this = this;
-
-	            if (this.subscriptions) {
-	                return this.subscriptions.map(function (subscription) {
-	                    //console.log('detaching event', this, subscription);
-	                    var evt = subscription.ev,
-	                        fn = subscription.fn;
-	                    return _this.off(evt, fn);
-	                });
-	            }
-	            return false;
-	        }
 	    }]);
 	    return View;
 	}()) || _class);
@@ -8190,6 +8210,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var handler = subs[channel][subscriberId];
 	        delete handler.sId;
 	        delete subs[channel][subscriberId];
+	        if (subs[channel].isEmpty()) {
+	            delete subs[channel];
+	        }
 	        ret = { ev: channel, id: null, fn: handler };
 	    }
 	    return ret;

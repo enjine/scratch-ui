@@ -186,6 +186,7 @@ Object.assign(Evented.prototype, {
 
     /**
      * Emits custom Events
+     * Also passes DOM events through to trigger();
      * @param eventName
      * @param data
      * @param args

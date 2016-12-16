@@ -34,7 +34,7 @@ function removeSubscriber (channel, subscriberId) {
         delete handler.sId;
         delete subs[channel][subscriberId];
         if (subs[channel].isEmpty()) {
-            delete subs[channel];
+            this.removeChannel(channel);
         }
         ret = {ev: channel, id: null, fn: handler};
     }
@@ -44,8 +44,8 @@ function removeSubscriber (channel, subscriberId) {
 function removeChannel (channel) {
     let subs = this.getSubscribers(channel);
 
-    if (subs.has(channel)) {
-        delete subs[channel];
+    if (subs) {
+        delete this.subscribers[channel];
         return true;
     }
     return false;

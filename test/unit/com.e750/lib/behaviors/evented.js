@@ -131,7 +131,6 @@ describe('Evented.mixin', () => {
             testeeClass.emit('b');
             spy.should.have.callCount(2);
             expect(testeeFunc.subscriptions.length).to.equal(0);
-
         });
     });
 
