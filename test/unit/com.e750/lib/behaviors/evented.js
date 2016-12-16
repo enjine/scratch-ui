@@ -44,10 +44,6 @@ describe('Evented.mixin', () => {
         spy2 = mocks.spy();
 
     });
-    after(() => {
-        //testeeFunc.detachEvents();
-        //testeeClass.detachEvents();
-    });
 
     it('Can be mixed into a function', () => {
         verifyMixin(testeeFunc);
