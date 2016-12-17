@@ -1,6 +1,13 @@
 import Dispatcher from 'lib/event/Dispatcher';
-import {isNativeEvent as isNative, addHandler, removeHandler} from 'lib/event/utils';
-import {isElement, isNode, elementMatches} from 'lib/util/DOM';
+import {
+    isNativeEvent as isNative,
+    addHandler,
+    removeHandler,
+    getEventPath,
+    eventPathContains,
+    isBindable
+} from 'lib/event/utils';
+import {isElement, isNode, elementMatchesSelector} from 'lib/util/DOM';
 import guid from 'lib/util/guid';
 import nEvent from 'lib/event/nEvent';
 
@@ -18,16 +25,20 @@ Object.assign(Evented.prototype, {
      * @param context
      * @returns {delegate}
      */
-    delegate: function (evTarget, eventNames, handler, context) {
+    delegate: function (selector, eventNames, handler, context) {
         let ctx = context || this;
-        this.on(eventNames, function (e) {
+
+        function wrap (e) {
             let target = e.target || e.srcElement;
-            if (target && elementMatches(target, evTarget)) {
+            if (target && (eventPathContains(e, selector) || elementMatchesSelector(target, selector))) {
                 return handler.apply(ctx, arguments);
             }
             return false;
-        });
-        return this;
+        }
+
+        wrap.originalHandler = handler;
+
+        return this.on(eventNames, wrap);
 
     },
 
@@ -41,16 +52,20 @@ Object.assign(Evented.prototype, {
      * @param context
      * @returns {delegateOnce}
      */
-    delegateOnce: function (evTarget, eventNames, handler, context) {
-        let ctx = context || this;
-        this.once(eventNames, function (e) {
+    delegateOnce: function (selector, eventNames, handler, context) {
+        let ctx = context || this,
+            that = this;
+
+        function cb (e) {
             let target = e.target || e.srcElement;
-            if (target && elementMatches(target, evTarget)) {
+            if (target && (eventPathContains(e, selector) || elementMatchesSelector(target, selector))) {
+                that.off(eventNames, cb);
                 return handler.apply(ctx, arguments);
             }
             return false;
-        });
-        return this;
+        }
+
+        return this.on(eventNames, cb);
     },
 
     /**
@@ -132,10 +147,24 @@ Object.assign(Evented.prototype, {
      */
     off: function (eventNames, handler) {
         let subscription,
-            subs = this.subscriptions;
-        let delegate = this.el || this;
+            subs = this.subscriptions,
+            delegate = this.el || this,
+            evts = eventNames.split(' '),
+            cb = handler;
 
-        return removeHandler(delegate, eventNames, handler).reduce((ret, result) => {
+        // this is a little slow, but allows us to remove bound event handlers
+        // from DOM Nodes!
+        let hits = subs.filter((sub) => {
+            let h = sub.fn.originalHandler || sub.fn;
+            return (h === handler || sub.fn.sId === sub.id) && evts.indexOf(sub.ev) !== -1;
+        });
+
+        if (hits.length) {
+            let h = hits.pop();
+            cb = h.fn;
+        }
+
+        return removeHandler(delegate, eventNames, cb).reduce((ret, result) => {
             if (!result.id) {
                 subscription = this.unsubscribe(result.ev, result.fn);
             } else {
@@ -254,7 +283,7 @@ Object.assign(Evented.prototype, {
             channels.forEach((ch) => {
                 let c = ch.trim();
                 ret = subs.filter((sub) => {
-                    return sub.ev === c && this.mediator.subscribers[c][sub.id] === handler;
+                    return sub.ev === c && this.mediator.subscribers[c] && this.mediator.subscribers[c][sub.id] === handler;
                 }).map((hit) => {
                     subs.splice(subs.indexOf(hit), 1);
                     return this.mediator.remove(channel, hit.id);

@@ -28,7 +28,7 @@ export function isElement (o) {
  * @param selector
  * @returns {*}
  */
-export function elementMatches (el, selector) {
+export function elementMatchesSelector (el, selector) {
     var p = Element.prototype;
     var f = p.matches || p.webkitMatchesSelector || p.mozMatchesSelector || p.msMatchesSelector || function (s) {
             return [].indexOf.call(document.querySelectorAll(s), this) !== -1;

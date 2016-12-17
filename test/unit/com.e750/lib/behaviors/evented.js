@@ -2,6 +2,7 @@
 
 import {settings} from 'setup';
 import compose from 'lib/util/compose';
+import {htmlToDom} from 'lib/util/DOM';
 import {EmitterMixinBehavior} from 'behaviors/emitter';
 
 let expect = settings.assertions.expect;
@@ -142,7 +143,7 @@ describe('Evented.mixin', () => {
             testeeClass.emit('bong');
             spy2.should.have.callCount(3);
 
-            let unsubs = testeeFunc.off('bing bong', spy2);
+            let unsubs = testeeFunc.off('bong bing', spy2);
             testeeFunc.emit('bing');
             testeeClass.emit('bing');
             testeeClass.emit('bong');
@@ -176,14 +177,93 @@ describe('Evented.mixin', () => {
             expect(unsubs).to.be.ok;
             expect(unsubs.length).to.equal(0);
         });
+
+        it('Can remove bound event handlers', () => {
+            let cb = mocks.spy(() => {
+                    console.log('BOUND!!');
+                }),
+                subs = testeeClass.on('rip rop', cb.bind(cb)),
+                unsubs;
+
+            testeeClass.emit('rip');
+            testeeClass.emit('rop');
+            cb.should.have.callCount(2);
+            unsubs = testeeClass.off('rip', cb);
+            testeeClass.emit('rip');
+            testeeClass.emit('rop');
+            cb.should.have.callCount(3);
+            expect(unsubs).to.be.an.instanceof(Array);
+            expect(unsubs).to.be.ok;
+            expect(unsubs.length).to.equal(1);
+        });
     });
 
     describe('delegate()', () => {
-        xit('stub', () => {
+        it('Delegates an event handler to child elements matching the selector', () => {
+            let el = htmlToDom('<div><h1>Hello test <a href="#">decoy</a></h1>  <ul><li><a href="#">one</a></li><li><a href="#">2</a></li><li><a href="#">three</a></li></ul></div>'),
+                cb = mocks.spy(e => {
+                    console.log('wahoo', e);
+                });
+
+            testeeFunc.el = el;
+            testeeFunc.render = () => {
+                document.querySelector('body').appendChild(el);
+            };
+
+            testeeFunc.render();
+
+            let subs = testeeFunc.delegate('ul', 'click', cb),
+                unsubs;
+
+
+            expect(testeeFunc.el).to.be.an.instanceOf(Element);
+            expect(subs.length).to.equal(1);
+            let decoy = el.querySelector('h1 > a'),
+                a = el.querySelector('li > a');
+
+            decoy.click();
+            decoy.click();
+            a.click();
+            a.click();
+            unsubs = testeeFunc.off('click', cb); //werx
+            //unsubs = testeeFunc.off('click', subs[0].fn); //werx
+            //testeeFunc.detachEvents(); //werx
+            expect(unsubs.length).to.equal(1);
+            a.click();
+            a.click();
+            cb.should.have.callCount(2);
+            document.querySelector('body').removeChild(el);
+
         });
     });
     describe('delegateOnce()', () => {
-        xit('stub', () => {
+        it('Delegates and calls only once', () => {
+            let el = htmlToDom('<div><h1>Hello test 2 <a href="#">decoy</a></h1>  <ul><li><a href="#">one</a></li><li><a href="#">2</a></li><li><a href="#">three</a></li></ul></div>'),
+                cb = mocks.spy(e => {
+                    console.log('wahooOnce', e);
+                });
+
+            testeeFunc.el = el;
+            testeeFunc.render = () => {
+                document.querySelector('body').appendChild(el);
+            };
+
+            testeeFunc.render();
+
+            let subs = testeeFunc.delegateOnce('ul', 'click', cb);
+
+            expect(testeeFunc.el).to.be.an.instanceOf(Element);
+            expect(subs.length).to.equal(1);
+            let decoy = el.querySelector('h1 > a'),
+                a = el.querySelector('li > a');
+
+            decoy.click();
+            decoy.click();
+            a.click();
+            a.click();
+            a.click();
+            cb.should.have.callCount(1);
+            document.querySelector('body').removeChild(el);
         });
     });
     describe('listenTo()', () => {

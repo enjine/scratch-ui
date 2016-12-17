@@ -109,5 +109,14 @@ export function getEventPath (event) {
     return path;
 }
 
-export default {isNativeEvent, addHandler, removeHandler, parseEventStr, getEventPath};
+export function eventPathContains (event, selector) {
+    let isInPath = getEventPath(event).map(el => {
+        return el.tagName === selector.toUpperCase();
+    });
+    return isInPath.indexOf(true) !== -1;
+}
+
+export const isBindable = func => func.hasOwnProperty('prototype');
+
+export default {isNativeEvent, addHandler, removeHandler, parseEventStr, getEventPath, eventPathContains, isBindable};
 
