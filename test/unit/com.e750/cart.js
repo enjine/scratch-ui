@@ -11,8 +11,8 @@ settings.init();
 
 import cart from 'cart';
 
-xdescribe('core', () => {
-    it('', () => {
+describe('Cart', () => {
+    it('core', () => {
         console.log(cart);
     });
 });

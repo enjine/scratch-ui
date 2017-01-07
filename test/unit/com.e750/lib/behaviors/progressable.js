@@ -28,14 +28,21 @@ testFunc.prototype = new Progressable();
 let testeeC,
     testeeF;
 
-describe('Progressable.mixin', function ()  {
+describe('Progressable.mixin', function () {
     beforeEach(() => {
         testeeC = new testClass();
         testeeF = new testFunc();
     });
-    it('Must be mixed into an object with the `el` property set to a DOM element)', () => {
+    it('Must be mixed into an object with the `el` property set to a DOM element and have  <progress> element as a child)', () => {
+        let pF = document.createElement('progress'),
+            pC = document.createElement('progress'),
+            pChildF = testeeF.el.appendChild(pF),
+            pChildC = testeeC.el.appendChild(pC);
+
         expect(testeeC.el).to.be.ok;
-        expect(testeeF.el).to.be.ok;
+        expect(testeeC.el).to.be.ok;
+        expect(testeeF.el.children.length).to.equal(1);
+        expect(testeeC.el.children.length).to.equal(1);
         expect(testeeC.el).to.respondTo('appendChild');
         expect(testeeF.el).to.respondTo('appendChild');
         expect(testeeC).to.respondTo('showProgress');
@@ -44,6 +51,10 @@ describe('Progressable.mixin', function ()  {
         expect(testeeF).to.respondTo('hideProgress');
         expect(testeeC).to.respondTo('onProgress');
         expect(testeeF).to.respondTo('onProgress');
+        expect(testeeF.onProgress.bind(testeeF, {data: {lengthComputable: false}})).not.to.throw(Error);
+        expect(testeeC.onProgress.bind(testeeC, {data: {lengthComputable: true, total: 1024, loaded: 10}})).not.to.throw(Error);
+        expect(testeeF.hideProgress.bind(testeeF)).not.to.throw(Error);
+        expect(testeeC.hideProgress.bind(testeeC)).not.to.throw(Error);
     });
 
     it('Throws when the required properties/methods are not implemented', function () {
@@ -51,6 +62,11 @@ describe('Progressable.mixin', function ()  {
         delete testeeC.el;
         expect(testeeF.showProgress.bind(testeeF)).to.throw(Error);
         expect(testeeC.showProgress.bind(testeeC)).to.throw(Error);
+        expect(testeeF.hideProgress.bind(testeeF)).to.throw(Error);
+        expect(testeeC.hideProgress.bind(testeeC)).to.throw(Error);
+    });
+
+    it('Throws when the no <progress> element is present', function () {
         expect(testeeF.hideProgress.bind(testeeF)).to.throw(Error);
         expect(testeeC.hideProgress.bind(testeeC)).to.throw(Error);
     });

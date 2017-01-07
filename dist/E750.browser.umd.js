@@ -2224,16 +2224,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param context
 	     * @returns {delegate}
 	     */
-	    delegate: function delegate(evTarget, eventNames, handler, context) {
+	    delegate: function delegate(selector, eventNames, handler, context) {
 	        var ctx = context || this;
-	        this.on(eventNames, function (e) {
+
+	        function wrap(e) {
 	            var target = e.target || e.srcElement;
-	            if (target && (0, _DOM.elementMatches)(target, evTarget)) {
+	            if (target && ((0, _utils.eventPathContains)(e, selector) || (0, _DOM.elementMatchesSelector)(target, selector))) {
 	                return handler.apply(ctx, arguments);
 	            }
 	            return false;
-	        });
-	        return this;
+	        }
+
+	        wrap.originalHandler = handler;
+
+	        return this.on(eventNames, wrap);
 	    },
 
 	    /**
@@ -2246,16 +2250,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param context
 	     * @returns {delegateOnce}
 	     */
-	    delegateOnce: function delegateOnce(evTarget, eventNames, handler, context) {
-	        var ctx = context || this;
-	        this.once(eventNames, function (e) {
+	    delegateOnce: function delegateOnce(selector, eventNames, handler, context) {
+	        var ctx = context || this,
+	            that = this;
+
+	        function cb(e) {
 	            var target = e.target || e.srcElement;
-	            if (target && (0, _DOM.elementMatches)(target, evTarget)) {
+	            if (target && ((0, _utils.eventPathContains)(e, selector) || (0, _DOM.elementMatchesSelector)(target, selector))) {
+	                that.off(eventNames, cb);
 	                return handler.apply(ctx, arguments);
 	            }
 	            return false;
-	        });
-	        return this;
+	        }
+
+	        return this.on(eventNames, cb);
 	    },
 
 	    /**
@@ -2341,10 +2349,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var _this2 = this;
 
 	        var subscription = void 0,
-	            subs = this.subscriptions;
-	        var delegate = this.el || this;
+	            subs = this.subscriptions,
+	            delegate = this.el || this,
+	            evts = eventNames.split(' '),
+	            cb = handler;
 
-	        return (0, _utils.removeHandler)(delegate, eventNames, handler).reduce(function (ret, result) {
+	        // this is a little slow, but allows us to remove bound event handlers
+	        // from DOM Nodes!
+	        var hits = subs.filter(function (sub) {
+	            var h = sub.fn.originalHandler || sub.fn;
+	            return (h === handler || sub.fn.sId === sub.id) && evts.indexOf(sub.ev) !== -1;
+	        });
+
+	        if (hits.length) {
+	            var h = hits.pop();
+	            cb = h.fn;
+	        }
+
+	        return (0, _utils.removeHandler)(delegate, eventNames, cb).reduce(function (ret, result) {
 	            if (!result.id) {
 	                subscription = _this2.unsubscribe(result.ev, result.fn);
 	            } else {
@@ -2470,7 +2492,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            channels.forEach(function (ch) {
 	                var c = ch.trim();
 	                ret = subs.filter(function (sub) {
-	                    return sub.ev === c && _this4.mediator.subscribers[c][sub.id] === handler;
+	                    return sub.ev === c && _this4.mediator.subscribers[c] && _this4.mediator.subscribers[c][sub.id] === handler;
 	                }).map(function (hit) {
 	                    subs.splice(subs.indexOf(hit), 1);
 	                    return _this4.mediator.remove(channel, hit.id);
@@ -3214,7 +3236,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.isNode = isNode;
 	exports.isElement = isElement;
-	exports.elementMatches = elementMatches;
+	exports.elementMatchesSelector = elementMatchesSelector;
 	exports.htmlToDom = htmlToDom;
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -3244,7 +3266,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param selector
 	 * @returns {*}
 	 */
-	function elementMatches(el, selector) {
+	function elementMatchesSelector(el, selector) {
 	    var p = Element.prototype;
 	    var f = p.matches || p.webkitMatchesSelector || p.mozMatchesSelector || p.msMatchesSelector || function (s) {
 	        return [].indexOf.call(document.querySelectorAll(s), this) !== -1;
@@ -4473,12 +4495,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
+	exports.isBindable = undefined;
 	exports.manageNativeEvents = manageNativeEvents;
 	exports.isNativeEvent = isNativeEvent;
 	exports.addHandler = addHandler;
 	exports.removeHandler = removeHandler;
 	exports.parseEventStr = parseEventStr;
 	exports.getEventPath = getEventPath;
+	exports.eventPathContains = eventPathContains;
 
 	var _guid = __webpack_require__(68);
 
@@ -4597,7 +4621,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return path;
 	}
 
-	exports.default = { isNativeEvent: isNativeEvent, addHandler: addHandler, removeHandler: removeHandler, parseEventStr: parseEventStr, getEventPath: getEventPath };
+	function eventPathContains(event, selector) {
+	    var isInPath = getEventPath(event).map(function (el) {
+	        return el.tagName === selector.toUpperCase();
+	    });
+	    return isInPath.indexOf(true) !== -1;
+	}
+
+	var isBindable = exports.isBindable = function isBindable(func) {
+	    return func.hasOwnProperty('prototype');
+	};
+
+	exports.default = { isNativeEvent: isNativeEvent, addHandler: addHandler, removeHandler: removeHandler, parseEventStr: parseEventStr, getEventPath: getEventPath, eventPathContains: eventPathContains, isBindable: isBindable };
 
 /***/ },
 /* 149 */

@@ -267,31 +267,179 @@ describe('Evented.mixin', () => {
         });
     });
     describe('listenTo()', () => {
-        xit('stub', () => {
+        it('Enables event delegation on objects rather than DOM elements', () => {
+            let cb = mocks.spy(),
+                subs;
+
+            subs = testeeFunc.listenTo(testeeClass, 'beforeFetch', cb);
+            expect(subs.length).to.equal(1);
+            testeeClass.emit('beforeFetch');
+            testeeClass.emit('beforeFetch');
+            testeeFunc.emit('beforeFetch');
+            testeeFunc.emit('beforeFetch');
+            cb.should.have.callCount(2);
+
         });
     });
     describe('listenToOnce()', () => {
-        xit('stub', () => {
+        it('Delegates to objects and invokes the callback only once', () => {
+            let cb = mocks.spy(),
+                subs;
+
+            subs = testeeFunc.listenToOnce(testeeClass, 'beforeFetch', cb);
+            expect(subs.length).to.equal(1);
+            testeeClass.emit('beforeFetch');
+            testeeClass.emit('beforeFetch');
+            testeeFunc.emit('beforeFetch');
+            testeeFunc.emit('beforeFetch');
+            cb.should.have.callCount(1);
         });
     });
     describe('once()', () => {
-        xit('stub', () => {
+        it('Adds an event listener whose callback will only be invoked once', () => {
+            let cb = mocks.spy(),
+                subs;
+
+            subs = testeeFunc.once('beforeFetch', cb);
+            expect(subs.length).to.equal(1);
+            testeeClass.emit('beforeFetch');
+            testeeClass.emit('beforeFetch');
+            testeeFunc.emit('beforeFetch');
+            testeeFunc.emit('beforeFetch');
+            cb.should.have.callCount(1);
         });
     });
     describe('trigger()', () => {
-        xit('stub', () => {
+        let el = htmlToDom('<div><h1>Hello test 2 <a href="#">decoy</a></h1>  <ul><li><a href="#">one</a></li><li><a href="#">2</a></li><li><a href="#">three</a></li></ul></div>');
+        it('Will throw a reference error if no DOMElement is present', () => {
+            let k = new testFunc();
+            expect(testeeFunc.trigger.bind(k, 'click')).to.throw(ReferenceError);
         });
+
+        it('Triggers DOM Events', () => {
+            let cb = mocks.spy(e => {
+                    console.log('triggered!', e);
+                }),
+                doc;
+
+            testeeFunc.el = el;
+            testeeClass.el = htmlToDom('<a href="#"><h1>eep</h1></a>');
+            testeeFunc.render = () => {
+                doc = document.querySelector('body').appendChild(el);
+            };
+            testeeClass.render = () => {
+                document.querySelector('body').appendChild(testeeClass.el);
+            };
+
+            testeeFunc.render();
+            testeeClass.render();
+
+            let subs = testeeFunc.on('click', cb);
+
+            expect(testeeFunc.el).to.be.an.instanceOf(Element);
+            expect(subs.length).to.equal(1);
+            let decoy = el.querySelector('h1 > a'),
+                a = el.querySelector('li > a');
+
+            testeeFunc.trigger('click', {v: 'func'});
+            testeeClass.trigger('click', {v: 'class'}); // this one should not get handled
+            decoy.click({v: 'decoy'});
+            a.click({v: 'el'});
+            cb.should.have.callCount(3);
+            document.querySelector('body').removeChild(el);
+            document.querySelector('body').removeChild(testeeClass.el);
+        });
+
     });
     describe('emit()', () => {
-        xit('stub', () => {
+        it('Emits custom Events or passes native DOM events through to trigger()', () => {
+            let cb = mocks.spy(),
+                ncb = mocks.spy(),
+                tcb = mocks.spy(testeeFunc, 'trigger');
+
+            testeeFunc.el = htmlToDom('<a href="#"><h1>eep</h1></a>');
+
+            testeeFunc.on('emitted', cb);
+            testeeFunc.on('click', ncb);
+
+            testeeClass.emit('emitted');
+            testeeFunc.emit('emitted');
+            testeeClass.emit('click');
+            testeeFunc.emit('click');
+
+            cb.should.have.callCount(2);
+            ncb.should.have.callCount(1);
+            tcb.should.have.callCount(1);
+            tcb.should.have.been.calledWith('click');
+
+
+        });
+        it('Custom events can have payloads', () => {
+            let cb = mocks.spy((payload) => {
+                if (typeof payload === 'function') {
+                    expect(payload()).to.deep.equal({i: 2});
+                } else {
+                    expect(payload).to.deep.equal({i: 1});
+                }
+            });
+
+            testeeFunc.el = htmlToDom('<a href="#"><h1>eep</h1></a>');
+
+            testeeFunc.on('custom', cb);
+
+            testeeClass.emit('custom', {i: 1});
+            testeeFunc.emit('custom', function () {
+                return {i: 2};
+            });
+            testeeClass.emit('click');
+            testeeFunc.emit('click');
+
+            cb.should.have.callCount(2);
         });
     });
     describe('subscribe()', () => {
-        xit('stub', () => {
+        it('Adds a pub/sub event handler', () => {
+            let cb = mocks.spy(),
+                subs = testeeFunc.subscribe('channelOne', cb);
+
+            expect(subs.length).to.equal(1);
+            expect(subs[0].id).to.be.ok;
+            expect(subs[0].fn).to.deep.equal(cb);
+
+            testeeClass.emit('channelOne');
+            testeeClass.emit('channelOne');
+            testeeClass.emit('not-message');
+
+            cb.should.have.callCount(2);
         });
     });
     describe('unsubscribe()', () => {
-        xit('stub', () => {
+        it('Removes a pub/sub event handler', () => {
+            let cb = mocks.spy(),
+                subs = testeeFunc.subscribe('channelOne', cb),
+                unsubs;
+
+            expect(subs.length).to.equal(1);
+            expect(subs[0].id).to.be.ok;
+            expect(subs[0].fn).to.deep.equal(cb);
+
+            testeeClass.emit('channelOne');
+            testeeClass.emit('channelOne');
+            testeeClass.emit('not-message');
+
+            cb.should.have.callCount(2);
+
+            unsubs = testeeFunc.unsubscribe('channelOne', cb);
+
+            expect(subs.length).to.equal(1);
+            expect(subs[0].id).to.be.falsy;
+            expect(subs[0].fn).to.deep.equal(cb);
+
+            testeeClass.emit('channelOne');
+            testeeClass.emit('channelOne');
+            testeeClass.emit('not-message');
+
+            cb.should.have.callCount(2);
         });
     });
 

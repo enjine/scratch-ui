@@ -9,10 +9,29 @@ import {settings} from 'setup';
 
 settings.init();
 
-import core from 'lib/util/core';
+import {compose, curry, mixes, guid, anyIntBetween, getRandomArbitrary} from 'lib/util/core';
+describe('Utils/core', () => {
+    xit('compose', () => {
+        console.log(compose);
+    });
 
-xdescribe('Utils/core', () => {
-    it('', () => {
-        console.log(core);
+    xit('curry', () => {
+        console.log(curry);
+    });
+
+    xit('mixes', () => {
+        console.log(mixes);
+    });
+
+    xit('guid', () => {
+        console.log(guid);
+    });
+
+    xit('anyIntBetween', () => {
+        console.log(anyIntBetween);
+    });
+
+    xit('getRandomArbitrary', () => {
+        console.log(getRandomArbitrary);
     });
 });

@@ -15,6 +15,7 @@ Object.assign(Progressable.prototype, {
 
     onProgress: function (e) {
         let progress = this.el.querySelector('progress');
+        console.log(e);
         if (progress) {
             let progressEvent = e.data,
                 value = parseInt(progress.value, 10) || 0;
@@ -38,9 +39,13 @@ Object.assign(Progressable.prototype, {
             throw new Error('Progessables must have a DOMElement `el`');
         }
         let progress = this.el.querySelector('progress');
-        progress.value = progress.max;
-        this.el.classList.remove('loading');
-        return this;
+        if (progress) {
+            progress.value = progress.max;
+            this.el.classList.remove('loading');
+            return this;
+        } else {
+            throw new Error('<progress> element not found in component DOM.');
+        }
     }
 });
 

@@ -16,14 +16,15 @@ export var DomEventBehavior = {
                 let handler = mocks.spy(),
                     onceHandler = mocks.spy();
 
-                o.on('keyup', handler);
-                o.once('resize', onceHandler);
-                o.emit('keyup');
-                o.emit('keyup');
+                o.on('change', handler);
+                o.once('click', onceHandler);
+                o.emit('change');
+                o.emit('change');
+                o.emit('click');
+                o.emit('click');
+                o.emit('scroll');
                 o.emit('resize');
-                o.emit('resize');
-                o.emit('resize');
-                o.off('click', handler);
+                o.off('change', handler);
 
                 handler.should.have.been.calledTwice;
                 onceHandler.should.have.been.calledOnce;

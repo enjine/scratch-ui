@@ -100,14 +100,21 @@ Object.assign(Evented.prototype, {
      * @returns {*}
      */
     listenToOnce: function (obj, event, handler, context) {
-        let ctx = context || this;
-        return this.once(event, function (e) {
+        let ctx = context || this,
+            that = this;
+
+        function wrap (e) {
             let target = e.target || e.srcElement;
             if (target && target === obj) {
+                that.off(event, handler);
                 return handler.apply(ctx, arguments);
             }
             return false;
-        });
+        }
+
+        wrap.originalHandler = handler;
+
+        return this.on(event, wrap);
     },
 
     /**
@@ -186,9 +193,9 @@ Object.assign(Evented.prototype, {
         let that = this,
             ctx = context || this;
 
-        function cb () {
+        function cb (...args) {
             that.off(event, cb);
-            return handler.apply(ctx, arguments);
+            return handler.apply(ctx, args);
         }
 
         cb.sId = guid();
@@ -203,14 +210,24 @@ Object.assign(Evented.prototype, {
      * @param data
      * @returns {*|boolean}
      */
-    trigger: function (eventName, element, data) {
-        let E;
-        if (!isNative(eventName) && CustomEvent in window) {
-            E = CustomEvent(eventName, data);
-            return element.dispatchEvent(E);
+    trigger: function (eventName, data, element) {
+        let E,
+            el = element || this.el;
+
+        if (!isElement(el)) {
+            throw new ReferenceError('DOMElement is undefined! Cannot trigger DOMEvent without a DOMElement');
         }
-        E = new Event(eventName);
-        return element.dispatchEvent(E);
+
+        if (!isNative(eventName)) {
+            if (CustomEvent in window) {
+                E = new CustomEvent(eventName, {detail: data});
+            } else {
+                E = new Event(eventName, {bubbles: true, cancelable: true});
+            }
+            return el.dispatchEvent(E);
+        }
+
+        return el[eventName]();
     },
 
     /**
@@ -228,13 +245,12 @@ Object.assign(Evented.prototype, {
             subscribers = this.mediator.subscribers;
 
         if (native && elIsDOM) {
-            return this.trigger(eventName, el);
+            return this.trigger(eventName, {data, args}, el);
         }
 
         if (subscribers.has(eventName)) {
             let payload = new nEvent(eventName, data, this);
             return this.mediator.dispatch(eventName, payload, args);
-
         }
 
         return false;
