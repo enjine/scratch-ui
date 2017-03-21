@@ -75,6 +75,7 @@
     "request-promise": ">=0.4.2",
     "sass-loader": "^4.0.2",
     "sinon": "*",
+    "sinon-as-promised": "^4.0.2",
     "sinon-chai": "^2.8.0",
     "style-loader": "^0.13.1",
     "url-loader": "^0.5.7",

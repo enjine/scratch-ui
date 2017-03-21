@@ -1,7 +1,7 @@
-const Mustache = require('mustache');
+import Mustache from 'mustache';
 import Evt from './event/Registry';
-const axios = require('axios');
-const Cookies = require('cookies-js');
+import axios from 'axios';
+import Cookies from 'cookies-js';
 
 
 export const net = {

@@ -11,7 +11,7 @@ export function isNode (o) {
 }
 
 /**
- * Returns true if DOM Elemebt
+ * Returns true if DOM Element
  * @param o
  * @returns Boolean
  */

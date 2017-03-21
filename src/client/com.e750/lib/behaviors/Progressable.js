@@ -1,6 +1,6 @@
 import utils from 'lib/util/core';
 
-var styles = require('!style!css!postcss!sass!../components/styles/Progress.scss');
+const styles = require('!style!css!postcss!sass!../components/styles/Progress.scss');
 
 const Progressable = function () {};
 
@@ -15,7 +15,6 @@ Object.assign(Progressable.prototype, {
 
     onProgress: function (e) {
         let progress = this.el.querySelector('progress');
-        console.log(e);
         if (progress) {
             let progressEvent = e.data,
                 value = parseInt(progress.value, 10) || 0;

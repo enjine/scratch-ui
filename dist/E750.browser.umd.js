@@ -2298,14 +2298,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @returns {*}
 	     */
 	    listenToOnce: function listenToOnce(obj, event, handler, context) {
-	        var ctx = context || this;
-	        return this.once(event, function (e) {
+	        var ctx = context || this,
+	            that = this;
+
+	        function wrap(e) {
 	            var target = e.target || e.srcElement;
 	            if (target && target === obj) {
+	                that.off(event, handler);
 	                return handler.apply(ctx, arguments);
 	            }
 	            return false;
-	        });
+	        }
+
+	        wrap.originalHandler = handler;
+
+	        return this.on(event, wrap);
 	    },
 
 	    /**
@@ -2390,7 +2397,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        function cb() {
 	            that.off(event, cb);
-	            return handler.apply(ctx, arguments);
+
+	            for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	                args[_key] = arguments[_key];
+	            }
+
+	            return handler.apply(ctx, args);
 	        }
 
 	        cb.sId = (0, _guid2.default)();
@@ -2405,14 +2417,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param data
 	     * @returns {*|boolean}
 	     */
-	    trigger: function trigger(eventName, element, data) {
-	        var E = void 0;
-	        if (!(0, _utils.isNativeEvent)(eventName) && CustomEvent in window) {
-	            E = CustomEvent(eventName, data);
-	            return element.dispatchEvent(E);
+	    trigger: function trigger(eventName, data, element) {
+	        var E = void 0,
+	            el = element || this.el;
+
+	        if (!(0, _DOM.isElement)(el)) {
+	            throw new ReferenceError('DOMElement is undefined! Cannot trigger DOMEvent without a DOMElement');
 	        }
-	        E = new Event(eventName);
-	        return element.dispatchEvent(E);
+
+	        if (!(0, _utils.isNativeEvent)(eventName)) {
+	            if (CustomEvent in window) {
+	                E = new CustomEvent(eventName, { detail: data });
+	            } else {
+	                E = new Event(eventName, { bubbles: true, cancelable: true });
+	            }
+	            return el.dispatchEvent(E);
+	        }
+
+	        return el[eventName]();
 	    },
 
 	    /**
@@ -2424,22 +2446,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @returns {*}
 	     */
 	    emit: function emit(eventName, data) {
+	        for (var _len2 = arguments.length, args = Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
+	            args[_key2 - 2] = arguments[_key2];
+	        }
+
 	        var el = this.el,
 	            elIsDOM = (0, _DOM.isElement)(el) || (0, _DOM.isNode)(el),
 	            native = (0, _utils.isNativeEvent)(eventName),
 	            subscribers = this.mediator.subscribers;
 
 	        if (native && elIsDOM) {
-	            return this.trigger(eventName, el);
+	            return this.trigger(eventName, { data: data, args: args }, el);
 	        }
 
 	        if (subscribers.has(eventName)) {
 	            var payload = new _nEvent2.default(eventName, data, this);
-
-	            for (var _len = arguments.length, args = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
-	                args[_key - 2] = arguments[_key];
-	            }
-
 	            return this.mediator.dispatch(eventName, payload, args);
 	        }
 
@@ -7000,6 +7021,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    onProgress: function onProgress(e) {
 	        var progress = this.el.querySelector('progress');
+	        console.log(e);
 	        if (progress) {
 	            var progressEvent = e.data,
 	                value = parseInt(progress.value, 10) || 0;
@@ -7023,9 +7045,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            throw new Error('Progessables must have a DOMElement `el`');
 	        }
 	        var progress = this.el.querySelector('progress');
-	        progress.value = progress.max;
-	        this.el.classList.remove('loading');
-	        return this;
+	        if (progress) {
+	            progress.value = progress.max;
+	            this.el.classList.remove('loading');
+	            return this;
+	        } else {
+	            throw new Error('<progress> element not found in component DOM.');
+	        }
 	    }
 	});
 

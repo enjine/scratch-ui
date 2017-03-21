@@ -9,11 +9,11 @@ export default class Login extends Component {
     constructor (el, options = {}) {
         Object.assign(options, {
             template: options.template || jst.getFromDOM('login'),
-            id: 'ui/login'
+            id: 'ui/login',
+            checkEndpoint: options.checkEndpoint || 'https://api.securecheckout.com/v1/cart/auth/username/',
+            authEndpoint: options.authEndpoint || 'https://api.securecheckout.com/v1/cart/auth'
         });
         super(el, options);
-        this.checkEndpoint = 'https://api.securecheckout.com/v1/cart/auth/username/';
-        this.authEndpoint = 'https://api.securecheckout.com/v1/cart/auth';
         this.indicator = this.el.querySelector('figure');
     }
 
@@ -35,7 +35,7 @@ export default class Login extends Component {
 
     checkUsername (username) {
         return this.model.fetch({
-            url: this.checkEndpoint + encodeURIComponent(username),
+            url: this.options.checkEndpoint + encodeURIComponent(username),
             method: 'get',
             headers: {
                 'X-Auth-Token': storage.cookie.get('apiToken')
@@ -88,7 +88,7 @@ export default class Login extends Component {
         let data = new FormData(e.target);
 
         this.model.fetch({
-            url: this.authEndpoint,
+            url: this.options.authEndpoint,
             method: 'POST',
             headers: {
                 //'X-Session-Id': storage.cookie.get('laravel_session'),
@@ -111,7 +111,7 @@ export default class Login extends Component {
 
     render () {
         try {
-            if (this.el.dataset.mounted === undefined) {
+            if (!this.el.dataset.mounted) {
                 this.el.insertBefore(jst.compileToDOM(this.template), this.el.children[0]);
             }
             return this;

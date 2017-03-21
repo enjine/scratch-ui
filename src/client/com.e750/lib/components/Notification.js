@@ -1,4 +1,4 @@
-import {jst} from 'lib/core';
+import { jst } from 'lib/core';
 import {NotificationModel} from 'lib/classes/models/Notification';
 import Component from './Component';
 

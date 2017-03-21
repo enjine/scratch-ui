@@ -50,7 +50,7 @@ function Validator (options = {}) {
 Validator.prototype = new Evented();
 
 /**
- * Validates an true array of values
+ * Validates a true array of values
  * @param values
  * @returns {*}
  */
