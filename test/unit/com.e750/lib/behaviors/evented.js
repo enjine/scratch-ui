@@ -311,9 +311,9 @@ describe('Evented.mixin', () => {
     });
     describe('trigger()', () => {
         let el = htmlToDom('<div><h1>Hello test 2 <a href="#">decoy</a></h1>  <ul><li><a href="#">one</a></li><li><a href="#">2</a></li><li><a href="#">three</a></li></ul></div>');
-        it('Will throw a reference error if no DOMElement is present', () => {
-            let k = new testFunc();
-            expect(testeeFunc.trigger.bind(k, 'click')).to.throw(ReferenceError);
+        it('Will throw a reference error if callback is event handler is not a function', () => {
+            let k = mocks.spy(testFunc);
+            expect(testeeFunc.trigger.bind(k, 'click')).to.throw(TypeError);
         });
 
         it('Triggers DOM Events', () => {

@@ -96,8 +96,12 @@ export const jst = {
     },
 
     compileToDOM: (templateStr, data, partials) => {
-        let parser = new DOMParser();
-        return parser.parseFromString(jst.compile(templateStr, data, partials), 'text/html').body.firstElementChild;
+        try {
+            let parser = new DOMParser();
+            return parser.parseFromString(jst.compile(templateStr, data, partials), 'text/html').body.firstElementChild;
+        } catch (e) {
+            throw Error('Unable to parse string to DOM', e.message);
+        }
     }
 };
 

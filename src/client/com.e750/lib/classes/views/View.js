@@ -5,8 +5,7 @@ import LookupTable from 'lib/util/LookupTable';
 @mixes(Evented)
 export default class View {
     constructor (options) {
-        this.options = {};
-        Object.assign(this.options, options);
+        this.options = Object.assign({}, options);
         this.childViews = Object.create(LookupTable);
     }
 

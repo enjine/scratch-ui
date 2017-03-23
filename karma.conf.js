@@ -1,13 +1,14 @@
 // Karma configuration
-var path = require('path');
-var webpackConfig = require('./webpack.config.js');
+const webpack = require('webpack');
+const path = require('path');
+const webpackConfig = require('./webpack.config.js');
 
 webpackConfig.entry = [];
 webpackConfig.module.noParse = [/\/sinon\.js/];
-webpackConfig.module.preLoaders.push(
+webpackConfig.module.loaders.unshift(
     {
         test: /\.js$/,
-        loader: 'babel-loader',
+        use: 'babel-loader',
         include: [
             path.resolve(__dirname, 'test/modules'),
             path.resolve(__dirname, 'test/behaviors'),
@@ -18,15 +19,28 @@ webpackConfig.module.preLoaders.push(
     },
     {
         test: /sinon\.js$/,
-        loader: 'imports?define=>false,require=>false'
+        loaders: ['imports-loader']
     },
     {
         test: /\.js$/,
         include: path.resolve('src/client'),
-        loader: 'isparta'
+        loaders: ['isparta-loader']
     }
 );
-webpackConfig.resolve.modulesDirectories.push('test');
+webpackConfig.resolve.modules.push('test');
+webpackConfig.plugins.push(new webpack.LoaderOptionsPlugin({
+    options: {
+        debug: true,
+        'imports-loader': [
+            'define=>false',
+            'require=>false'
+        ],
+        'isparta-loader': [{
+            embedSource: true,
+            noAutoWrap: true
+        }]
+    }
+}));
 
 module.exports = function (config) {
     config.set({
@@ -52,6 +66,7 @@ module.exports = function (config) {
 
         // list of files / patterns to load in the browser test runner
         files: [
+            './test/polyfills/phantomjs.domparser.js',
             './test/fixtures.js',
             './test/index.js'
         ],
@@ -70,13 +85,8 @@ module.exports = function (config) {
 
         webpack: {
             devtool: 'inline-source-map',
-            debug: true,
             module: webpackConfig.module,
             resolve: webpackConfig.resolve,
-            isparta: {
-                embedSource: true,
-                noAutoWrap: true
-            }
         },
 
         webpackMiddleware: {
@@ -146,7 +156,10 @@ module.exports = function (config) {
         //browsers: ['ChromeES6', 'ChromeCanaryES6', 'Firefox', 'Safari'],
         //browsers: ['Chrome', 'ChromeCanary', 'Firefox', 'Safari', 'PhantomJS'],
         //browsers: ['Chrome', 'PhantomJS', 'Firefox'], //'PhantomJS',
-        browsers: ['Chrome'],
+        browsers: ['Chrome', 'PhantomJS', 'Safari'],
+        //browsers: ['Chrome', 'Firefox', 'Safari'],
+        //browsers: ['Firefox'],
+        //browsers: ['PhantomJS'],
 
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits

@@ -34,20 +34,11 @@ describe('Component/Login.class', () => {
         expect(login.options.authEndpoint).to.equal(options.authEndpoint);
         // indiciator is DOM Element
         expect(login.indicator).to.be.an.instanceOf(Element);
-        expect(login.el).to.be.an.instanceOf(HTMLDivElement);
     });
 
     it('initState', () => {
         // validator is an instance of Validator
         expect(login.validator).to.be.an.instanceOf(Validator);
-        let onSubmit = mocks.spy(login.validator, 'onSubmit');
-        // handles 'submit' event
-        //login.emit('submit');
-        //onSubmit.should.have.callCount(1);
-        //onSubmit.should.have.beenCalledWith(false);
-        // handles #username 'input' event
-        // el is properly rendered
-        expect(login.el.innerHTML).to.equal(options.template);
     });
 
     it('onUsernameInput - PASS -- REWRITE THIS', function () {

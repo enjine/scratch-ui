@@ -1,6 +1,6 @@
 import utils from 'lib/util/core';
 
-const styles = require('!style!css!postcss!sass!../components/styles/Progress.scss');
+const styles = require('./styles/Progress');
 
 const Progressable = function () {};
 

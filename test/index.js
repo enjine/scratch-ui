@@ -1,10 +1,10 @@
-require('es6-promise'); // polyfill for phantomjs
+require('babel-polyfill'); // polyfill for phantomjs
 
 const unitTestsContext = require.context('./unit', true, /.+\.js$/);
-unitTestsContext.keys().forEach(unitTestsContext);
+unitTestsContext.keys().map(unitTestsContext);
 
 const functionalTestsContext = require.context('./functional', true, /.+\.js$/);
-functionalTestsContext.keys().forEach(functionalTestsContext);
+functionalTestsContext.keys().map(functionalTestsContext);
 
 const sourceFilesContext = require.context('../src/client', true, /.+\.js$/);
-sourceFilesContext.keys().forEach(sourceFilesContext);
+sourceFilesContext.keys().map(sourceFilesContext);

@@ -214,11 +214,7 @@ Object.assign(Evented.prototype, {
         let E,
             el = element || this.el;
 
-        if (!isElement(el)) {
-            throw new ReferenceError('DOMElement is undefined! Cannot trigger DOMEvent without a DOMElement');
-        }
-
-        if (!isNative(eventName)) {
+        if (isElement(el) && isNative(eventName)) {
             if (CustomEvent in window) {
                 E = new CustomEvent(eventName, {detail: data});
             } else {
@@ -226,7 +222,11 @@ Object.assign(Evented.prototype, {
             }
             return el.dispatchEvent(E);
         }
+        console.debug(typeof el, eventName, typeof el[eventName], element);
 
+        if (typeof el[eventName] !== 'function') {
+            throw new TypeError(`DOMElement.${eventName} is not callable!`);
+        }
         return el[eventName]();
     },
 

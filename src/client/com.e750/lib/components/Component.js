@@ -1,4 +1,5 @@
 import mixes from 'lib/util/mixes';
+import { jst } from 'lib/core';
 import Progressable from 'lib/behaviors/Progressable';
 
 import View from 'lib/classes/views/View';
@@ -26,6 +27,17 @@ export default class Component extends View {
         this.modelClass = this.options.modelClass || Component.modelClass;
         this.collectionClass = this.options.modelClass || Component.collectionClass;
         this.initModel().initCollection().initTemplate();
+    }
+
+    render () {
+        try {
+            if (!this.el.dataset.mounted) {
+                this.el.insertBefore(jst.compileToDOM(this.template), this.el.children[0]);
+            }
+            return this;
+        } catch (e) {
+            throw e;
+        }
     }
 
     initModel () {

@@ -20,8 +20,8 @@ module.exports = {
     },
     plugins: plugins,
     resolve: {
-        root: path.resolve(__dirname),
-        modulesDirectories: [
+        modules: [
+            path.resolve(__dirname),
             'node_modules'
         ],
         alias: {
@@ -29,10 +29,9 @@ module.exports = {
             lib: 'src/client/com.e750/lib',
             cart: 'src/client/com.e750/cart'
         },
-        extensions: ['', '.js', '.jsx']
+        extensions: ['.js', '.jsx', '.scss']
     },
     module: {
-        preLoaders: [],
         loaders: [
             {
                 test: /\.js$/,
@@ -45,7 +44,7 @@ module.exports = {
             },
             {
                 test: /\.scss$/,
-                loaders: ['style', 'css?importLoaders=1', 'postcss?sourceMap=inline', 'sass']
+                loaders: ['style-loader', 'css-loader?importLoaders=1', 'postcss-loader?sourceMap=inline', 'sass-loader']
             },
             {
                 test: /\.woff$/,
@@ -58,15 +57,6 @@ module.exports = {
                 loader: 'file-loader'
             }
         ]
-    },
-    postcss: (webpack) => {
-        return [
-            require('postcss-import')({ addDependencyTo: webpack }),
-            require('postcss-cssnext')({
-                browsers: ['last 2 versions', '> 1%']
-            }),
-            require('postcss-reporter')()
-        ];
     },
     stats: {colors: true}
 };

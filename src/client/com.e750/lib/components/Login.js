@@ -3,11 +3,11 @@ import Component from './Component';
 import Evt from 'lib/event/Registry';
 import Validator from 'lib/util/Validator';
 
-var styles = require('!style!css!postcss!sass!./styles/Login.scss');
+const styles = require('./styles/Login');
 
 export default class Login extends Component {
     constructor (el, options = {}) {
-        Object.assign(options, {
+        let opts = Object.assign(options, {
             template: options.template || jst.getFromDOM('login'),
             id: 'ui/login',
             checkEndpoint: options.checkEndpoint || 'https://api.securecheckout.com/v1/cart/auth/username/',
@@ -107,16 +107,5 @@ export default class Login extends Component {
         }).catch(this.onXHRError.bind(this));
 
         return false;
-    }
-
-    render () {
-        try {
-            if (!this.el.dataset.mounted) {
-                this.el.insertBefore(jst.compileToDOM(this.template), this.el.children[0]);
-            }
-            return this;
-        } catch (e) {
-            throw e;
-        }
     }
 }
