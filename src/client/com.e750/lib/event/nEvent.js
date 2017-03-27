@@ -6,4 +6,6 @@ export default function nEvent (type = '', data = {}, target = null) {
     this.data = data;
     this.target = target;
     this.cancelled = false;
+
+    return this;
 }

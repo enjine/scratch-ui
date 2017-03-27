@@ -22,7 +22,7 @@ export default class ProductList extends Component {
                 type: 'json',
                 headers: {
                     'X-Auth-Token': storage.cookie.get('apiToken')
-                },
+                }
             }, fetchOpts = {};
 
             Object.assign(fetchOpts, defaults, this.options);

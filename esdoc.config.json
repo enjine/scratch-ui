@@ -9,8 +9,15 @@
     "source": "./test",
     "includes": ["\\.js$"]
   },
-  "plugins": [
-    {"name": "esdoc-es7-plugin"}
-  ],
+  "experimentalProposal": {
+    "classProperties": true,
+    "objectRestSpread": true,
+    "decorators": true,
+    "doExpressions": true,
+    "functionBind": true,
+    "asyncGenerators": true,
+    "exportExtensions": true,
+    "dynamicImport": true
+  },
   "lint": true
 }
