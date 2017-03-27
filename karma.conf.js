@@ -18,15 +18,6 @@ webpackConfig.module.loaders.unshift(
     }
 );
 
-
-if (process.env.NODE_ENV !== 'production') {
-    webpackConfig.module.loaders.unshift({
-        test: /\.js$/,
-        include: path.resolve('src/client'),
-        loaders: ['istanbul-instrumenter-loader']
-    });
-}
-
 webpackConfig.resolve.modules.push('test');
 webpackConfig.plugins.push(new webpack.LoaderOptionsPlugin({
     options: {
@@ -69,6 +60,7 @@ module.exports = function (config) {
             './test/server/**/*.js'
         ],
 
+        // support writing tests in ES6-7
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
         preprocessors: {
@@ -90,12 +82,13 @@ module.exports = function (config) {
 
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
         reporters: ['progress', 'mocha', 'notify', 'junit', 'coverage-istanbul'],
+
         coverageIstanbulReporter: {
             reports: ['html', 'text-summary'],
             dir: path.join(__dirname, 'reports', 'coverage'),
             'report-config': {
                 html: {
-                    // outputs the report in ./coverage/html
+                    // outputs the report in ./reports/coverage/html
                     subdir: 'html'
                 },
                 thresholds: {
@@ -156,10 +149,10 @@ module.exports = function (config) {
         //browsers: ['ChromeES6', 'ChromeCanaryES6', 'Firefox', 'Safari'],
         //browsers: ['Chrome', 'ChromeCanary', 'Firefox', 'Safari', 'PhantomJS'],
         //browsers: ['Chrome', 'PhantomJS', 'Firefox'], //'PhantomJS',
-        //browsers: ['Chrome', 'PhantomJS', 'Safari', 'Firefox'],
+        browsers: ['Chrome', 'PhantomJS', 'Safari', 'Firefox'],
         //browsers: ['Chrome', 'Firefox', 'Safari'],
         //browsers: ['Firefox'],
-        browsers: ['PhantomJS'],
+        //browsers: ['PhantomJS'],
 
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits
