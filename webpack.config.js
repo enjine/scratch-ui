@@ -10,7 +10,7 @@ module.exports = {
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
-        publicPath: '/',
+        publicPath: '/js',
         filename: '[name].js',
         //filename: '[name].[hash].js',
         //chunkFilename: '[id].[hash].js',
@@ -25,7 +25,6 @@ module.exports = {
             'node_modules'
         ],
         alias: {
-            sinon: 'sinon/pkg/sinon.js',
             lib: 'src/client/com.e750/lib',
             cart: 'src/client/com.e750/cart'
         },
@@ -33,6 +32,12 @@ module.exports = {
     },
     module: {
         loaders: [
+            {
+                enforce: 'pre',
+                test: /\.js$/,
+                exclude: /node_modules/,
+                loader: 'eslint-loader',
+            },
             {
                 test: /\.js$/,
                 loaders: ['babel-loader'],
@@ -56,6 +61,7 @@ module.exports = {
                 test: /\.(eot|ttf|svg|gif|png)$/,
                 loader: 'file-loader'
             }
+
         ]
     },
     stats: {colors: true}

@@ -222,7 +222,6 @@ Object.assign(Evented.prototype, {
             }
             return el.dispatchEvent(E);
         }
-        console.debug(typeof el, eventName, typeof el[eventName], element);
 
         if (typeof el[eventName] !== 'function') {
             throw new TypeError(`DOMElement.${eventName} is not callable!`);

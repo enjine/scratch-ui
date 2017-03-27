@@ -4,7 +4,6 @@ const path = require('path');
 const webpackConfig = require('./webpack.config.js');
 
 webpackConfig.entry = [];
-webpackConfig.module.noParse = [/\/sinon\.js/];
 webpackConfig.module.loaders.unshift(
     {
         test: /\.js$/,
@@ -16,29 +15,22 @@ webpackConfig.module.loaders.unshift(
             path.resolve(__dirname, 'test')
         ],
         exclude: /(node_modules|bower_components)/
-    },
-    {
-        test: /sinon\.js$/,
-        loaders: ['imports-loader']
-    },
-    {
-        test: /\.js$/,
-        include: path.resolve('src/client'),
-        loaders: ['isparta-loader']
     }
 );
+
+
+if (process.env.NODE_ENV !== 'production') {
+    webpackConfig.module.loaders.unshift({
+        test: /\.js$/,
+        include: path.resolve('src/client'),
+        loaders: ['istanbul-instrumenter-loader']
+    });
+}
+
 webpackConfig.resolve.modules.push('test');
 webpackConfig.plugins.push(new webpack.LoaderOptionsPlugin({
     options: {
         debug: true,
-        'imports-loader': [
-            'define=>false',
-            'require=>false'
-        ],
-        'isparta-loader': [{
-            embedSource: true,
-            noAutoWrap: true
-        }]
     }
 }));
 
@@ -49,7 +41,7 @@ module.exports = function (config) {
         basePath: '',
 
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-        frameworks: ['mocha', 'sinon-chai', 'phantomjs-shim'],
+        frameworks: ['mocha', 'chai', 'sinon', 'better-sinon-chai'],
 
         client: {
             captureConsole: true,
@@ -97,8 +89,24 @@ module.exports = function (config) {
         },
 
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-        reporters: ['progress', 'mocha', 'notify', 'coverage', 'junit'],
-
+        reporters: ['progress', 'mocha', 'notify', 'junit', 'coverage-istanbul'],
+        coverageIstanbulReporter: {
+            reports: ['html', 'text-summary'],
+            dir: path.join(__dirname, 'reports', 'coverage'),
+            'report-config': {
+                html: {
+                    // outputs the report in ./coverage/html
+                    subdir: 'html'
+                },
+                thresholds: {
+                    statements: 80,
+                    lines: 80,
+                    branches: 80,
+                    functions: 90
+                },
+                fixWebpackSourcePaths: true
+            }
+        },
         mochaReporter: {
             output: 'full' //full, autowatch, minimal
         },
@@ -108,14 +116,6 @@ module.exports = function (config) {
             outputDir: './reports/junit',
             outputFile: 'test-results.xml',
             suite: ''
-        },
-
-        coverageReporter: {
-            dir: './reports/coverage',
-            reporters: [
-                {type: 'html', subdir: 'html'},
-                {type: 'text', subdir: '.'}
-            ]
         },
 
         notifyReporter: {
@@ -156,10 +156,10 @@ module.exports = function (config) {
         //browsers: ['ChromeES6', 'ChromeCanaryES6', 'Firefox', 'Safari'],
         //browsers: ['Chrome', 'ChromeCanary', 'Firefox', 'Safari', 'PhantomJS'],
         //browsers: ['Chrome', 'PhantomJS', 'Firefox'], //'PhantomJS',
-        browsers: ['Chrome', 'PhantomJS', 'Safari'],
+        //browsers: ['Chrome', 'PhantomJS', 'Safari', 'Firefox'],
         //browsers: ['Chrome', 'Firefox', 'Safari'],
         //browsers: ['Firefox'],
-        //browsers: ['PhantomJS'],
+        browsers: ['PhantomJS'],
 
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits

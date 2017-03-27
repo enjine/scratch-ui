@@ -66,7 +66,7 @@ describe('Progressable.mixin', function () {
         expect(testeeC.hideProgress.bind(testeeC)).to.throw(Error);
     });
 
-    it('Throws when the no <progress> element is present', function () {
+    it('Throws when there is no <progress> element present', function () {
         expect(testeeF.hideProgress.bind(testeeF)).to.throw(Error);
         expect(testeeC.hideProgress.bind(testeeC)).to.throw(Error);
     });

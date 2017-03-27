@@ -2,6 +2,7 @@
 import {settings} from 'setup';
 
 let expect = settings.assertions.expect;
+let mocks = settings.mocking;
 
 export var EmitterMixinBehavior = {
     describe: function () {
@@ -51,16 +52,6 @@ export var EmitterMixinBehavior = {
 
             it('Implements unsubscribe().', () => {
                 expect(o).to.respondTo('unsubscribe');
-            });
-        });
-
-        xdescribe('Sending Payloads', () => {
-            it('When an event is dispatched, any number of values can be passed along.', () => {
-
-            });
-
-            it('Values will be provided as arguments to the callback, in the same order they were passed', () => {
-
             });
         });
     }

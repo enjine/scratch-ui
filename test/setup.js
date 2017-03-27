@@ -1,6 +1,6 @@
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
-import sinon from 'sinon/pkg/sinon.js';
+import sinon from 'sinon';
 const axios = require('axios');
 const mockAxios = require('axios-mock-adapter');
 

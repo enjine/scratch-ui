@@ -3,6 +3,7 @@
 import {settings} from 'setup';
 import compose from 'lib/util/compose';
 import {htmlToDom} from 'lib/util/DOM';
+import {nEvent} from 'lib/event/nEvent';
 import {EmitterMixinBehavior} from 'behaviors/emitter';
 
 let expect = settings.assertions.expect;
@@ -38,7 +39,7 @@ function verifyMixin (obj) {
 }
 
 describe('Evented.mixin', () => {
-    before(() => {
+    beforeEach(() => {
         testeeFunc = new testFunc();
         testeeClass = new testClass();
         spy = mocks.spy();
@@ -202,7 +203,7 @@ describe('Evented.mixin', () => {
         it('Delegates an event handler to child elements matching the selector', () => {
             let el = htmlToDom('<div><h1>Hello test <a href="#">decoy</a></h1>  <ul><li><a href="#">one</a></li><li><a href="#">2</a></li><li><a href="#">three</a></li></ul></div>'),
                 cb = mocks.spy(e => {
-                    console.log('wahoo', e);
+                    //console.log('wahoo', e);
                 });
 
             testeeFunc.el = el;
@@ -240,7 +241,7 @@ describe('Evented.mixin', () => {
         it('Delegates and calls only once', () => {
             let el = htmlToDom('<div><h1>Hello test 2 <a href="#">decoy</a></h1>  <ul><li><a href="#">one</a></li><li><a href="#">2</a></li><li><a href="#">three</a></li></ul></div>'),
                 cb = mocks.spy(e => {
-                    console.log('wahooOnce', e);
+                    //console.log('wahooOnce', e);
                 });
 
             testeeFunc.el = el;
@@ -318,7 +319,7 @@ describe('Evented.mixin', () => {
 
         it('Triggers DOM Events', () => {
             let cb = mocks.spy(e => {
-                    console.log('triggered!', e);
+                    //console.log('triggered!', e);
                 }),
                 doc;
 
@@ -395,6 +396,24 @@ describe('Evented.mixin', () => {
             testeeFunc.emit('click');
 
             cb.should.have.callCount(2);
+        });
+
+        it('Values will be provided as arguments to the callback, in the same order they were passed', async () => {
+            let s = mocks.spy(),
+                cb = mocks.spy((...args) => {
+                    expect(args[0]).to.be.an.instanceOf(nEvent);
+                    expect(args[0].data).to.eql({test: true, s});
+                    expect(args[1]).to.eql({second: true});
+                    expect(args[2]).to.eql({third: true});
+                });
+
+            testeeFunc.on('test', cb);
+            await testeeClass.emit('test', {test: true, s}, {second: true}, {third: true});
+
+            expect(cb).to.have.been.calledOnce;
+            // dunno why this is not working... grrr.
+            //cb.should.have.been.calledWithMatch({second: true}, {third: true});
+
         });
     });
     describe('subscribe()', () => {

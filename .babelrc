@@ -1,8 +1,19 @@
 {
-    "presets": ["babel-preset-es2015", "stage-0", "react"],
-    "plugins": [
-        "add-module-exports",
-        "transform-runtime",
-        "transform-decorators-legacy"
-    ]
+  "presets": [
+    "es2015",
+    "stage-0",
+    "react"
+  ],
+  "plugins": [
+    "add-module-exports",
+    "transform-runtime",
+    "transform-decorators-legacy"
+  ],
+  "env": {
+    "test": {
+      "plugins": [
+        "istanbul"
+      ]
+    }
+  }
 }

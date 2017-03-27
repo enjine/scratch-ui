@@ -70,8 +70,8 @@ function dispatch (channel, payload, args) {
             let handler = channelSubs[recipient],
                 ret;
 
-            //console.log('dispatch!', 'evt:', channel, 'rcp:', recipient, 'fn:', handler, 'data:', payload, 'args:', args);
-            ret = handler(payload, args);
+            //console.debug('dispatch!', 'evt:', channel, 'rcp:', recipient, 'fn:', handler, 'data:', payload, 'args:', ...args);
+            ret = handler(payload, ...args);
             responses.push(ret || 0);
         }
         //console.log('responses', responses);
