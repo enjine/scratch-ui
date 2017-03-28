@@ -144,7 +144,7 @@ describe('Models::Product', () => {
 
         before(() => {
             mockRequest.onGet('/api/product/23').reply(200, fakeModelResponse);
-            mocks.stub(p, 'request', function (url, options) {
+            mocks.stub(p, 'request').callsFake(function (url, options) {
                 options.url = url;
                 return net.request(options);
             });

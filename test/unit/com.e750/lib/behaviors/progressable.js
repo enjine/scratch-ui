@@ -35,9 +35,9 @@ describe('Progressable.mixin', function () {
     });
     it('Must be mixed into an object with the `el` property set to a DOM element and have  <progress> element as a child)', () => {
         let pF = document.createElement('progress'),
-            pC = document.createElement('progress'),
-            pChildF = testeeF.el.appendChild(pF),
-            pChildC = testeeC.el.appendChild(pC);
+            pC = document.createElement('progress');
+        testeeF.el.appendChild(pF);
+        testeeC.el.appendChild(pC);
 
         expect(testeeC.el).to.be.ok;
         expect(testeeC.el).to.be.ok;

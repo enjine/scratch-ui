@@ -2,9 +2,9 @@
 import {settings} from 'setup';
 
 let expect = settings.assertions.expect;
-let mocks = settings.mocking;
+//let mocks = settings.mocking;
 
-export var EmitterMixinBehavior = {
+export const EmitterMixinBehavior = {
     describe: function () {
         return 'Mixes the Evented behavior.';
     },

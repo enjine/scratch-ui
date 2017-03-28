@@ -1,5 +1,4 @@
 import Component from './Component';
-import Evt from 'lib/event/Registry';
 import {storage} from 'lib/core';
 import Validator from 'lib/util/Validator';
 

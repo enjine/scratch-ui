@@ -41,7 +41,7 @@ describe('Can make network requests.', function () {
                 console.log('MOCK XHR: ', config);
                 return [200, fakeResponse];
             });
-            mocks.stub(o, 'request', function (url, options) {
+            mocks.stub(o, 'request').callsFake(function (url, options) {
                 options.url = url;
                 o.emit(Evt.BEFORE_XHR);
                 return net.request(options);

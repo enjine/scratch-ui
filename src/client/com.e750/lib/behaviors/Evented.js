@@ -3,17 +3,14 @@ import {
     isNativeEvent as isNative,
     addHandler,
     removeHandler,
-    getEventPath,
-    eventPathContains,
-    isBindable
+    eventPathContains
 } from 'lib/event/utils';
 import {isElement, isNode, elementMatchesSelector} from 'lib/util/DOM';
 import guid from 'lib/util/guid';
 import nEvent from 'lib/event/nEvent';
 
 
-export default function Evented () {
-};
+export default function Evented () {}
 
 Object.assign(Evented.prototype, {
     /**
@@ -125,9 +122,8 @@ Object.assign(Evented.prototype, {
      * @param context
      * @returns {*}
      */
-    on: function (eventNames, handler, context) {
-        let delegate = this.el || this,
-            ctx = context || this;
+    on: function (eventNames, handler) {
+        let delegate = this.el || this;
 
         return addHandler(delegate, eventNames, handler).reduce((ret, result) => {
             let subscription;

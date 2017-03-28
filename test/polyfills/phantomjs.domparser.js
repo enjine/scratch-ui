@@ -22,7 +22,7 @@
             // text/html parsing is natively supported
             return;
         }
-    } catch (ex) {}
+    } catch (ex) {} // eslint-disable-line no-empty
 
     DOMParser_proto.parseFromString = function (markup, type) {
         if (/^\s*text\/html\s*(?:;|$)/i.test(type)) {

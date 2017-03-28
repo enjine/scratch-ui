@@ -4,7 +4,6 @@ import {settings} from 'setup';
 import compose from 'lib/util/compose';
 import {htmlToDom} from 'lib/util/DOM';
 import {nEvent} from 'lib/event/nEvent';
-import {EmitterMixinBehavior} from 'behaviors/emitter';
 
 let expect = settings.assertions.expect;
 let mocks = settings.mocking;
@@ -20,11 +19,11 @@ class testClass extends compose(Evented) {
     }
 }
 
-let testFunc = function () {
+var testFunc = function () {
     },
     testeeFunc,
     testeeClass,
-    spy, spy2;
+    spy, spy2; // eslint-disable-line no-unused-vars
 
 testFunc.prototype = new Evented();
 
@@ -92,7 +91,7 @@ describe('Evented.mixin', () => {
 
         });
 
-        it('Event handlers are invoked once each time an event fires', () => {
+        it('Event handlers are invoked sonce each time an event fires', () => {
             let cb = mocks.spy(() => {
             });
 
@@ -116,7 +115,7 @@ describe('Evented.mixin', () => {
 
     describe('detachEvents()', () => {
         it('Removes all attached event listeners', () => {
-            let spy = mocks.spy(),
+            let spy = mocks.spy(), // eslint-disable-line no-shadow
                 subs = testeeFunc.on('a b c d', spy);
             expect(testeeFunc.subscriptions.length).to.equal(subs.length);
             expect(subs.length).to.equal(4);
@@ -138,13 +137,13 @@ describe('Evented.mixin', () => {
 
     describe('off()', () => {
         it('Removing event listeners stops them from being called when the respective event fires', () => {
-            let subs = testeeFunc.on('bing bong', spy2);
+            testeeFunc.on('bing bong', spy2);
             testeeFunc.emit('bing');
             testeeClass.emit('bing');
             testeeClass.emit('bong');
             spy2.should.have.callCount(3);
 
-            let unsubs = testeeFunc.off('bong bing', spy2);
+            testeeFunc.off('bong bing', spy2);
             testeeFunc.emit('bing');
             testeeClass.emit('bing');
             testeeClass.emit('bong');
@@ -169,9 +168,9 @@ describe('Evented.mixin', () => {
         });
 
         it('Removing an event that was not attached returns an empty array', () => {
-            let cb = () => {
-                },
-                subs = testeeClass.on('clack flap', cb),
+            let cb = () => {},
+                unsubs;
+                testeeClass.on('clack flap', cb);
                 unsubs = testeeClass.off('yack', cb);
 
             expect(unsubs).to.be.an.instanceof(Array);
@@ -183,8 +182,8 @@ describe('Evented.mixin', () => {
             let cb = mocks.spy(() => {
                     console.log('BOUND!!');
                 }),
-                subs = testeeClass.on('rip rop', cb.bind(cb)),
                 unsubs;
+                testeeClass.on('rip rop', cb.bind(cb));
 
             testeeClass.emit('rip');
             testeeClass.emit('rop');
@@ -202,9 +201,7 @@ describe('Evented.mixin', () => {
     describe('delegate()', () => {
         it('Delegates an event handler to child elements matching the selector', () => {
             let el = htmlToDom('<div><h1>Hello test <a href="#">decoy</a></h1>  <ul><li><a href="#">one</a></li><li><a href="#">2</a></li><li><a href="#">three</a></li></ul></div>'),
-                cb = mocks.spy(e => {
-                    //console.log('wahoo', e);
-                });
+                cb = mocks.spy();
 
             testeeFunc.el = el;
             testeeFunc.render = () => {
@@ -240,9 +237,7 @@ describe('Evented.mixin', () => {
     describe('delegateOnce()', () => {
         it('Delegates and calls only once', () => {
             let el = htmlToDom('<div><h1>Hello test 2 <a href="#">decoy</a></h1>  <ul><li><a href="#">one</a></li><li><a href="#">2</a></li><li><a href="#">three</a></li></ul></div>'),
-                cb = mocks.spy(e => {
-                    //console.log('wahooOnce', e);
-                });
+                cb = mocks.spy();
 
             testeeFunc.el = el;
             testeeFunc.render = () => {
@@ -318,10 +313,8 @@ describe('Evented.mixin', () => {
         });
 
         it('Triggers DOM Events', () => {
-            let cb = mocks.spy(e => {
-                    //console.log('triggered!', e);
-                }),
-                doc;
+            let cb = mocks.spy(),
+                doc; // eslint-disable-line no-unused-vars
 
             testeeFunc.el = el;
             testeeClass.el = htmlToDom('<a href="#"><h1>eep</h1></a>');
@@ -435,8 +428,7 @@ describe('Evented.mixin', () => {
     describe('unsubscribe()', () => {
         it('Removes a pub/sub event handler', () => {
             let cb = mocks.spy(),
-                subs = testeeFunc.subscribe('channelOne', cb),
-                unsubs;
+                subs = testeeFunc.subscribe('channelOne', cb);
 
             expect(subs.length).to.equal(1);
             expect(subs[0].id).to.be.ok;
@@ -448,7 +440,7 @@ describe('Evented.mixin', () => {
 
             cb.should.have.callCount(2);
 
-            unsubs = testeeFunc.unsubscribe('channelOne', cb);
+            testeeFunc.unsubscribe('channelOne', cb);
 
             expect(subs.length).to.equal(1);
             expect(subs[0].id).to.be.falsy;

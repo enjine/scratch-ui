@@ -35,7 +35,7 @@ module.exports = function (config) {
         frameworks: ['mocha', 'chai', 'sinon', 'better-sinon-chai'],
 
         client: {
-            captureConsole: true,
+            //captureConsole: true,
             mocha: {
                 reporter: 'html', // change Karma's debug.html to the mocha web reporter
                 ui: 'bdd'
@@ -81,7 +81,7 @@ module.exports = function (config) {
         },
 
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-        reporters: ['progress', 'mocha', 'notify', 'junit', 'coverage-istanbul'],
+        reporters: ['mocha', 'notify', 'junit', 'coverage-istanbul'],
 
         coverageIstanbulReporter: {
             reports: ['html', 'text-summary'],
@@ -101,7 +101,8 @@ module.exports = function (config) {
             }
         },
         mochaReporter: {
-            output: 'full' //full, autowatch, minimal
+            output: 'autowatch',
+            showDiff: true
         },
 
         // unit tests JUNIT reporter for Bamboo
@@ -149,10 +150,10 @@ module.exports = function (config) {
         //browsers: ['ChromeES6', 'ChromeCanaryES6', 'Firefox', 'Safari'],
         //browsers: ['Chrome', 'ChromeCanary', 'Firefox', 'Safari', 'PhantomJS'],
         //browsers: ['Chrome', 'PhantomJS', 'Firefox'], //'PhantomJS',
-        browsers: ['Chrome', 'PhantomJS', 'Safari', 'Firefox'],
+        //browsers: ['Chrome', 'PhantomJS', 'Safari', 'Firefox'],
         //browsers: ['Chrome', 'Firefox', 'Safari'],
         //browsers: ['Firefox'],
-        //browsers: ['PhantomJS'],
+        browsers: ['PhantomJS'],
 
         // Continuous Integration mode
         // if true, Karma captures browsers, runs the tests and exits

@@ -107,10 +107,9 @@ export default class Collection {
     }
 
     fetch (options = {}) {
-        let response = this.request(this.verifyResource(options.url), options).then((response) => {
+        return this.request(this.verifyResource(options.url), options).then((response) => {
             this.parse(response.data);
         }, this.onParseFailed.bind(this), 'collection.fetch');
-        return response;
     }
 
     get (index) {

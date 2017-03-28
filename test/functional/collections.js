@@ -106,7 +106,7 @@ describe('Collections::ProductCollection', () => {
             mockRequest.onGet(/.*/).reply(() => {
                 return [200, fakeCollectionResponse];
             });
-            mocks.stub(pc, 'request', function (url, options) {
+            mocks.stub(pc, 'request').callsFake(function (url, options) {
                 options.url = url;
                 pc.emit(Evt.BEFORE_XHR);
                 return net.request(options);

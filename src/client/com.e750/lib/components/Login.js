@@ -3,11 +3,11 @@ import Component from './Component';
 import Evt from 'lib/event/Registry';
 import Validator from 'lib/util/Validator';
 
-const styles = require('./styles/Login');
+const styles = require('./styles/Login'); // eslint-disable-line no-unused-vars
 
 export default class Login extends Component {
     constructor (el, options = {}) {
-        let opts = Object.assign(options, {
+        Object.assign(options, {
             template: options.template || jst.getFromDOM('login'),
             id: 'ui/login',
             checkEndpoint: options.checkEndpoint || 'https://api.securecheckout.com/v1/cart/auth/username/',

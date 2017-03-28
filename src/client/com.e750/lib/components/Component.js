@@ -13,7 +13,7 @@ export default class Component extends View {
 
     constructor (el, options = {}) {
         super(options);
-        this.initProps(el);
+        this.initProps();
         this.ensureElement(el);
         this.initState();
     }
@@ -22,7 +22,7 @@ export default class Component extends View {
         return this;
     }
 
-    initProps (el) {
+    initProps () {
         this.id = this.options.id || this.generateComponentId();
         this.modelClass = this.options.modelClass || Component.modelClass;
         this.collectionClass = this.options.modelClass || Component.collectionClass;

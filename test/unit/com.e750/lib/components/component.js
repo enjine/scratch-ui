@@ -4,7 +4,7 @@ import {settings} from 'setup';
 import {levenshtein } from 'lib/util/core';
 
 let expect = settings.assertions.expect;
-let mocks = settings.mocking;
+//let mocks = settings.mocking;
 //let mockRequest = settings.net.mock;
 //let net = settings.net.request;
 

@@ -1,6 +1,6 @@
 import utils from 'lib/util/core';
 
-const styles = require('./styles/Progress');
+const styles = require('./styles/Progress'); // eslint-disable-line no-unused-vars
 
 const Progressable = function () {};
 

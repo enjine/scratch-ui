@@ -27,7 +27,7 @@ describe('Component/Login.class', () => {
         // template is OK
         expect(login.template).to.equal(options.template);
         // id equals 'ui/login'
-        expect(login.id).to.be.ok
+        expect(login.id).to.be.ok;
         // checkEndpoint is OK
         expect(login.options.checkEndpoint).to.equal(options.checkEndpoint);
         // authEndpoint is OK
@@ -43,10 +43,10 @@ describe('Component/Login.class', () => {
 
     it('onUsernameInput - PASS -- REWRITE THIS', function () {
         // stub out checkUsername
-        let checkUsername = mocks.stub(login, 'checkUsername', username => {
-                return {data: true};
+        let checkUsername = mocks.stub(login, 'checkUsername').callsFake(username => {
+                return {data: true, username};
             }),
-            onUsernameInput = mocks.stub(login, 'onUsernameInput', e => {
+            onUsernameInput = mocks.stub(login, 'onUsernameInput').callsFake(e => {
                 login.indicator.dataset.isvalid = login.checkUsername(e.target.value).data;
             }),
             e = {target: {value: 'alice'}};
@@ -59,10 +59,10 @@ describe('Component/Login.class', () => {
 
     it('onUsernameInput - FAIL -- REWRITE THIS', function () {
         // stub out checkUsername
-        let checkUsername = mocks.stub(login, 'checkUsername', username => {
-                return {data: false};
+        let checkUsername = mocks.stub(login, 'checkUsername').callsFake(username => {
+                return {data: false, username};
             }),
-            onUsernameInput = mocks.stub(login, 'onUsernameInput', e => {
+            onUsernameInput = mocks.stub(login, 'onUsernameInput').callsFake(e => {
                 login.indicator.dataset.isvalid = login.checkUsername(e.target.value).data;
             }),
             e = {target: {value: false}};
