@@ -9,7 +9,7 @@ console.log('Running in ' + ENV + ' mode!!');
 
 const variants = {
     minified: [true, false],
-    target: ['umd', 'commonjs2']
+    target: ['umd']
 };
 
 const baseProps = {devtool: 'hidden-source-map'};

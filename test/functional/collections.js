@@ -122,6 +122,7 @@ describe('Collections::ProductCollection', () => {
 
         it('receives JSON back from the API.', () => {
             thenable = pc.request(reqOpts.url, reqOpts).then((response) => {
+                console.debug(response);
                 expect(response.data).to.deep.equal(JSON.parse(fakeCollectionResponse));
             });
 
@@ -130,8 +131,8 @@ describe('Collections::ProductCollection', () => {
         });
 
         it('Parses a non-empty response into an array of Product models.', () => {
+            pc.parse(JSON.parse(fakeCollectionResponse));
             let models = pc.models;
-            pc.parse(fakeCollectionResponse);
             expect(models).to.not.be.empty;
             expect(models).to.be.an.instanceof(Array);
             expect(models).to.have.length.above(0);
@@ -156,7 +157,7 @@ describe('Collections::ProductCollection', () => {
                 let json;
                 expect(pc).to.respondTo('toMeta');
                 json = pc.toJSON();
-                expect(json).to.be.a('string'); //passes
+                expect(json).to.be.a('string');
             });
 
             it('Implements a `serialize` method to return all models attributes as an array of JS objects.', () => {

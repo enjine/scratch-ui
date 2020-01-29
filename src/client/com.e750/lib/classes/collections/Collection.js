@@ -26,12 +26,21 @@ export default class Collection {
     }
 
     add (data) {
-        let m = data;
-        if (!m instanceof this.modelClass) {
-            m = new this.modelClass(data);
+        let items = data,
+            added,
+            models = this.models;
+        if (!Array.isArray(data)) {
+            items = [data];
         }
-        this.models.push(m);
-        this.emit(Evt.COLLECTION_ADD, m);
+
+        added = items.map(item => {
+            if (item instanceof this.modelClass) {
+                return item;
+            }
+            return new this.modelClass(item);
+        });
+        this.models = models.concat(added);
+        this.emit(Evt.COLLECTION_ADD, added);
     }
 
     remove (index) {
@@ -52,22 +61,8 @@ export default class Collection {
     parse (data) {
         //console.log('incoming models data:', data, Object.getOwnPropertyNames(data), data.length);
         try {
-            if (!data) throw new Error('Incoming data has zero length');
-
-            if (data[0] instanceof this.modelClass) {
-                data.forEach((m) => {
-                    this.add(m);
-                });
-            } else {
-                let item;
-                for (item in data) {
-                    if (data.hasOwnProperty(item)) {
-                        let m = new this.modelClass(data[item]);
-                        //console.log('new models:', m, item, 'data:', data[item]);
-                        this.add(m);
-                    }
-                }
-            }
+            if (!data && !data.length) throw new Error('Incoming data has zero length');
+            this.add(data);
         } catch (e) {
             console.warn(e);
         }
