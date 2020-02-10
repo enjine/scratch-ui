@@ -1,6 +1,6 @@
 import Application from "lib/components/Application";
 
-export default class e750 extends Application {
+export default class Scratch extends Application {
   constructor(rootNode, options = {}) {
     super(rootNode, options);
 

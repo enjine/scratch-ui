@@ -8,7 +8,7 @@ export default class Application extends Component {
   start() {
     this.VERSION = "<{version}>";
     this.emit(Evt.APP_START, { appVer: this.VERSION });
-    console.info("e750.js v" + this.VERSION);
+    console.info("scratch-ui.js v" + this.VERSION);
     return this;
   }
 

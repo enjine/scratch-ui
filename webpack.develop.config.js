@@ -9,7 +9,7 @@ const ENV = process.env.NODE_ENV || "development";
 console.log("Running in " + ENV + " mode!!");
 
 defaultConfig.entry = {
-  E750: [
+  Scratch: [
     "webpack-dev-server/client?http://0.0.0.0:8000",
     // bundle the client for webpack-dev-server
     // and connect to the provided endpoint
@@ -66,7 +66,7 @@ const plugins = defaultPlugins.concat([
       "https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"
     ],
     window: {
-      E750: {
+      Scratch: {
         config: {
           fixtures: {
             quantities: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]

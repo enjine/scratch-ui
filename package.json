@@ -121,8 +121,7 @@
     "build": "NODE_ENV=production ./node_modules/.bin/parallel-webpack --config=./webpack.master.config.js --display-error-details --progress",
     "postbuild": "esdoc -c ./esdoc.config.json && npm run metrics",
     "babel": "babel --optional runtime src/client/net.enjine --out-dir ./build/babel",
-    "copy": "cp dist/*.js ~/Sync/Clients/750Group/e750.laravel/e750/core/resources/assets/js",
-    "metrics": "node --use_strict ./node_modules/.bin/es6-plato -r -t 'e750.js MicroFramework' -d ./reports/metrics ./src/client"
+    "metrics": "node --use_strict ./node_modules/.bin/es6-plato -r -t 'Scratch UI MicroFramework' -d ./reports/metrics ./src/client"
   },
   "author": "Alessandro Di Candia",
   "license": "BSD"

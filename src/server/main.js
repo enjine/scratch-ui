@@ -7,7 +7,6 @@ var cookieParser = require("cookie-parser");
 var rp = require("request-promise");
 var errors = require("request-promise/errors");
 
-// e750 com.e750
 var routeFilters = require("./filters");
 
 var app;

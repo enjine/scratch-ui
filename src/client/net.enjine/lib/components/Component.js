@@ -100,8 +100,8 @@ class Component extends View {
   }
 
   getBootstrap() {
-    if (window.E750 && window.E750.bootstrap) {
-      return window.E750.bootstrap[this.constructor.name] || [];
+    if (window.Scratch && window.Scratch.bootstrap) {
+      return window.Scratch.bootstrap[this.constructor.name] || [];
     }
     return [];
   }
