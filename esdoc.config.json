@@ -1,5 +1,5 @@
 {
-  "title": "e750 Micro Framework",
+  "title": "UI Framework From Scratch",
   "package": "./package.json",
   "coverage": true,
   "source": "./src",

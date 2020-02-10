@@ -268,10 +268,10 @@
 <% } %>
 
 <script>
-    var config = window.E750.config || {},
+    var config = window.Scratch.config || {},
         fixtures = config.fixtures || {},
         options = config.options || {},
-        app = new window.E750.App(options.rootEl || 'body', {fixtures: fixtures, options: options});
+        app = new window.Scratch.UI(options.rootEl || 'body', {fixtures: fixtures, options: options});
     document.addEventListener('DOMContentLoaded', app.start.bind(app), false);
 </script>
 </body>

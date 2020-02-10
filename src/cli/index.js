@@ -1,2 +1,1 @@
-import 'core-js'; // Node module
-
+import "core-js"; // Node module

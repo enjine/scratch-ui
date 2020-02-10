@@ -16,4 +16,4 @@
  * var imported = require('myModule').default
  */
 
-module.exports = require('./src/client/main');
+module.exports = require("./src/client/main");
