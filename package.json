@@ -9,9 +9,9 @@
     "url": "git@github.com:enjine/scratch-ui.git"
   },
   "dependencies": {
-    "axios": "^0.15.3",
     "@babel/polyfill": "^7.0.0",
     "@babel/runtime-corejs2": "^7.0.0",
+    "axios": "^0.19.2",
     "cookies-js": "^1.2.2",
     "es6-promise": "^4.1.0",
     "mustache": "^2.0.0"
