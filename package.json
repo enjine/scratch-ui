@@ -100,7 +100,7 @@
     "url-loader": "^0.5.7",
     "webpack": "^2.0.0",
     "webpack-auto-inject-version": "^0.2.11",
-    "webpack-dev-server": "^2.4.2"
+    "webpack-dev-server": "^3.1.11"
   },
   "engines": {
     "node": "12.14.1"
