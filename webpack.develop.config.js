@@ -87,7 +87,8 @@ module.exports = Object.assign({}, defaultConfig, {
     port: process.env.PORT || 8000,
     host: "0.0.0.0",
     hot: true,
-    publicPath: "/js",
+    //publicPath: "/js",
+    publicPath: "/",
     contentBase: "./src",
     historyApiFallback: true
     /*proxy: [{

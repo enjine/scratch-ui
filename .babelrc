@@ -10,7 +10,7 @@
         "legacy": true
       }
     ],
-    "@babel/transform-runtime"
+    "@babel/plugin-proposal-class-properties"
   ],
   "env": {
     "test": {

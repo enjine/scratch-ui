@@ -10,7 +10,7 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, "dist"),
-    publicPath: "/js",
+    publicPath: "/",
     filename: "[name].js",
     //filename: '[name].[hash].js',
     //chunkFilename: '[id].[hash].js',
